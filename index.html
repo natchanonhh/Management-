@@ -7,7 +7,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; margin: 0; padding: 20px; }
-        .admin-box { max-width: 500px; background: white; margin: 40px auto; padding: 30px; border-radius: 16px; box-shadow: 0 8px 24px rgba(0,0,0,0.08); }
+        .admin-box { max-width: 500px; background: white; margin: 20px auto; padding: 30px; border-radius: 16px; box-shadow: 0 8px 24px rgba(0,0,0,0.08); }
         h2 { margin-top: 0; color: #1a1a1a; text-align: center; font-weight: 600; }
         .form-group { margin-bottom: 18px; }
         label { display: block; margin-bottom: 6px; font-weight: 600; color: #444; font-size: 14px; }
@@ -16,6 +16,9 @@
         button { width: 100%; padding: 14px; background: #0066ff; color: white; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; font-weight: bold; }
         #admin-panel { display: none; }
         .result-link { background: #e6f4ea; padding: 16px; border-radius: 8px; border: 1px solid #ceead6; word-break: break-all; margin-top: 20px; display: none; }
+        
+        /* กล่องรายงานปัญหาพิเศษสำหรับ iPad */
+        .debug-console { max-width: 500px; margin: 20px auto; background: #202124; color: #ff5252; padding: 15px; border-radius: 8px; font-family: monospace; font-size: 13px; text-align: left; box-sizing: border-box; }
     </style>
 </head>
 <body>
@@ -24,13 +27,13 @@
         <h2>Admin Management</h2>
         <div class="form-group">
             <label>อีเมลผู้ดูแลระบบ</label>
-            <input type="email" id="admin-email" placeholder="admin@example.com">
+            <input type="email" id="admin-email" placeholder="admin@example.com" value="">
         </div>
         <div class="form-group">
             <label>รหัสผ่าน</label>
-            <input type="password" id="admin-password" placeholder="******">
+            <input type="password" id="admin-password" placeholder="******" value="">
         </div>
-        <button onclick="loginAdmin()" id="login-btn">เข้าสู่ระบบ</button>
+        <button type="button" onclick="window.loginAdmin()" id="login-btn">เข้าสู่ระบบ</button>
     </div>
 
     <div id="admin-panel" class="admin-box">
@@ -39,43 +42,72 @@
         <div class="form-group"><label>2. เลือกไฟล์</label><input type="file" id="file-input"></div>
         <div class="form-group"><label>3. คำสั่งให้หน้าบ้านกรอก (Smart Login Prompt)</label><input type="text" id="login-prompt"></div>
         <div class="form-group"><label>4. รหัสที่อนุญาตให้เข้าดูได้ (คั่นด้วย ,)</label><textarea id="allowed-credentials" rows="4"></textarea></div>
-        <button onclick="uploadDataAndSetRules()" style="background: #0d904f;">อัปโหลดและสร้างลิงก์</button>
+        <button type="button" onclick="window.uploadDataAndSetRules()" style="background: #0d904f;">อัปโหลดและสร้างลิงก์</button>
         <div id="result-box" class="result-link">
             <strong style="color: #0d904f;">สร้างลิงก์สำเร็จ!</strong><br>
             <a id="share-link" href="#" target="_blank" style="color: #0066ff; font-weight: 500;">กำลังสร้างลิงก์...</a>
         </div>
     </div>
 
+    <div class="debug-console">
+        <strong style="color: #white;">ระบบตรวจจับสถานะ (System Status):</strong>
+        <div id="debug-text" style="color: #00ff00; margin-top: 5px;">ระบบพร้อมใช้งาน กรุณากดเข้าสู่ระบบ...</div>
+    </div>
+
     <script>
         const SUPABASE_URL = 'https://qspfyaqsnbtyzqcvfzsd.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFzcGZ5YXFzbmJ0eXpxY3ZmenNkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIxMTgzOTMsImV4cCI6MjA5NzY5NDM5M30.je7dDqR3XnHP3SwNgUCM4Ae2DnajhLGAUh0wnSKCh2c';
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        
+        // ตรวจสอบความถูกต้องของการดึงไลบรารี
+        let supabase;
+        try {
+            supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        } catch(e) {
+            document.getElementById('debug-text').innerText = 'ไม่สามารถเชื่อมต่อ Supabase SDK ได้: ' + e.message;
+            document.getElementById('debug-text').style.color = '#ff5252';
+        }
 
-        async function loginAdmin() {
+        // ฟังก์ชันล็อกอินแบบบังคับแสดงข้อผิดพลาด
+        window.loginAdmin = async function() {
+            const debugText = document.getElementById('debug-text');
+            const btn = document.getElementById('login-btn');
+            const email = document.getElementById('admin-email').value.trim();
+            const password = document.getElementById('admin-password').value.trim();
+            
+            debugText.innerText = 'กำลังพยายามส่งข้อมูลล็อกอินไปยัง Supabase...';
+            debugText.style.color = '#ffea00';
+            btn.innerText = 'กำลังตรวจสอบ...';
+
+            if(!email || !password) {
+                debugText.innerText = 'ข้อผิดพลาด: กรุณากรอกอีเมลและรหัสผ่านให้ครบถ้วน';
+                debugText.style.color = '#ff5252';
+                btn.innerText = 'เข้าสู่ระบบ';
+                return;
+            }
+
             try {
-                const email = document.getElementById('admin-email').value;
-                const password = document.getElementById('admin-password').value;
-                const btn = document.getElementById('login-btn');
-                
-                btn.innerText = 'กำลังตรวจสอบ...';
-                
                 const { data, error } = await supabase.auth.signInWithPassword({ email, password });
 
                 if (error) {
-                    alert('เข้าสู่ระบบไม่สำเร็จ สาเหตุ: ' + error.message); // เด้งแจ้งเตือน Error
+                    debugText.innerText = 'Supabase ปฏิเสธการเข้าสู่ระบบ: ' + error.message;
+                    debugText.style.color = '#ff5252';
                     btn.innerText = 'เข้าสู่ระบบ';
                 } else {
+                    debugText.innerText = 'ล็อกอินสำเร็จ! กำลังเข้าสู่หน้าจอจัดการข้อมูล';
+                    debugText.style.color = '#00ff00';
                     document.getElementById('login-panel').style.display = 'none';
                     document.getElementById('admin-panel').style.display = 'block';
                 }
             } catch (err) {
-                alert('ระบบขัดข้อง: ' + err.message);
-                document.getElementById('login-btn').innerText = 'เข้าสู่ระบบ';
+                debugText.innerText = 'ระบบเครือข่ายขัดข้อง หรือตรวจพบข้อผิดพลาด: ' + err.message;
+                debugText.style.color = '#ff5252';
+                btn.innerText = 'เข้าสู่ระบบ';
             }
         }
 
-        async function uploadDataAndSetRules() {
-            // โค้ดอัปโหลดเหมือนเดิม
+        window.uploadDataAndSetRules = async function() {
+            // ฟังก์ชันอัปโหลดไฟล์
+            const debugText = document.getElementById('debug-text');
             const fileTitle = document.getElementById('file-title').value;
             const fileInput = document.getElementById('file-input').files[0];
             const loginPrompt = document.getElementById('login-prompt').value;
@@ -86,28 +118,42 @@
                 return;
             }
 
+            debugText.innerText = 'กำลังอัปโหลดไฟล์ไปยัง Storage...';
+            debugText.style.color = '#ffea00';
+
             const allowedCredentialsArray = credentialsText.split(',').map(item => item.trim());
             const fileName = Date.now() + '_' + fileInput.name.replace(/[^a-zA-Z0-9.]/g, ''); 
 
             const { data: storageData, error: storageError } = await supabase.storage
                 .from('secure_vault').upload('uploads/' + fileName, fileInput);
 
-            if (storageError) { alert('อัปโหลดไฟล์ไม่สำเร็จ: ' + storageError.message); return; }
+            if (storageError) { 
+                debugText.innerText = 'อัปโหลดไปคลังไม่สำเร็จ: ' + storageError.message;
+                debugText.style.color = '#ff5252';
+                return; 
+            }
 
             const { data: dbData, error: dbError } = await supabase
                 .from('system_files')
                 .insert([{ file_title: fileTitle, storage_path: storageData.path, login_prompt: loginPrompt, allowed_credentials: allowedCredentialsArray }])
                 .select();
 
-            if (dbError) { alert('บันทึกฐานข้อมูลไม่สำเร็จ: ' + dbError.message); return; }
+            if (dbError) { 
+                debugText.innerText = 'บันทึกฐานข้อมูลล้มเหลว: ' + dbError.message;
+                debugText.style.color = '#ff5252';
+                return; 
+            }
 
             const createdFileId = dbData[0].id;
             let currentOrigin = window.location.origin + window.location.pathname.replace('admin.html', 'index.html');
             if (currentOrigin.endsWith('/')) currentOrigin += 'index.html';
+            
             document.getElementById('share-link').href = `${currentOrigin}?id=${createdFileId}`;
             document.getElementById('share-link').innerText = `${currentOrigin}?id=${createdFileId}`;
             document.getElementById('result-box').style.display = 'block';
-            alert('อัปโหลดสำเร็จ!');
+            
+            debugText.innerText = 'ทำรายการสำเร็จและสร้างลิงก์หน้าบ้านเรียบร้อย!';
+            debugText.style.color = '#00ff00';
         }
     </script>
 </body>
