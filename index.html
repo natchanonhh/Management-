@@ -3,34 +3,94 @@
 <head>
   <meta charset="UTF-8">
   <title>ระบบแอดมิน - จัดการสิทธิ์แบบรวมศูนย์</title>
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;600&display=swap" rel="stylesheet">
   <style>
-    body { font-family: sans-serif; background: #e9ecef; padding: 20px; display: flex; flex-direction: column; align-items: center; margin: 0; }
-    .admin-box { background: white; padding: 25px; border-radius: 10px; width: 100%; max-width: 800px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin-bottom: 25px; box-sizing: border-box; }
-    h2 { margin-top: 0; display: flex; justify-content: space-between; align-items: center; }
-    label { font-weight: bold; margin-top: 15px; display: block; font-size: 14px; color: #333; }
-    input, select, textarea, button { width: 100%; padding: 12px; margin-top: 8px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 5px; font-family: inherit; font-size: 14px; }
+    body { 
+      font-family: 'Prompt', sans-serif; 
+      background: #f0f4f8; 
+      padding: 20px; 
+      display: flex; 
+      flex-direction: column; 
+      align-items: center; 
+      margin: 0; 
+    }
+    .admin-box { 
+      background: white; 
+      padding: 30px; 
+      border-radius: 16px; 
+      width: 100%; 
+      max-width: 900px; 
+      box-shadow: 0 10px 25px rgba(0,0,0,0.05); 
+      border: 1px solid #e1e8ed;
+      margin-bottom: 25px; 
+      box-sizing: border-box; 
+    }
+    h2 { margin-top: 0; display: flex; justify-content: space-between; align-items: center; color: #1e293b; }
+    label { font-weight: 600; margin-top: 15px; display: block; font-size: 15px; color: #475569; }
+    
+    input, select, textarea { 
+      width: 100%; 
+      padding: 12px; 
+      margin-top: 8px; 
+      box-sizing: border-box; 
+      border: 2px solid #e2e8f0; 
+      border-radius: 8px; 
+      font-family: 'Prompt', sans-serif; 
+      font-size: 15px; 
+      transition: border-color 0.3s;
+    }
+    input:focus, select:focus, textarea:focus { border-color: #3b82f6; outline: none; }
     textarea { height: 120px; resize: vertical; }
-    button { color: white; border: none; cursor: pointer; font-weight: bold; margin-top: 15px; transition: 0.2s; }
-    button:hover { opacity: 0.85; }
     
-    .btn-blue { background: #007bff; }
-    .btn-green { background: #28a745; }
-    .btn-yellow { background: #ffc107; color: #000; }
-    .btn-red { background: #dc3545; }
-    .btn-gray { background: #6c757d; display: none; }
+    button { 
+      color: white; 
+      border: none; 
+      border-radius: 8px;
+      padding: 12px;
+      font-family: 'Prompt', sans-serif; 
+      cursor: pointer; 
+      font-weight: 600; 
+      margin-top: 15px; 
+      transition: opacity 0.2s, transform 0.1s; 
+    }
+    button:active { transform: scale(0.98); }
+    button:hover { opacity: 0.9; }
     
-    table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 15px; }
-    th, td { border: 1px solid #ddd; padding: 10px; text-align: left; vertical-align: middle; }
-    th { background-color: #f8f9fa; text-align: center; }
-    .action-btns { display: flex; gap: 5px; justify-content: center; }
-    .action-btns button { width: auto; padding: 6px 10px; margin: 0; font-size: 12px; }
+    .btn-blue { background: #3b82f6; }
+    .btn-green { background: #10b981; }
+    .btn-yellow { background: #f59e0b; color: #fff; }
+    .btn-red { background: #ef4444; }
+    .btn-gray { background: #64748b; display: none; }
+    
+    table { 
+      width: 100%; 
+      border-collapse: collapse; 
+      font-size: 14px; 
+      margin-top: 20px; 
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+    }
+    th, td { 
+      border: 1px solid #e2e8f0; 
+      padding: 12px 15px; 
+      text-align: left; 
+      vertical-align: middle; 
+    }
+    th { background-color: #f8fafc; text-align: center; color: #475569; font-weight: 600; }
+    tr:hover td { background-color: #f1f5f9; }
+    
+    .action-btns { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;}
+    .action-btns button { width: auto; padding: 6px 12px; margin: 0; font-size: 13px; }
   </style>
 </head>
 <body>
 
   <div class="admin-box">
     <h2 id="formTitle">⚙️ เพิ่มงานใหม่เข้าสู่ระบบ</h2>
-    <input type="hidden" id="editJobId"> <label>1. ชื่องาน / ชื่อบทเรียน:</label>
+    <input type="hidden" id="editJobId"> 
+    
+    <label>1. ชื่องาน / ชื่อบทเรียน:</label>
     <input type="text" id="jobTitle" placeholder="เช่น: เอกสารประกอบการเรียน บทที่ 1" required>
     
     <label>2. ประเภทของไฟล์:</label>
@@ -47,10 +107,10 @@
     <textarea id="allowedUsers" placeholder="ใส่รหัสหรือชื่อ คั่นด้วยลูกน้ำ (,) หรือขึ้นบรรทัดใหม่&#10;เช่น: 6810210178, 6810210220&#10;(ก๊อปปี้จาก Excel มาวางได้เลย)"></textarea>
 
     <div style="display: flex; gap: 10px;">
-      <button class="btn-blue" id="btnSave" onclick="saveJob()">➕ บันทึกงาน</button>
-      <button class="btn-gray" id="btnCancel" onclick="cancelEdit()">❌ ยกเลิกการแก้ไข</button>
+      <button class="btn-blue" id="btnSave" onclick="saveJob()" style="flex: 1;">➕ บันทึกงาน</button>
+      <button class="btn-gray" id="btnCancel" onclick="cancelEdit()" style="flex: 1;">❌ ยกเลิกการแก้ไข</button>
     </div>
-    <p id="status" style="text-align: center; font-weight: bold; margin-bottom: 0;"></p>
+    <p id="status" style="text-align: center; font-weight: 600; margin-bottom: 0; margin-top: 15px;"></p>
   </div>
 
   <div class="admin-box">
@@ -97,7 +157,7 @@
 
       if (!title || !url) {
         statusText.innerText = "❌ กรุณากรอกชื่องานและลิงก์ให้ครบ";
-        statusText.style.color = "red";
+        statusText.style.color = "#ef4444";
         return;
       }
 
@@ -105,7 +165,7 @@
       url = cleanUrl(type, url);
 
       statusText.innerText = "กำลังบันทึกข้อมูล...";
-      statusText.style.color = "blue";
+      statusText.style.color = "#3b82f6";
 
       try {
         const jobData = {
@@ -125,12 +185,12 @@
           statusText.innerText = "✅ สร้างงานใหม่เรียบร้อย!";
         }
         
-        statusText.style.color = "green";
+        statusText.style.color = "#10b981";
         cancelEdit(); 
         loadJobs();   
       } catch (error) {
         statusText.innerText = "❌ เกิดข้อผิดพลาด (อย่าลืมตั้งค่า Rules เป็น true นะครับ)";
-        statusText.style.color = "red";
+        statusText.style.color = "#ef4444";
       }
     }
 
@@ -163,7 +223,7 @@
           html += `<tr>
                     <td><b>${data.title}</b></td>
                     <td style="text-align:center;">${data.type}</td>
-                    <td style="text-align:center; color:green; font-weight:bold;">${userCount} คน</td>
+                    <td style="text-align:center; color:#10b981; font-weight:bold;">${userCount} คน</td>
                     <td>
                       <div class="action-btns">
                         <button class="btn-yellow" onclick="editJob('${safeData}')">✏️ แก้ไข</button>
@@ -194,7 +254,7 @@
       document.getElementById("btnCancel").style.display = "block";
       document.getElementById("status").innerText = "";
       
-      window.scrollTo(0, 0);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     window.cancelEdit = function() {
@@ -231,9 +291,9 @@
         let html = `<table>
                       <tr>
                         <th width="20%">รหัสผู้ชม</th>
-                        <th width="40%">ชื่องาน</th>
+                        <th width="35%">ชื่องาน</th>
                         <th width="20%">สถานะ</th>
-                        <th width="20%">จัดการ</th>
+                        <th width="25%">จัดการ</th>
                       </tr>`;
         
         querySnapshot.forEach((docSnap) => {
@@ -242,17 +302,17 @@
           
           let badge = "";
           if (data.status === "pending") {
-            badge = `<span style="color:#856404; font-weight:bold;">⏳ รอตรวจสอบ</span>`;
+            badge = `<span style="color:#b45309; font-weight:bold;">⏳ รอตรวจสอบ</span>`;
           } else if (data.status === "approved") {
-            badge = `<span style="color:#28a745; font-weight:bold;">✅ ยินยอมแล้ว</span>`;
+            badge = `<span style="color:#10b981; font-weight:bold;">✅ ยินยอมแล้ว</span>`;
             if (data.expiresAt) {
               const exp = data.expiresAt.toDate();
-              badge += `<br><small style="color:gray;">หมดอายุ: ${exp.toLocaleString('th-TH')}</small>`;
+              badge += `<br><small style="color:#64748b;">หมดอายุ: ${exp.toLocaleString('th-TH')}</small>`;
             } else {
-              badge += `<br><small style="color:gray;">ไม่จำกัดเวลา</small>`;
+              badge += `<br><small style="color:#64748b;">ไม่จำกัดเวลา</small>`;
             }
           } else if (data.status === "rejected") {
-            badge = `<span style="color:#dc3545; font-weight:bold;">❌ ไม่ยินยอม</span>`;
+            badge = `<span style="color:#ef4444; font-weight:bold;">❌ ไม่ยินยอม</span>`;
           }
 
           html += `<tr>
@@ -261,8 +321,12 @@
                     <td style="text-align:center;">${badge}</td>
                     <td>
                       <div class="action-btns">
-                        ${data.status !== 'approved' ? `<button class="btn-green" onclick="updateRequestStatus('${id}', 'approved')">ยินยอม</button>` : ''}
-                        ${data.status !== 'rejected' ? `<button class="btn-red" onclick="updateRequestStatus('${id}', 'rejected')">ไม่ยินยอม</button>` : ''}
+                        ${data.status !== 'approved' 
+                          ? `<button class="btn-green" onclick="updateRequestStatus('${id}', 'approved')">ยินยอม</button>` 
+                          : `<button class="btn-yellow" onclick="editExpirationTime('${id}')">⏳ แก้ไขเวลา</button>`}
+                        ${data.status !== 'rejected' 
+                          ? `<button class="btn-red" onclick="updateRequestStatus('${id}', 'rejected')">ไม่ยินยอม</button>` 
+                          : ''}
                       </div>
                     </td>
                    </tr>`;
@@ -274,7 +338,7 @@
       }
     }
 
-    // ฟังก์ชันอัปเดตสถานะและตั้งเวลาหมดอายุ
+    // ฟังก์ชันอัปเดตสถานะและตั้งเวลาหมดอายุตอนกด "ยินยอม"
     window.updateRequestStatus = async function(reqId, newStatus) {
       try {
         let updateData = {
@@ -283,10 +347,9 @@
         };
 
         if (newStatus === 'approved') {
-          // ถามแอดมินว่าให้ดาวน์โหลดได้กี่ชั่วโมง
           const hours = prompt("กำหนดเวลาให้ดาวน์โหลดได้กี่ชั่วโมง?\\n(ระบุตัวเลข เช่น 24 = 1 วัน, 72 = 3 วัน, 0 = ไม่จำกัดเวลา)", "72");
           
-          if (hours === null) return; // กรณีกดยกเลิก
+          if (hours === null) return; 
           
           const duration = parseInt(hours);
           if (isNaN(duration) || duration < 0) {
@@ -299,7 +362,7 @@
             expireDate.setHours(expireDate.getHours() + duration);
             updateData.expiresAt = expireDate;
           } else {
-            updateData.expiresAt = null; // กรณีอนุญาตถาวร (ไม่จำกัดเวลา)
+            updateData.expiresAt = null; 
           }
         }
 
@@ -307,6 +370,36 @@
         loadRequests();
       } catch (e) {
         alert("เกิดข้อผิดพลาดในการอัปเดตสถานะ");
+      }
+    }
+
+    // ฟังก์ชันใหม่: แก้ไขเวลาหมดอายุดาวน์โหลด
+    window.editExpirationTime = async function(reqId) {
+      const hours = prompt("⏳ แก้ไขเวลาดาวน์โหลด (ชั่วโมงนับจากปัจจุบัน)\\n(ระบุตัวเลข เช่น 24 = 1 วัน, 72 = 3 วัน, 0 = ไม่จำกัดเวลา)", "72");
+      
+      if (hours === null) return; 
+      
+      const duration = parseInt(hours);
+      if (isNaN(duration) || duration < 0) {
+        alert("กรุณากรอกตัวเลขที่ถูกต้อง");
+        return;
+      }
+      
+      try {
+        let updateData = { updatedAt: serverTimestamp() };
+        if (duration > 0) {
+          const expireDate = new Date();
+          expireDate.setHours(expireDate.getHours() + duration);
+          updateData.expiresAt = expireDate;
+        } else {
+          updateData.expiresAt = null; // ไม่จำกัดเวลา
+        }
+
+        await updateDoc(doc(db, "download_requests", reqId), updateData);
+        alert("✅ อัปเดตเวลาเรียบร้อยแล้ว");
+        loadRequests();
+      } catch (e) {
+        alert("เกิดข้อผิดพลาดในการแก้ไขเวลา");
       }
     }
 
