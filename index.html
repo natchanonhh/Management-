@@ -1,160 +1,230 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ระบบหลังบ้าน - จัดการข้อมูลส่วนบุคคล</title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; margin: 0; padding: 20px; }
-        .admin-box { max-width: 500px; background: white; margin: 20px auto; padding: 30px; border-radius: 16px; box-shadow: 0 8px 24px rgba(0,0,0,0.08); }
-        h2 { margin-top: 0; color: #1a1a1a; text-align: center; font-weight: 600; }
-        .form-group { margin-bottom: 18px; }
-        label { display: block; margin-bottom: 6px; font-weight: 600; color: #444; font-size: 14px; }
-        input[type="text"], input[type="email"], input[type="password"], textarea, input[type="file"] {
-            width: 100%; padding: 12px; border: 1.5px solid #dce0e4; border-radius: 8px; box-sizing: border-box; font-size: 15px; }
-        button { width: 100%; padding: 14px; background: #0066ff; color: white; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; font-weight: bold; }
-        #admin-panel { display: none; }
-        .result-link { background: #e6f4ea; padding: 16px; border-radius: 8px; border: 1px solid #ceead6; word-break: break-all; margin-top: 20px; display: none; }
-        
-        /* กล่องรายงานปัญหาพิเศษสำหรับ iPad */
-        .debug-console { max-width: 500px; margin: 20px auto; background: #202124; color: #ff5252; padding: 15px; border-radius: 8px; font-family: monospace; font-size: 13px; text-align: left; box-sizing: border-box; }
-    </style>
+  <meta charset="UTF-8">
+  <title>ระบบแอดมิน - จัดการสิทธิ์แบบรวมศูนย์</title>
+  <style>
+    body { font-family: sans-serif; background: #e9ecef; padding: 20px; display: flex; flex-direction: column; align-items: center; margin: 0; }
+    .admin-box { background: white; padding: 25px; border-radius: 10px; width: 100%; max-width: 800px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin-bottom: 25px; box-sizing: border-box; }
+    h2 { margin-top: 0; display: flex; justify-content: space-between; align-items: center; }
+    label { font-weight: bold; margin-top: 15px; display: block; font-size: 14px; color: #333; }
+    input, select, textarea, button { width: 100%; padding: 12px; margin-top: 8px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 5px; font-family: inherit; font-size: 14px; }
+    textarea { height: 120px; resize: vertical; }
+    button { color: white; border: none; cursor: pointer; font-weight: bold; margin-top: 15px; transition: 0.2s; }
+    button:hover { opacity: 0.85; }
+    
+    .btn-blue { background: #007bff; }
+    .btn-green { background: #28a745; }
+    .btn-yellow { background: #ffc107; color: #000; }
+    .btn-red { background: #dc3545; }
+    .btn-gray { background: #6c757d; display: none; }
+    
+    table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 15px; }
+    th, td { border: 1px solid #ddd; padding: 10px; text-align: left; vertical-align: middle; }
+    th { background-color: #f8f9fa; text-align: center; }
+    .action-btns { display: flex; gap: 5px; justify-content: center; }
+    .action-btns button { width: auto; padding: 6px 10px; margin: 0; font-size: 12px; }
+  </style>
 </head>
 <body>
 
-    <div id="login-panel" class="admin-box">
-        <h2>Admin Management</h2>
-        <div class="form-group">
-            <label>อีเมลผู้ดูแลระบบ</label>
-            <input type="email" id="admin-email" placeholder="admin@example.com" value="">
-        </div>
-        <div class="form-group">
-            <label>รหัสผ่าน</label>
-            <input type="password" id="admin-password" placeholder="******" value="">
-        </div>
-        <button type="button" onclick="window.loginAdmin()" id="login-btn">เข้าสู่ระบบ</button>
-    </div>
+  <div class="admin-box">
+    <h2 id="formTitle">⚙️ เพิ่มงานใหม่เข้าสู่ระบบ</h2>
+    <input type="hidden" id="editJobId"> <label>1. ชื่องาน / ชื่อบทเรียน:</label>
+    <input type="text" id="jobTitle" placeholder="เช่น: เอกสารประกอบการเรียน บทที่ 1" required>
+    
+    <label>2. ประเภทของไฟล์:</label>
+    <select id="fileType">
+      <option value="youtube">วิดีโอ (ลิงก์ YouTube)</option>
+      <option value="image">รูปภาพ (ลิงก์ภาพ)</option>
+      <option value="pdf">ไฟล์ PDF / Google Drive (ลิงก์เอกสาร)</option>
+    </select>
 
-    <div id="admin-panel" class="admin-box">
-        <h2>อัปโหลดและตั้งค่าสิทธิ์ไฟล์</h2>
-        <div class="form-group"><label>1. ชื่อไฟล์ / หัวข้อข้อมูล</label><input type="text" id="file-title"></div>
-        <div class="form-group"><label>2. เลือกไฟล์</label><input type="file" id="file-input"></div>
-        <div class="form-group"><label>3. คำสั่งให้หน้าบ้านกรอก (Smart Login Prompt)</label><input type="text" id="login-prompt"></div>
-        <div class="form-group"><label>4. รหัสที่อนุญาตให้เข้าดูได้ (คั่นด้วย ,)</label><textarea id="allowed-credentials" rows="4"></textarea></div>
-        <button type="button" onclick="window.uploadDataAndSetRules()" style="background: #0d904f;">อัปโหลดและสร้างลิงก์</button>
-        <div id="result-box" class="result-link">
-            <strong style="color: #0d904f;">สร้างลิงก์สำเร็จ!</strong><br>
-            <a id="share-link" href="#" target="_blank" style="color: #0066ff; font-weight: 500;">กำลังสร้างลิงก์...</a>
-        </div>
-    </div>
+    <label>3. วางลิงก์ไฟล์ (URL):</label>
+    <input type="text" id="fileUrl" placeholder="วางลิงก์ไฟล์ที่นี่..." required>
 
-    <div class="debug-console">
-        <strong style="color: #white;">ระบบตรวจจับสถานะ (System Status):</strong>
-        <div id="debug-text" style="color: #00ff00; margin-top: 5px;">ระบบพร้อมใช้งาน กรุณากดเข้าสู่ระบบ...</div>
-    </div>
+    <label>4. รายชื่อผู้มีสิทธิ์เข้าชม (1 งานใส่ได้ไม่จำกัด):</label>
+    <textarea id="allowedUsers" placeholder="ใส่รหัสหรือชื่อ คั่นด้วยลูกน้ำ (,) หรือขึ้นบรรทัดใหม่&#10;เช่น: 6810210178, 6810210220&#10;(ก๊อปปี้จาก Excel มาวางได้เลย)"></textarea>
 
-    <script>
-        const SUPABASE_URL = 'https://qspfyaqsnbtyzqcvfzsd.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFzcGZ5YXFzbmJ0eXpxY3ZmenNkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIxMTgzOTMsImV4cCI6MjA5NzY5NDM5M30.je7dDqR3XnHP3SwNgUCM4Ae2DnajhLGAUh0wnSKCh2c';
+    <div style="display: flex; gap: 10px;">
+      <button class="btn-blue" id="btnSave" onclick="saveJob()">➕ บันทึกงาน</button>
+      <button class="btn-gray" id="btnCancel" onclick="cancelEdit()">❌ ยกเลิกการแก้ไข</button>
+    </div>
+    <p id="status" style="text-align: center; font-weight: bold; margin-bottom: 0;"></p>
+  </div>
+
+  <div class="admin-box">
+    <h2>📋 จัดการงานทั้งหมด</h2>
+    <div id="jobsTable"></div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    // เปลี่ยนมาใช้ Collection "jobs" เพื่อให้ง่ายต่อการจัดการ
+    import { getFirestore, doc, setDoc, addDoc, getDoc, deleteDoc, collection, getDocs, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBLyMpowfyQK_1UnredPFmXdBdtQZKpY-c",
+      authDomain: "datapdf-d14d0.firebaseapp.com",
+      databaseURL: "https://datapdf-d14d0-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "datapdf-d14d0",
+      storageBucket: "datapdf-d14d0.firebasestorage.app",
+      messagingSenderId: "1034739093928",
+      appId: "1:1034739093928:web:cd56cc0e208d7d00f24d9d"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    function cleanUrl(type, url) {
+      if (type === "youtube" && url.includes("watch?v=")) return `https://www.youtube.com/embed/${url.split("v=")[1].split("&")[0]}`;
+      if (type === "youtube" && url.includes("youtu.be/")) return `https://www.youtube.com/embed/${url.split("youtu.be/")[1].split("?")[0]}`;
+      if (type === "pdf" && url.includes("drive.google.com") && url.includes("/view")) return url.split("/view")[0] + "/preview";
+      return url;
+    }
+
+    // 1. บันทึก / อัปเดตงาน
+    window.saveJob = async function() {
+      const editId = document.getElementById("editJobId").value;
+      const title = document.getElementById("jobTitle").value.trim();
+      const type = document.getElementById("fileType").value;
+      let url = document.getElementById("fileUrl").value.trim();
+      const rawUsers = document.getElementById("allowedUsers").value;
+      const statusText = document.getElementById("status");
+
+      if (!title || !url) {
+        statusText.innerText = "❌ กรุณากรอกชื่องานและลิงก์ให้ครบ";
+        statusText.style.color = "red";
+        return;
+      }
+
+      // ทำความสะอาดรายชื่อ กรองตัวที่ว่างทิ้ง
+      const userList = rawUsers.split(/[\n,]+/).map(id => id.trim()).filter(id => id !== "");
+      url = cleanUrl(type, url);
+
+      statusText.innerText = "กำลังบันทึกข้อมูล...";
+      statusText.style.color = "blue";
+
+      try {
+        const jobData = {
+          title: title,
+          type: type,
+          url: url,
+          allowedUsers: userList,
+          updatedAt: serverTimestamp()
+        };
+
+        if (editId) {
+          // กรณีแก้ไขงานเดิม
+          await setDoc(doc(db, "jobs", editId), jobData, { merge: true });
+          statusText.innerText = "✅ อัปเดตงานเรียบร้อย!";
+        } else {
+          // กรณีสร้างงานใหม่
+          jobData.createdAt = serverTimestamp();
+          await addDoc(collection(db, "jobs"), jobData);
+          statusText.innerText = "✅ สร้างงานใหม่เรียบร้อย!";
+        }
         
-        // ตรวจสอบความถูกต้องของการดึงไลบรารี
-        let supabase;
-        try {
-            supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        } catch(e) {
-            document.getElementById('debug-text').innerText = 'ไม่สามารถเชื่อมต่อ Supabase SDK ได้: ' + e.message;
-            document.getElementById('debug-text').style.color = '#ff5252';
+        statusText.style.color = "green";
+        cancelEdit(); // เคลียร์ฟอร์ม
+        loadJobs();   // โหลดตารางใหม่
+      } catch (error) {
+        statusText.innerText = "❌ เกิดข้อผิดพลาด (อย่าลืมตั้งค่า Rules เป็น true นะครับ)";
+        statusText.style.color = "red";
+      }
+    }
+
+    // 2. โหลดรายการงานมาแสดงในตาราง
+    window.loadJobs = async function() {
+      const tableDiv = document.getElementById("jobsTable");
+      tableDiv.innerHTML = "<p style='text-align:center;'>กำลังโหลด...</p>";
+
+      try {
+        const querySnapshot = await getDocs(collection(db, "jobs"));
+        if (querySnapshot.empty) {
+          tableDiv.innerHTML = "<p style='text-align:center; color:gray;'>ยังไม่มีงานในระบบ</p>";
+          return;
         }
 
-        // ฟังก์ชันล็อกอินแบบบังคับแสดงข้อผิดพลาด
-        window.loginAdmin = async function() {
-            const debugText = document.getElementById('debug-text');
-            const btn = document.getElementById('login-btn');
-            const email = document.getElementById('admin-email').value.trim();
-            const password = document.getElementById('admin-password').value.trim();
-            
-            debugText.innerText = 'กำลังพยายามส่งข้อมูลล็อกอินไปยัง Supabase...';
-            debugText.style.color = '#ffea00';
-            btn.innerText = 'กำลังตรวจสอบ...';
+        let html = `<table>
+                      <tr>
+                        <th width="30%">ชื่องาน</th>
+                        <th width="15%">ประเภท</th>
+                        <th width="30%">จำนวนผู้มีสิทธิ์ดู</th>
+                        <th width="25%">จัดการ</th>
+                      </tr>`;
+        
+        querySnapshot.forEach((docSnap) => {
+          const id = docSnap.id;
+          const data = docSnap.data();
+          const userCount = data.allowedUsers ? data.allowedUsers.length : 0;
+          
+          // ดึงข้อมูลมาแปลงเป็น string เพื่อส่งเข้าฟังก์ชันแก้ไข
+          const safeData = encodeURIComponent(JSON.stringify({id: id, ...data}));
 
-            if(!email || !password) {
-                debugText.innerText = 'ข้อผิดพลาด: กรุณากรอกอีเมลและรหัสผ่านให้ครบถ้วน';
-                debugText.style.color = '#ff5252';
-                btn.innerText = 'เข้าสู่ระบบ';
-                return;
-            }
+          html += `<tr>
+                    <td><b>${data.title}</b></td>
+                    <td style="text-align:center;">${data.type}</td>
+                    <td style="text-align:center; color:green; font-weight:bold;">${userCount} คน</td>
+                    <td>
+                      <div class="action-btns">
+                        <button class="btn-yellow" onclick="editJob('${safeData}')">✏️ แก้ไข</button>
+                        <button class="btn-red" onclick="deleteJob('${id}')">🗑️ ลบ</button>
+                      </div>
+                    </td>
+                   </tr>`;
+        });
+        html += "</table>";
+        tableDiv.innerHTML = html;
+      } catch (error) {
+        tableDiv.innerHTML = "<p style='color:red; text-align:center;'>โหลดข้อมูลไม่สำเร็จ</p>";
+      }
+    }
 
-            try {
-                const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    // 3. เตรียมข้อมูลสำหรับแก้ไข
+    window.editJob = function(encodedData) {
+      const data = JSON.parse(decodeURIComponent(encodedData));
+      
+      document.getElementById("formTitle").innerText = "✏️ แก้ไขข้อมูลงาน / จัดการสิทธิ์";
+      document.getElementById("editJobId").value = data.id;
+      document.getElementById("jobTitle").value = data.title;
+      document.getElementById("fileType").value = data.type;
+      document.getElementById("fileUrl").value = data.url;
+      // นำ Array กลับมาเป็นข้อความที่คั่นด้วยลูกน้ำ เพื่อให้แอดมินแก้ไขได้ง่าย
+      document.getElementById("allowedUsers").value = (data.allowedUsers || []).join(",\n");
 
-                if (error) {
-                    debugText.innerText = 'Supabase ปฏิเสธการเข้าสู่ระบบ: ' + error.message;
-                    debugText.style.color = '#ff5252';
-                    btn.innerText = 'เข้าสู่ระบบ';
-                } else {
-                    debugText.innerText = 'ล็อกอินสำเร็จ! กำลังเข้าสู่หน้าจอจัดการข้อมูล';
-                    debugText.style.color = '#00ff00';
-                    document.getElementById('login-panel').style.display = 'none';
-                    document.getElementById('admin-panel').style.display = 'block';
-                }
-            } catch (err) {
-                debugText.innerText = 'ระบบเครือข่ายขัดข้อง หรือตรวจพบข้อผิดพลาด: ' + err.message;
-                debugText.style.color = '#ff5252';
-                btn.innerText = 'เข้าสู่ระบบ';
-            }
-        }
+      document.getElementById("btnSave").innerText = "💾 บันทึกการแก้ไข";
+      document.getElementById("btnSave").classList.replace("btn-blue", "btn-yellow");
+      document.getElementById("btnCancel").style.display = "block";
+      document.getElementById("status").innerText = "";
+      
+      // เลื่อนจอขึ้นไปด้านบนสุด
+      window.scrollTo(0, 0);
+    }
 
-        window.uploadDataAndSetRules = async function() {
-            // ฟังก์ชันอัปโหลดไฟล์
-            const debugText = document.getElementById('debug-text');
-            const fileTitle = document.getElementById('file-title').value;
-            const fileInput = document.getElementById('file-input').files[0];
-            const loginPrompt = document.getElementById('login-prompt').value;
-            const credentialsText = document.getElementById('allowed-credentials').value;
+    // 4. ยกเลิกการแก้ไข (เคลียร์ฟอร์ม)
+    window.cancelEdit = function() {
+      document.getElementById("formTitle").innerText = "⚙️ เพิ่มงานใหม่เข้าสู่ระบบ";
+      document.getElementById("editJobId").value = "";
+      document.getElementById("jobTitle").value = "";
+      document.getElementById("fileUrl").value = "";
+      document.getElementById("allowedUsers").value = "";
+      
+      document.getElementById("btnSave").innerText = "➕ บันทึกงาน";
+      document.getElementById("btnSave").classList.replace("btn-yellow", "btn-blue");
+      document.getElementById("btnCancel").style.display = "none";
+    }
 
-            if (!fileTitle || !fileInput || !loginPrompt || !credentialsText) {
-                alert('กรุณากรอกข้อมูลให้ครบทุกช่อง');
-                return;
-            }
+    // 5. ลบงาน
+    window.deleteJob = async function(id) {
+      if (!confirm("⚠️ ยืนยันการลบงานนี้? (นักศึกษาทุกคนจะถูกตัดสิทธิ์จากงานนี้ทันที)")) return;
+      try {
+        await deleteDoc(doc(db, "jobs", id));
+        loadJobs();
+      } catch (e) { alert("ลบไม่สำเร็จ"); }
+    }
 
-            debugText.innerText = 'กำลังอัปโหลดไฟล์ไปยัง Storage...';
-            debugText.style.color = '#ffea00';
-
-            const allowedCredentialsArray = credentialsText.split(',').map(item => item.trim());
-            const fileName = Date.now() + '_' + fileInput.name.replace(/[^a-zA-Z0-9.]/g, ''); 
-
-            const { data: storageData, error: storageError } = await supabase.storage
-                .from('secure_vault').upload('uploads/' + fileName, fileInput);
-
-            if (storageError) { 
-                debugText.innerText = 'อัปโหลดไปคลังไม่สำเร็จ: ' + storageError.message;
-                debugText.style.color = '#ff5252';
-                return; 
-            }
-
-            const { data: dbData, error: dbError } = await supabase
-                .from('system_files')
-                .insert([{ file_title: fileTitle, storage_path: storageData.path, login_prompt: loginPrompt, allowed_credentials: allowedCredentialsArray }])
-                .select();
-
-            if (dbError) { 
-                debugText.innerText = 'บันทึกฐานข้อมูลล้มเหลว: ' + dbError.message;
-                debugText.style.color = '#ff5252';
-                return; 
-            }
-
-            const createdFileId = dbData[0].id;
-            let currentOrigin = window.location.origin + window.location.pathname.replace('admin.html', 'index.html');
-            if (currentOrigin.endsWith('/')) currentOrigin += 'index.html';
-            
-            document.getElementById('share-link').href = `${currentOrigin}?id=${createdFileId}`;
-            document.getElementById('share-link').innerText = `${currentOrigin}?id=${createdFileId}`;
-            document.getElementById('result-box').style.display = 'block';
-            
-            debugText.innerText = 'ทำรายการสำเร็จและสร้างลิงก์หน้าบ้านเรียบร้อย!';
-            debugText.style.color = '#00ff00';
-        }
-    </script>
+    loadJobs();
+  </script>
 </body>
 </html>
