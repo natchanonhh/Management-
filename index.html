@@ -46,6 +46,7 @@
 </head>
 <body>
 
+  <!-- ส่วนล็อกอินผู้ดูแลระบบ (Firebase Auth) -->
   <div id="adminLoginWrapper">
      <div class="login-card">
         <h2>ระบบจัดการสำหรับผู้ดูแล</h2>
@@ -57,12 +58,14 @@
      </div>
   </div>
 
+  <!-- เนื้อหาหน้าแอดมินเดิม (จะแสดงเมื่อล็อกอินสำเร็จ) -->
   <div id="mainAdminContent">
     
     <div style="width: 100%; max-width: 800px; display: flex; justify-content: flex-end; margin-bottom: 15px;">
        <button class="btn-red" style="width: auto; padding: 8px 15px; margin: 0;" onclick="logoutAdmin()">ออกจากระบบผู้ดูแล</button>
     </div>
 
+    <!-- กล่อง: ให้สิทธิ์ดาวน์โหลดโดยตรง -->
     <div class="admin-box" style="border: 2px solid #28a745;">
       <h2>การอนุมัติสิทธิ์การเข้าถึงทันที (โดยไม่ต้องรอยื่นคำขอ)</h2>
       <label>1. เลือกระบบงาน / เอกสาร:</label>
@@ -224,7 +227,10 @@
         return;
       }
 
+      // ดึงรายชื่อต้นฉบับมาเพื่อแสดงผล และสร้างชุดรายชื่อแบบไม่มีช่องว่างสำหรับการค้นหาให้ลื่นไหลขึ้น
       const userList = rawUsers.split(/[\n,]+/).map(id => id.trim()).filter(id => id !== "");
+      const searchList = userList.map(id => id.replace(/[\s"']/g, '').toLowerCase());
+      
       url = cleanUrl(type, url);
 
       statusText.innerText = "ระบบกำลังบันทึกข้อมูล...";
@@ -236,6 +242,7 @@
           type: type,
           url: url,
           allowedUsers: userList,
+          searchableUsers: searchList, // ชุดข้อมูลที่ถูกกรองเว้นวรรค
           updatedAt: serverTimestamp()
         };
 
