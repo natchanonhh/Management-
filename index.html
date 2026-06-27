@@ -4,7 +4,25 @@
   <meta charset="UTF-8">
   <title>ระบบผู้ดูแล - จัดการสิทธิ์แบบรวมศูนย์</title>
   <style>
-    body { font-family: sans-serif; background: #e9ecef; padding: 20px; display: flex; flex-direction: column; align-items: center; margin: 0; }
+    body { font-family: sans-serif; background: #e9ecef; display: flex; flex-direction: column; align-items: center; margin: 0; min-height: 100vh;}
+    
+    /* สไตล์สำหรับกล่อง Login หน้าแอดมิน */
+    #adminLoginWrapper {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: #e9ecef; display: flex; justify-content: center; align-items: center;
+      z-index: 9999;
+    }
+    .login-card {
+      background: white; padding: 40px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      width: 100%; max-width: 400px; text-align: center; box-sizing: border-box;
+    }
+    .login-card h2 { margin-top: 0; color: #333; justify-content: center;}
+    
+    /* สไตล์เนื้อหาหลักแอดมิน */
+    #mainAdminContent {
+      width: 100%; display: none; flex-direction: column; align-items: center; padding: 20px; box-sizing: border-box;
+    }
+
     .admin-box { background: white; padding: 25px; border-radius: 10px; width: 100%; max-width: 800px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin-bottom: 25px; box-sizing: border-box; }
     h2 { margin-top: 0; display: flex; justify-content: space-between; align-items: center; color: #333; }
     label { font-weight: bold; margin-top: 15px; display: block; font-size: 14px; color: #333; }
@@ -28,63 +46,84 @@
 </head>
 <body>
 
-  <div class="admin-box" style="border: 2px solid #28a745;">
-    <h2>การอนุมัติสิทธิ์การเข้าถึงทันที (โดยไม่ต้องรอยื่นคำขอ)</h2>
-    <label>1. เลือกระบบงาน / เอกสาร:</label>
-    <select id="directJobSelect">
-      <option value="">-- กำลังโหลดข้อมูลระบบงาน... --</option>
-    </select>
-    
-    <label>2. รหัสผู้รับสิทธิ์:</label>
-    <input type="text" id="directStudentId" placeholder="ระบุรหัสประจำตัวผู้รับสิทธิ์..." required>
-    
-    <button class="btn-green" onclick="grantDirectDownload()">ยืนยันการให้สิทธิ์การดาวน์โหลด</button>
+  <div id="adminLoginWrapper">
+     <div class="login-card">
+        <h2>ระบบจัดการสำหรับผู้ดูแล</h2>
+        <p style="color:gray; margin-bottom: 20px;">กรุณาเข้าสู่ระบบด้วยบัญชีแอดมินที่ลงทะเบียนไว้</p>
+        <input type="email" id="adminEmail" placeholder="อีเมลแอดมิน..." style="text-align:center;" required>
+        <input type="password" id="adminPassword" placeholder="รหัสผ่าน..." style="text-align:center;" required>
+        <button class="btn-blue" onclick="loginAdmin()">เข้าสู่ระบบ</button>
+        <p id="loginError" style="color:red; display:none; margin-top:10px; font-weight:bold;">อีเมลหรือรหัสผ่านไม่ถูกต้อง</p>
+     </div>
   </div>
 
-  <div class="admin-box">
-    <h2 id="formTitle">เพิ่มรายการเข้าสู่ระบบ</h2>
-    <input type="hidden" id="editJobId"> <label>1. ชื่อรายการ / เอกสาร:</label>
-    <input type="text" id="jobTitle" placeholder="ตัวอย่าง: เอกสารประกอบการเรียน" required>
+  <div id="mainAdminContent">
     
-    <label>2. ประเภทของไฟล์:</label>
-    <select id="fileType">
-      <option value="youtube">วิดีโอ (ลิงก์ YouTube)</option>
-      <option value="image">รูปภาพ (ลิงก์ภาพ)</option>
-      <option value="pdf">ไฟล์ PDF / Google Drive (ลิงก์เอกสาร)</option>
-      <option value="link">ลิงก์เว็บไซต์ภายนอก (URL)</option>
-    </select>
-
-    <label>3. ข้อมูลลิงก์ (URL):</label>
-    <input type="text" id="fileUrl" placeholder="ระบุลิงก์ข้อมูลที่นี่..." required>
-
-    <label>4. กำหนดรายชื่อผู้มีสิทธิ์เข้าชมเบื้องต้น (คั่นด้วยลูกน้ำ หรือ ขึ้นบรรทัดใหม่):</label>
-    <textarea id="allowedUsers" placeholder="ระบุรหัสประจำตัว เช่น: 6810210178, 6810210220"></textarea>
-
-    <div style="display: flex; gap: 10px;">
-      <button class="btn-blue" id="btnSave" onclick="saveJob()">บันทึกข้อมูลระบบงาน</button>
-      <button class="btn-gray" id="btnCancel" onclick="cancelEdit()">ยกเลิกการแก้ไข</button>
+    <div style="width: 100%; max-width: 800px; display: flex; justify-content: flex-end; margin-bottom: 15px;">
+       <button class="btn-red" style="width: auto; padding: 8px 15px; margin: 0;" onclick="logoutAdmin()">ออกจากระบบผู้ดูแล</button>
     </div>
-    <p id="status" style="text-align: center; font-weight: bold; margin-bottom: 0;"></p>
-  </div>
 
-  <div class="admin-box">
-    <h2>การจัดการรายการระบบงาน</h2>
-    <div id="jobsTable"></div>
-  </div>
+    <div class="admin-box" style="border: 2px solid #28a745;">
+      <h2>การอนุมัติสิทธิ์การเข้าถึงทันที (โดยไม่ต้องรอยื่นคำขอ)</h2>
+      <label>1. เลือกระบบงาน / เอกสาร:</label>
+      <select id="directJobSelect">
+        <option value="">-- กำลังโหลดข้อมูลระบบงาน... --</option>
+      </select>
+      
+      <label>2. รหัสผู้รับสิทธิ์:</label>
+      <input type="text" id="directStudentId" placeholder="ระบุรหัสประจำตัวผู้รับสิทธิ์..." required>
+      
+      <button class="btn-green" onclick="grantDirectDownload()">ยืนยันการให้สิทธิ์การดาวน์โหลด</button>
+    </div>
 
-  <div class="admin-box">
-    <h2>จัดการคำขอสิทธิ์การเข้าถึง/ดาวน์โหลด</h2>
-    <div id="requestsTable"></div>
-  </div>
+    <div class="admin-box">
+      <h2 id="formTitle">เพิ่มรายการเข้าสู่ระบบ</h2>
+      <input type="hidden" id="editJobId"> <label>1. ชื่อรายการ / เอกสาร:</label>
+      <input type="text" id="jobTitle" placeholder="ตัวอย่าง: เอกสารประกอบการเรียน" required>
+      
+      <label>2. ประเภทของไฟล์:</label>
+      <select id="fileType">
+        <option value="youtube">วิดีโอ (ลิงก์ YouTube)</option>
+        <option value="image">รูปภาพ (ลิงก์ภาพ)</option>
+        <option value="pdf">ไฟล์ PDF / Google Drive (ลิงก์เอกสาร)</option>
+        <option value="link">ลิงก์เว็บไซต์ภายนอก (URL)</option>
+      </select>
 
-  <div class="admin-box">
-    <h2>ประวัติการดาวน์โหลด (ผู้ชม)</h2>
-    <div id="historyTable"></div>
+      <label>3. ข้อมูลลิงก์ (URL):</label>
+      <input type="text" id="fileUrl" placeholder="ระบุลิงก์ข้อมูลที่นี่..." required>
+
+      <label>4. กำหนดรายชื่อผู้มีสิทธิ์เข้าชมเบื้องต้น (คั่นด้วยลูกน้ำ หรือ ขึ้นบรรทัดใหม่):</label>
+      <textarea id="allowedUsers" placeholder="ระบุรหัสประจำตัว เช่น: 6810210178, 6810210220"></textarea>
+
+      <div style="display: flex; gap: 10px;">
+        <button class="btn-blue" id="btnSave" onclick="saveJob()">บันทึกข้อมูลระบบงาน</button>
+        <button class="btn-gray" id="btnCancel" onclick="cancelEdit()">ยกเลิกการแก้ไข</button>
+      </div>
+      <p id="status" style="text-align: center; font-weight: bold; margin-bottom: 0;"></p>
+    </div>
+
+    <div class="admin-box">
+      <h2>การจัดการรายการระบบงาน</h2>
+      <div id="jobsTable"></div>
+    </div>
+
+    <div class="admin-box">
+      <h2>จัดการคำขอสิทธิ์การเข้าถึง/ดาวน์โหลด</h2>
+      <div id="requestsTable"></div>
+    </div>
+
+    <div class="admin-box">
+      <h2>ประวัติการดาวน์โหลด (ผู้ชม)</h2>
+      <div id="historyTable"></div>
+    </div>
   </div>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getFirestore, doc, setDoc, addDoc, getDoc, deleteDoc, collection, getDocs, serverTimestamp, updateDoc, query } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    
+    // นำเข้า Firebase Authentication
+    import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyBLyMpowfyQK_1UnredPFmXdBdtQZKpY-c",
@@ -98,6 +137,71 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
+    const auth = getAuth(app); // เริ่มต้นใช้งานระบบล็อกอิน
+
+    // ==========================================
+    // ระบบล็อกอินผู้ดูแล (Firebase Authentication)
+    // ==========================================
+
+    window.loginAdmin = function() {
+      const email = document.getElementById("adminEmail").value;
+      const pwd = document.getElementById("adminPassword").value;
+      const errorMsg = document.getElementById("loginError");
+
+      if (!email || !pwd) {
+        errorMsg.innerText = "กรุณากรอกอีเมลและรหัสผ่านให้ครบถ้วน";
+        errorMsg.style.display = "block";
+        return;
+      }
+
+      errorMsg.style.display = "none";
+      document.querySelector("#adminLoginWrapper button").innerText = "กำลังเข้าสู่ระบบ...";
+
+      signInWithEmailAndPassword(auth, email, pwd)
+        .then((userCredential) => {
+          document.querySelector("#adminLoginWrapper button").innerText = "เข้าสู่ระบบ";
+        })
+        .catch((error) => {
+          document.querySelector("#adminLoginWrapper button").innerText = "เข้าสู่ระบบ";
+          errorMsg.style.display = "block";
+          errorMsg.innerText = "อีเมลหรือรหัสผ่านไม่ถูกต้อง กรุณาลองใหม่";
+        });
+    }
+
+    window.logoutAdmin = function() {
+      if (confirm("ต้องการออกจากระบบผู้ดูแลหรือไม่?")) {
+        signOut(auth).catch((error) => {
+          alert("เกิดข้อผิดพลาดในการออกจากระบบ");
+        });
+      }
+    }
+
+    // ติดตามสถานะการเข้าสู่ระบบ
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        // หากเข้าสู่ระบบแล้ว ให้ซ่อนหน้าล็อกอินและแสดงข้อมูลหลังบ้าน
+        document.getElementById("adminLoginWrapper").style.display = "none";
+        document.getElementById("mainAdminContent").style.display = "flex";
+        
+        // โหลดข้อมูลต่างๆ หลังจากยืนยันตัวตนสำเร็จ
+        loadJobs();
+        loadRequests();
+        loadHistory();
+      } else {
+        // หากยังไม่เข้าสู่ระบบ ให้แสดงหน้าล็อกอิน
+        document.getElementById("adminLoginWrapper").style.display = "flex";
+        document.getElementById("mainAdminContent").style.display = "none";
+      }
+    });
+
+    // ให้กด Enter เพื่อล็อกอินได้
+    document.getElementById("adminPassword").addEventListener("keypress", function(e) {
+      if (e.key === "Enter") loginAdmin();
+    });
+
+    // ==========================================
+    // ระบบจัดการฐานข้อมูลต่างๆ (ทำงานเมื่อเข้าระบบแล้ว)
+    // ==========================================
 
     function cleanUrl(type, url) {
       if (type === "youtube" && url.includes("watch?v=")) return `https://www.youtube.com/embed/${url.split("v=")[1].split("&")[0]}`;
@@ -304,7 +408,6 @@
       }
     }
 
-    // ฟังก์ชันเพิ่มเติม: ลบคำขอ
     window.deleteRequest = async function(reqId) {
       if (!confirm("ยืนยันการลบคำขอนี้ออกจากระบบ?")) return;
       try {
@@ -426,7 +529,6 @@
       }
     }
 
-    // ฟังก์ชันเพิ่มเติม: เรียกข้อมูลประวัติการดาวน์โหลด
     window.loadHistory = async function() {
       const tableDiv = document.getElementById("historyTable");
       tableDiv.innerHTML = "<p style='text-align:center;'>กำลังโหลดข้อมูลประวัติ...</p>";
@@ -443,7 +545,6 @@
             histories.push({ id: doc.id, ...doc.data() });
         });
 
-        // เรียงลำดับตามเวลาล่าสุด
         histories.sort((a, b) => {
             const timeA = a.downloadedAt ? a.downloadedAt.toMillis() : 0;
             const timeB = b.downloadedAt ? b.downloadedAt.toMillis() : 0;
@@ -474,10 +575,6 @@
         tableDiv.innerHTML = "<p style='color:red; text-align:center;'>การเรียกข้อมูลประวัติล้มเหลว</p>";
       }
     }
-
-    loadJobs();
-    loadRequests();
-    loadHistory(); // ทำงานเมื่อโหลดหน้าแอดมิน
   </script>
 </body>
 </html>
