@@ -2,11 +2,11 @@
 <html lang="th">
 <head>
   <meta charset="UTF-8">
-  <title>ระบบแอดมิน - จัดการสิทธิ์แบบรวมศูนย์</title>
+  <title>ระบบผู้ดูแล - จัดการสิทธิ์แบบรวมศูนย์</title>
   <style>
     body { font-family: sans-serif; background: #e9ecef; padding: 20px; display: flex; flex-direction: column; align-items: center; margin: 0; }
     .admin-box { background: white; padding: 25px; border-radius: 10px; width: 100%; max-width: 800px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin-bottom: 25px; box-sizing: border-box; }
-    h2 { margin-top: 0; display: flex; justify-content: space-between; align-items: center; }
+    h2 { margin-top: 0; display: flex; justify-content: space-between; align-items: center; color: #333; }
     label { font-weight: bold; margin-top: 15px; display: block; font-size: 14px; color: #333; }
     input, select, textarea, button { width: 100%; padding: 12px; margin-top: 8px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 5px; font-family: inherit; font-size: 14px; }
     textarea { height: 120px; resize: vertical; }
@@ -28,23 +28,24 @@
 </head>
 <body>
 
+  <!-- กล่อง: ให้สิทธิ์ดาวน์โหลดโดยตรง (ไม่ต้องรอยื่นเรื่อง) -->
   <div class="admin-box" style="border: 2px solid #28a745;">
-    <h2>🟢 ให้สิทธิ์ดาวน์โหลดโดยตรง (ไม่ต้องรอยื่นเรื่อง)</h2>
-    <label>1. เลือกงาน / เอกสาร:</label>
+    <h2>การอนุมัติสิทธิ์การเข้าถึงทันที (โดยไม่ต้องรอยื่นคำขอ)</h2>
+    <label>1. เลือกระบบงาน / เอกสาร:</label>
     <select id="directJobSelect">
-      <option value="">-- กำลังโหลดข้อมูลงาน... --</option>
+      <option value="">-- กำลังโหลดข้อมูลระบบงาน... --</option>
     </select>
     
-    <label>2. รหัสผู้มีสิทธิ์ (ตามคนๆ ไป):</label>
-    <input type="text" id="directStudentId" placeholder="พิมพ์รหัสผู้ชมที่นี่..." required>
+    <label>2. รหัสผู้รับสิทธิ์:</label>
+    <input type="text" id="directStudentId" placeholder="ระบุรหัสประจำตัวผู้รับสิทธิ์..." required>
     
-    <button class="btn-green" onclick="grantDirectDownload()">✅ ยืนยันให้สิทธิ์ดาวน์โหลด</button>
+    <button class="btn-green" onclick="grantDirectDownload()">ยืนยันการให้สิทธิ์การดาวน์โหลด</button>
   </div>
 
   <div class="admin-box">
-    <h2 id="formTitle">⚙️ เพิ่มงานใหม่เข้าสู่ระบบ</h2>
-    <input type="hidden" id="editJobId"> <label>1. ชื่องาน / ชื่อบทเรียน:</label>
-    <input type="text" id="jobTitle" placeholder="เช่น: เอกสารประกอบการเรียน บทที่ 1" required>
+    <h2 id="formTitle">เพิ่มรายการเข้าสู่ระบบ</h2>
+    <input type="hidden" id="editJobId"> <label>1. ชื่อรายการ / เอกสาร:</label>
+    <input type="text" id="jobTitle" placeholder="ตัวอย่าง: เอกสารประกอบการเรียน" required>
     
     <label>2. ประเภทของไฟล์:</label>
     <select id="fileType">
@@ -54,27 +55,33 @@
       <option value="link">ลิงก์เว็บไซต์ภายนอก (URL)</option>
     </select>
 
-    <label>3. วางลิงก์ไฟล์ (URL):</label>
-    <input type="text" id="fileUrl" placeholder="วางลิงก์ไฟล์ที่นี่..." required>
+    <label>3. ข้อมูลลิงก์ (URL):</label>
+    <input type="text" id="fileUrl" placeholder="ระบุลิงก์ข้อมูลที่นี่..." required>
 
-    <label>4. รายชื่อผู้มีสิทธิ์เข้าชม (1 งานใส่ได้ไม่จำกัด):</label>
-    <textarea id="allowedUsers" placeholder="ใส่รหัสหรือชื่อ คั่นด้วยลูกน้ำ (,) หรือขึ้นบรรทัดใหม่&#10;เช่น: 6810210178, 6810210220&#10;(ก๊อปปี้จาก Excel มาวางได้เลย)"></textarea>
+    <label>4. กำหนดรายชื่อผู้มีสิทธิ์เข้าชมเบื้องต้น (คั่นด้วยลูกน้ำ หรือ ขึ้นบรรทัดใหม่):</label>
+    <textarea id="allowedUsers" placeholder="ระบุรหัสประจำตัว เช่น: 6810210178, 6810210220"></textarea>
 
     <div style="display: flex; gap: 10px;">
-      <button class="btn-blue" id="btnSave" onclick="saveJob()">➕ บันทึกงาน</button>
-      <button class="btn-gray" id="btnCancel" onclick="cancelEdit()">❌ ยกเลิกการแก้ไข</button>
+      <button class="btn-blue" id="btnSave" onclick="saveJob()">บันทึกข้อมูลระบบงาน</button>
+      <button class="btn-gray" id="btnCancel" onclick="cancelEdit()">ยกเลิกการแก้ไข</button>
     </div>
     <p id="status" style="text-align: center; font-weight: bold; margin-bottom: 0;"></p>
   </div>
 
   <div class="admin-box">
-    <h2>📋 จัดการงานทั้งหมด</h2>
+    <h2>การจัดการรายการระบบงาน</h2>
     <div id="jobsTable"></div>
   </div>
 
   <div class="admin-box">
-    <h2>📥 จัดการคำขอดาวน์โหลดงาน</h2>
+    <h2>จัดการคำขอสิทธิ์การเข้าถึง/ดาวน์โหลด</h2>
     <div id="requestsTable"></div>
+  </div>
+
+  <!-- ส่วนเพิ่มเติม: ประวัติการดาวน์โหลดของผู้ชม -->
+  <div class="admin-box">
+    <h2>ประวัติการดาวน์โหลด (ผู้ชม)</h2>
+    <div id="historyTable"></div>
   </div>
 
   <script type="module">
@@ -98,7 +105,7 @@
       if (type === "youtube" && url.includes("watch?v=")) return `https://www.youtube.com/embed/${url.split("v=")[1].split("&")[0]}`;
       if (type === "youtube" && url.includes("youtu.be/")) return `https://www.youtube.com/embed/${url.split("youtu.be/")[1].split("?")[0]}`;
       if (type === "pdf" && url.includes("drive.google.com") && url.includes("/view")) return url.split("/view")[0] + "/preview";
-      return url; // ปล่อยผ่านสำหรับแบบลิงก์ (URL) หรือรูปภาพ
+      return url; 
     }
 
     window.saveJob = async function() {
@@ -110,7 +117,7 @@
       const statusText = document.getElementById("status");
 
       if (!title || !url) {
-        statusText.innerText = "❌ กรุณากรอกชื่องานและลิงก์ให้ครบ";
+        statusText.innerText = "กรุณาระบุข้อมูลให้ครบถ้วน";
         statusText.style.color = "red";
         return;
       }
@@ -118,7 +125,7 @@
       const userList = rawUsers.split(/[\n,]+/).map(id => id.trim()).filter(id => id !== "");
       url = cleanUrl(type, url);
 
-      statusText.innerText = "กำลังบันทึกข้อมูล...";
+      statusText.innerText = "ระบบกำลังบันทึกข้อมูล...";
       statusText.style.color = "blue";
 
       try {
@@ -132,43 +139,43 @@
 
         if (editId) {
           await setDoc(doc(db, "jobs", editId), jobData, { merge: true });
-          statusText.innerText = "✅ อัปเดตงานเรียบร้อย!";
+          statusText.innerText = "ปรับปรุงข้อมูลสำเร็จ";
         } else {
           jobData.createdAt = serverTimestamp();
           await addDoc(collection(db, "jobs"), jobData);
-          statusText.innerText = "✅ สร้างงานใหม่เรียบร้อย!";
+          statusText.innerText = "สร้างข้อมูลระบบงานสำเร็จ";
         }
         
         statusText.style.color = "green";
         cancelEdit(); 
         loadJobs();   
       } catch (error) {
-        statusText.innerText = "❌ เกิดข้อผิดพลาด (อย่าลืมตั้งค่า Rules เป็น true นะครับ)";
+        statusText.innerText = "เกิดข้อผิดพลาดในการบันทึกข้อมูล";
         statusText.style.color = "red";
       }
     }
 
     window.loadJobs = async function() {
       const tableDiv = document.getElementById("jobsTable");
-      tableDiv.innerHTML = "<p style='text-align:center;'>กำลังโหลด...</p>";
+      tableDiv.innerHTML = "<p style='text-align:center;'>กำลังโหลดข้อมูล...</p>";
 
       try {
         const querySnapshot = await getDocs(collection(db, "jobs"));
         if (querySnapshot.empty) {
-          tableDiv.innerHTML = "<p style='text-align:center; color:gray;'>ยังไม่มีงานในระบบ</p>";
-          document.getElementById("directJobSelect").innerHTML = '<option value="">-- ยังไม่มีงานในระบบ --</option>';
+          tableDiv.innerHTML = "<p style='text-align:center; color:gray;'>ไม่พบข้อมูลรายการในระบบ</p>";
+          document.getElementById("directJobSelect").innerHTML = '<option value="">-- ไม่พบข้อมูลรายการในระบบ --</option>';
           return;
         }
 
         let html = `<table>
                       <tr>
-                        <th width="30%">ชื่องาน</th>
+                        <th width="30%">ชื่อรายการ</th>
                         <th width="15%">ประเภท</th>
-                        <th width="30%">จำนวนผู้มีสิทธิ์ดู</th>
-                        <th width="25%">จัดการ</th>
+                        <th width="30%">สิทธิ์การเข้าชมเบื้องต้น</th>
+                        <th width="25%">การจัดการ</th>
                       </tr>`;
         
-        let jobOptionsHtml = '<option value="">-- กรุณาเลือกงาน --</option>';
+        let jobOptionsHtml = '<option value="">-- กรุณาเลือกระบบงาน --</option>';
 
         querySnapshot.forEach((docSnap) => {
           const id = docSnap.id;
@@ -182,11 +189,11 @@
           html += `<tr>
                     <td><b>${data.title}</b></td>
                     <td style="text-align:center;">${data.type}</td>
-                    <td style="text-align:center; color:green; font-weight:bold;">${userCount} คน</td>
+                    <td style="text-align:center; color:green; font-weight:bold;">${userCount} บัญชี</td>
                     <td>
                       <div class="action-btns">
-                        <button class="btn-yellow" onclick="editJob('${safeData}')">✏️ แก้ไข</button>
-                        <button class="btn-red" onclick="deleteJob('${id}')">🗑️ ลบ</button>
+                        <button class="btn-yellow" onclick="editJob('${safeData}')">แก้ไข</button>
+                        <button class="btn-red" onclick="deleteJob('${id}')">ลบ</button>
                       </div>
                     </td>
                    </tr>`;
@@ -195,21 +202,21 @@
         tableDiv.innerHTML = html;
         document.getElementById("directJobSelect").innerHTML = jobOptionsHtml;
       } catch (error) {
-        tableDiv.innerHTML = "<p style='color:red; text-align:center;'>โหลดข้อมูลไม่สำเร็จ</p>";
+        tableDiv.innerHTML = "<p style='color:red; text-align:center;'>การเรียกข้อมูลล้มเหลว</p>";
       }
     }
 
     window.editJob = function(encodedData) {
       const data = JSON.parse(decodeURIComponent(encodedData));
       
-      document.getElementById("formTitle").innerText = "✏️ แก้ไขข้อมูลงาน / จัดการสิทธิ์";
+      document.getElementById("formTitle").innerText = "แก้ไขข้อมูลและสิทธิ์ระบบงาน";
       document.getElementById("editJobId").value = data.id;
       document.getElementById("jobTitle").value = data.title;
       document.getElementById("fileType").value = data.type;
       document.getElementById("fileUrl").value = data.url;
       document.getElementById("allowedUsers").value = (data.allowedUsers || []).join(",\n");
 
-      document.getElementById("btnSave").innerText = "💾 บันทึกการแก้ไข";
+      document.getElementById("btnSave").innerText = "บันทึกการแก้ไข";
       document.getElementById("btnSave").classList.replace("btn-blue", "btn-yellow");
       document.getElementById("btnCancel").style.display = "block";
       document.getElementById("status").innerText = "";
@@ -218,42 +225,42 @@
     }
 
     window.cancelEdit = function() {
-      document.getElementById("formTitle").innerText = "⚙️ เพิ่มงานใหม่เข้าสู่ระบบ";
+      document.getElementById("formTitle").innerText = "เพิ่มรายการเข้าสู่ระบบ";
       document.getElementById("editJobId").value = "";
       document.getElementById("jobTitle").value = "";
       document.getElementById("fileUrl").value = "";
       document.getElementById("allowedUsers").value = "";
       
-      document.getElementById("btnSave").innerText = "➕ บันทึกงาน";
+      document.getElementById("btnSave").innerText = "บันทึกข้อมูลระบบงาน";
       document.getElementById("btnSave").classList.replace("btn-yellow", "btn-blue");
       document.getElementById("btnCancel").style.display = "none";
     }
 
     window.deleteJob = async function(id) {
-      if (!confirm("⚠️ ยืนยันการลบงานนี้? (นักศึกษาทุกคนจะถูกตัดสิทธิ์จากงานนี้ทันที)")) return;
+      if (!confirm("ยืนยันการลบรายการนี้? (บัญชีทั้งหมดจะถูกตัดสิทธิ์จากรายการนี้ทันที)")) return;
       try {
         await deleteDoc(doc(db, "jobs", id));
         loadJobs();
-      } catch (e) { alert("ลบไม่สำเร็จ"); }
+      } catch (e) { alert("การลบข้อมูลล้มเหลว"); }
     }
 
     window.loadRequests = async function() {
       const tableDiv = document.getElementById("requestsTable");
-      tableDiv.innerHTML = "<p style='text-align:center;'>กำลังโหลดคำขอ...</p>";
+      tableDiv.innerHTML = "<p style='text-align:center;'>กำลังโหลดข้อมูลคำขอ...</p>";
 
       try {
         const querySnapshot = await getDocs(collection(db, "download_requests"));
         if (querySnapshot.empty) {
-          tableDiv.innerHTML = "<p style='text-align:center; color:gray;'>ไม่มีคำขอดาวน์โหลดในระบบ</p>";
+          tableDiv.innerHTML = "<p style='text-align:center; color:gray;'>ไม่พบข้อมูลคำขอในระบบ</p>";
           return;
         }
 
         let html = `<table>
                       <tr>
-                        <th width="20%">รหัสผู้ชม</th>
-                        <th width="35%">ชื่องาน</th>
-                        <th width="20%">สถานะ</th>
-                        <th width="25%">จัดการ</th>
+                        <th width="20%">รหัสผู้รับสิทธิ์</th>
+                        <th width="30%">ชื่อรายการ</th>
+                        <th width="25%">สถานะปัจจุบัน</th>
+                        <th width="25%">การจัดการ</th>
                       </tr>`;
         
         querySnapshot.forEach((docSnap) => {
@@ -262,17 +269,17 @@
           
           let badge = "";
           if (data.status === "pending") {
-            badge = `<span style="color:#856404; font-weight:bold;">⏳ รอตรวจสอบ</span>`;
+            badge = `<span style="color:#856404; font-weight:bold;">รอการตรวจสอบ</span>`;
           } else if (data.status === "approved") {
-            badge = `<span style="color:#28a745; font-weight:bold;">✅ ยินยอมแล้ว</span>`;
+            badge = `<span style="color:#28a745; font-weight:bold;">อนุมัติการเข้าถึง</span>`;
             if (data.expiresAt) {
               const exp = data.expiresAt.toDate();
-              badge += `<br><small style="color:gray;">หมดอายุ: ${exp.toLocaleString('th-TH')}</small>`;
+              badge += `<br><small style="color:gray;">หมดเขต: ${exp.toLocaleString('th-TH')}</small>`;
             } else {
-              badge += `<br><small style="color:gray;">ไม่จำกัดเวลา</small>`;
+              badge += `<br><small style="color:gray;">ไม่มีวันหมดอายุ</small>`;
             }
           } else if (data.status === "rejected") {
-            badge = `<span style="color:#dc3545; font-weight:bold;">❌ ไม่ยินยอม</span>`;
+            badge = `<span style="color:#dc3545; font-weight:bold;">ปฏิเสธการเข้าถึง</span>`;
           }
 
           html += `<tr>
@@ -282,11 +289,12 @@
                     <td>
                       <div class="action-btns">
                         ${data.status !== 'approved' 
-                          ? `<button class="btn-green" onclick="updateRequestStatus('${id}', 'approved')">ยินยอม</button>` 
-                          : `<button class="btn-yellow" onclick="editExpirationTime('${id}')">⏳ แก้ไขเวลา</button>`}
+                          ? `<button class="btn-green" onclick="updateRequestStatus('${id}', 'approved')">อนุมัติ</button>` 
+                          : `<button class="btn-yellow" onclick="editExpirationTime('${id}')">กำหนดเวลา</button>`}
                         ${data.status !== 'rejected' 
-                          ? `<button class="btn-red" onclick="updateRequestStatus('${id}', 'rejected')">ไม่ยินยอม</button>` 
+                          ? `<button class="btn-blue" onclick="updateRequestStatus('${id}', 'rejected')">ปฏิเสธ</button>` 
                           : ''}
+                        <button class="btn-red" onclick="deleteRequest('${id}')">ลบคำขอ</button>
                       </div>
                     </td>
                    </tr>`;
@@ -294,11 +302,21 @@
         html += "</table>";
         tableDiv.innerHTML = html;
       } catch (error) {
-        tableDiv.innerHTML = "<p style='color:red; text-align:center;'>โหลดคำขอไม่สำเร็จ</p>";
+        tableDiv.innerHTML = "<p style='color:red; text-align:center;'>การเรียกข้อมูลล้มเหลว</p>";
       }
     }
 
-    // อัปเดตสถานะจากตาราง
+    // ฟังก์ชันเพิ่มเติม: ลบคำขอ
+    window.deleteRequest = async function(reqId) {
+      if (!confirm("ยืนยันการลบคำขอนี้ออกจากระบบ?")) return;
+      try {
+        await deleteDoc(doc(db, "download_requests", reqId));
+        loadRequests();
+      } catch (e) {
+        alert("การลบข้อมูลล้มเหลว");
+      }
+    }
+
     window.updateRequestStatus = async function(reqId, newStatus) {
       try {
         let updateData = {
@@ -307,13 +325,13 @@
         };
 
         if (newStatus === 'approved') {
-          const hours = prompt("กำหนดเวลาให้ดาวน์โหลดได้กี่ชั่วโมง?\\n(ระบุตัวเลข เช่น 24 = 1 วัน, 72 = 3 วัน, 0 = ไม่จำกัดเวลา)", "72");
+          const hours = prompt("กำหนดเวลาการเข้าถึง (ระบุเป็นชั่วโมง)\\n(ตัวอย่าง: 24 = 1 วัน, 72 = 3 วัน, หรือ 0 = เข้าถึงได้ถาวร)", "72");
           
           if (hours === null) return; 
           
           const duration = parseInt(hours);
           if (isNaN(duration) || duration < 0) {
-            alert("กรุณากรอกตัวเลขที่ถูกต้อง");
+            alert("กรุณาระบุตัวเลขที่ถูกต้อง");
             return;
           }
           
@@ -329,19 +347,18 @@
         await updateDoc(doc(db, "download_requests", reqId), updateData);
         loadRequests();
       } catch (e) {
-        alert("เกิดข้อผิดพลาดในการอัปเดตสถานะ");
+        alert("เกิดข้อผิดพลาดในการบันทึกข้อมูล");
       }
     }
 
-    // แก้ไขเวลา
     window.editExpirationTime = async function(reqId) {
-      const hours = prompt("⏳ แก้ไขเวลาดาวน์โหลด (ชั่วโมงนับจากปัจจุบัน)\\n(ระบุตัวเลข เช่น 24 = 1 วัน, 72 = 3 วัน, 0 = ไม่จำกัดเวลา)", "72");
+      const hours = prompt("กำหนดเวลาการเข้าถึงใหม่ (ระบุเป็นชั่วโมงนับจากปัจจุบัน)\\n(ตัวอย่าง: 24 = 1 วัน, 72 = 3 วัน, หรือ 0 = เข้าถึงได้ถาวร)", "72");
       
       if (hours === null) return; 
       
       const duration = parseInt(hours);
       if (isNaN(duration) || duration < 0) {
-        alert("กรุณากรอกตัวเลขที่ถูกต้อง");
+        alert("กรุณาระบุตัวเลขที่ถูกต้อง");
         return;
       }
       
@@ -352,18 +369,17 @@
           expireDate.setHours(expireDate.getHours() + duration);
           updateData.expiresAt = expireDate;
         } else {
-          updateData.expiresAt = null; // ไม่จำกัดเวลา
+          updateData.expiresAt = null;
         }
 
         await updateDoc(doc(db, "download_requests", reqId), updateData);
-        alert("✅ อัปเดตเวลาเรียบร้อยแล้ว");
+        alert("ปรับปรุงข้อมูลเวลาสำเร็จ");
         loadRequests();
       } catch (e) {
-        alert("เกิดข้อผิดพลาดในการแก้ไขเวลา");
+        alert("เกิดข้อผิดพลาดในการบันทึกข้อมูล");
       }
     }
 
-    // ฟังก์ชันใหม่: ให้สิทธิ์ดาวน์โหลดล่วงหน้าโดยตรง
     window.grantDirectDownload = async function() {
       const select = document.getElementById("directJobSelect");
       const jobId = select.value;
@@ -371,16 +387,16 @@
       const studentId = document.getElementById("directStudentId").value.trim();
 
       if (!jobId || !studentId) {
-        alert("กรุณาเลือกงานและพิมพ์รหัสผู้มีสิทธิ์ให้ครบถ้วน");
+        alert("กรุณาระบุข้อมูลรายการและรหัสผู้รับสิทธิ์ให้ครบถ้วน");
         return;
       }
 
-      const hours = prompt("กำหนดเวลาให้ดาวน์โหลดได้กี่ชั่วโมง?\\n(ระบุตัวเลข เช่น 24 = 1 วัน, 72 = 3 วัน, 0 = ไม่จำกัดเวลา)", "72");
+      const hours = prompt("กำหนดเวลาการเข้าถึง (ระบุเป็นชั่วโมง)\\n(ตัวอย่าง: 24 = 1 วัน, 72 = 3 วัน, หรือ 0 = เข้าถึงได้ถาวร)", "72");
       if (hours === null) return;
       
       const duration = parseInt(hours);
       if (isNaN(duration) || duration < 0) {
-        alert("กรุณากรอกตัวเลขที่ถูกต้อง");
+        alert("กรุณาระบุตัวเลขที่ถูกต้อง");
         return;
       }
 
@@ -401,20 +417,69 @@
           updateData.expiresAt = null;
         }
 
-        // คีย์เป็น jobId_studentId จะได้อัปเดตสิทธิ์หรือสร้างใหม่ได้เลย
         const reqId = `${jobId}_${studentId}`;
         await setDoc(doc(db, "download_requests", reqId), updateData);
         
-        alert(`✅ ให้สิทธิ์ดาวน์โหลดแก่ ${studentId} เรียบร้อยแล้ว`);
-        document.getElementById("directStudentId").value = ""; // เคลียร์ช่องให้พิมพ์คนต่อไปได้ง่ายๆ
+        alert(`ดำเนินการอนุมัติสิทธิ์ให้บัญชี ${studentId} สำเร็จ`);
+        document.getElementById("directStudentId").value = ""; 
         loadRequests();
       } catch (e) {
-        alert("เกิดข้อผิดพลาดในการให้สิทธิ์");
+        alert("เกิดข้อผิดพลาดในการประมวลผล");
+      }
+    }
+
+    // ฟังก์ชันเพิ่มเติม: เรียกข้อมูลประวัติการดาวน์โหลด
+    window.loadHistory = async function() {
+      const tableDiv = document.getElementById("historyTable");
+      tableDiv.innerHTML = "<p style='text-align:center;'>กำลังโหลดข้อมูลประวัติ...</p>";
+
+      try {
+        const querySnapshot = await getDocs(collection(db, "download_history"));
+        if (querySnapshot.empty) {
+          tableDiv.innerHTML = "<p style='text-align:center; color:gray;'>ไม่พบข้อมูลประวัติการดาวน์โหลด</p>";
+          return;
+        }
+
+        let histories = [];
+        querySnapshot.forEach(doc => {
+            histories.push({ id: doc.id, ...doc.data() });
+        });
+
+        // เรียงลำดับตามเวลาล่าสุด
+        histories.sort((a, b) => {
+            const timeA = a.downloadedAt ? a.downloadedAt.toMillis() : 0;
+            const timeB = b.downloadedAt ? b.downloadedAt.toMillis() : 0;
+            return timeB - timeA;
+        });
+
+        let html = `<table>
+                      <tr>
+                        <th width="20%">รหัสบัญชี</th>
+                        <th width="40%">ข้อมูลรายการที่เข้าถึง</th>
+                        <th width="40%">วัน / เวลาทำการ</th>
+                      </tr>`;
+        
+        histories.forEach(data => {
+          let dateStr = "-";
+          if (data.downloadedAt) {
+            dateStr = data.downloadedAt.toDate().toLocaleString('th-TH');
+          }
+          html += `<tr>
+                    <td style="text-align:center;"><b>${data.studentId || '-'}</b></td>
+                    <td>${data.jobTitle || '-'}</td>
+                    <td style="text-align:center;">${dateStr}</td>
+                   </tr>`;
+        });
+        html += "</table>";
+        tableDiv.innerHTML = html;
+      } catch (error) {
+        tableDiv.innerHTML = "<p style='color:red; text-align:center;'>การเรียกข้อมูลประวัติล้มเหลว</p>";
       }
     }
 
     loadJobs();
     loadRequests();
+    loadHistory(); // ทำงานเมื่อโหลดหน้าแอดมิน
   </script>
 </body>
 </html>
