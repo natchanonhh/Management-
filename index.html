@@ -98,26 +98,41 @@
       border-radius: 12px; 
       transition: background-color 0.2s, transform 0.2s;
       user-select: none;
+      height: 175px; /* คุมขอบเขตความสูงเผื่อปุ่มแอดมิน */
+      justify-content: flex-start;
     }
     .grid-item:hover { background-color: #f5f5f7; }
     
-    /* สไตล์เมื่อลากไอเทมภายในระบบมาวางทับโฟลเดอร์ */
     .grid-item.folder-target.dragover-active {
       background-color: rgba(0, 71, 227, 0.15) !important;
       transform: scale(1.05);
       box-shadow: 0 0 0 2px #0071e3;
     }
     
-    /* สไตล์สำหรับไอเทมที่กำลังถูกลากขยับ */
     .grid-item.dragging-item {
       opacity: 0.4;
     }
 
-    .grid-icon { width: 60px; height: 60px; margin-bottom: 10px; display: flex; justify-content: center; align-items: center; cursor: pointer; transition: transform 0.2s;}
+    /* ปรับสมดุลขนาดไอคอนในส่วนของแอดมินด้วย */
+    .grid-icon { 
+      margin-bottom: 10px; 
+      display: flex; 
+      justify-content: center; 
+      align-items: center; 
+      cursor: pointer; 
+      transition: transform 0.2s;
+      height: 65px; 
+      width: 100%;
+    }
     .grid-icon:hover { transform: scale(0.95); }
+    
+    .grid-icon svg.icon-folder { width: 70px; height: auto; }
+    .grid-icon svg.icon-file { width: 48px; height: auto; }
+    .grid-icon svg.icon-wide { width: 62px; height: auto; }
+
     .grid-name { font-size: 13px; font-weight: 500; color: #1d1d1f; text-align: center; line-height: 1.3; word-break: break-word; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; width: 100%; cursor: pointer;}
     
-    .admin-actions { display: flex; gap: 5px; margin-top: 10px; width: 100%; justify-content: center; }
+    .admin-actions { display: flex; gap: 5px; margin-top: auto; width: 100%; justify-content: center; }
     .admin-actions button { padding: 6px 10px; font-size: 11px; margin: 0; width: auto; border-radius: 8px; }
 
     @media (max-width: 600px) {
@@ -240,6 +255,7 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getFirestore, doc, setDoc, addDoc, getDoc, deleteDoc, collection, getDocs, serverTimestamp, updateDoc, query } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
     import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    
     const firebaseConfig = {
       apiKey: "AIzaSyBLyMpowfyQK_1UnredPFmXdBdtQZKpY-c",
       authDomain: "datapdf-d14d0.firebaseapp.com",
@@ -249,21 +265,22 @@
       messagingSenderId: "1034739093928",
       appId: "1:1034739093928:web:cd56cc0e208d7d00f24d9d"
     };
+    
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     const auth = getAuth(app);
 
     const icons = {
-      folder: `<svg viewBox="0 0 100 80" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M0 12C0 5.37258 5.37258 0 12 0H36.5C39.5 0 42.2 1.5 43.8 4L51 15H88C94.6274 15 100 20.3726 100 27V68C100 74.6274 94.6274 80 88 80H12C5.37258 80 0 74.6274 0 68V12Z" fill="#89C4FA"/><path d="M0 24C0 20.6863 2.68629 18 6 18H94C97.3137 18 100 20.6863 100 24V68C100 74.6274 94.6274 80 88 80H12C5.37258 80 0 74.6274 0 68V24Z" fill="#74B5F6"/></svg>`,
-      pdf: `<svg viewBox="0 0 64 80" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="4" y="4" width="56" height="72" rx="6" fill="#F9F9FB" stroke="#D2D2D7" stroke-width="2"/><path d="M40 4L60 24V10C60 6.68629 57.3137 4 54 4H40Z" fill="#E5E5EA"/><path d="M40 4V18C40 21.3137 42.6863 24 46 24H60" stroke="#D2D2D7" stroke-width="2" stroke-linejoin="round"/><rect x="16" y="32" width="32" height="4" rx="2" fill="#FF3B30"/><rect x="16" y="44" width="24" height="4" rx="2" fill="#D2D2D7"/><rect x="16" y="56" width="28" height="4" rx="2" fill="#D2D2D7"/></svg>`,
-      image: `<svg viewBox="0 0 80 64" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="4" y="4" width="72" height="56" rx="8" fill="#F9F9FB" stroke="#D2D2D7" stroke-width="2"/><circle cx="24" cy="24" r="6" fill="#FFCC00"/><path d="M4 48L28 28L52 48L64 38L76 48V52C76 56.4183 72.4183 60 68 60H12C7.58172 60 4 56.4183 4 52V48Z" fill="#34C759"/></svg>`,
-      youtube: `<svg viewBox="0 0 80 56" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="4" y="4" width="72" height="48" rx="12" fill="#FF3B30"/><path d="M34 18L52 28L34 38V18Z" fill="white"/></svg>`,
-      link: `<svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="40" cy="40" r="36" fill="#F9F9FB" stroke="#D2D2D7" stroke-width="2"/><path d="M40 10C28 10 20 25 20 40C20 55 28 70 40 70C52 70 60 55 60 40C60 25 52 10 40 10Z" stroke="#0071E3" stroke-width="2"/><path d="M10 40H70" stroke="#0071E3" stroke-width="2"/><path d="M20 25H60" stroke="#0071E3" stroke-width="2"/><path d="M20 55H60" stroke="#0071E3" stroke-width="2"/></svg>`
+      folder: `<svg class="icon-folder" viewBox="0 0 100 80" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M0 12C0 5.37258 5.37258 0 12 0H36.5C39.5 0 42.2 1.5 43.8 4L51 15H88C94.6274 15 100 20.3726 100 27V68C100 74.6274 94.6274 80 88 80H12C5.37258 80 0 74.6274 0 68V12Z" fill="#89C4FA"/><path d="M0 24C0 20.6863 2.68629 18 6 18H94C97.3137 18 100 20.6863 100 24V68C100 74.6274 94.6274 80 88 80H12C5.37258 80 0 74.6274 0 68V24Z" fill="#74B5F6"/></svg>`,
+      pdf: `<svg class="icon-file" viewBox="0 0 64 80" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="4" y="4" width="56" height="72" rx="6" fill="#F9F9FB" stroke="#D2D2D7" stroke-width="2"/><path d="M40 4L60 24V10C60 6.68629 57.3137 4 54 4H40Z" fill="#E5E5EA"/><path d="M40 4V18C40 21.3137 42.6863 24 46 24H60" stroke="#D2D2D7" stroke-width="2" stroke-linejoin="round"/><rect x="16" y="32" width="32" height="4" rx="2" fill="#FF3B30"/><rect x="16" y="44" width="24" height="4" rx="2" fill="#D2D2D7"/><rect x="16" y="56" width="28" height="4" rx="2" fill="#D2D2D7"/></svg>`,
+      image: `<svg class="icon-wide" viewBox="0 0 80 64" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="4" y="4" width="72" height="56" rx="8" fill="#F9F9FB" stroke="#D2D2D7" stroke-width="2"/><circle cx="24" cy="24" r="6" fill="#FFCC00"/><path d="M4 48L28 28L52 48L64 38L76 48V52C76 56.4183 72.4183 60 68 60H12C7.58172 60 4 56.4183 4 52V48Z" fill="#34C759"/></svg>`,
+      youtube: `<svg class="icon-wide" viewBox="0 0 80 56" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="4" y="4" width="72" height="48" rx="12" fill="#FF3B30"/><path d="M34 18L52 28L34 38V18Z" fill="white"/></svg>`,
+      link: `<svg class="icon-file" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="40" cy="40" r="36" fill="#F9F9FB" stroke="#D2D2D7" stroke-width="2"/><path d="M40 10C28 10 20 25 20 40C20 55 28 70 40 70C52 70 60 55 60 40C60 25 52 10 40 10Z" stroke="#0071E3" stroke-width="2"/><path d="M10 40H70" stroke="#0071E3" stroke-width="2"/><path d="M20 25H60" stroke="#0071E3" stroke-width="2"/><path d="M20 55H60" stroke="#0071E3" stroke-width="2"/></svg>`
     };
 
     let allJobsAdmin = [];
     let currentAdminPath = "";
-    let currentEmptyFolderMarkerId = null; // ตัวแปรเก็บ ID ของโฟลเดอร์เปล่า
+    let currentEmptyFolderMarkerId = null;
 
     window.loginAdmin = function() {
       const email = document.getElementById("adminEmail").value;
@@ -299,7 +316,7 @@
       if (user) {
         document.getElementById("adminLoginWrapper").style.display = "none";
         document.getElementById("mainAdminContent").style.display = "flex";
-        setupExternalDragAndDrop(); // เปิดระบบลากไฟล์จากข้างนอกคอมมาวาง
+        setupExternalDragAndDrop();
         loadJobs();
         loadRequests();
         loadHistory();
@@ -346,7 +363,6 @@
               jobOptionsHtml += `<option value="${docSnap.id}">${data.title}</option>`;
           }
 
-          // จัดการส่วน Table ด้านล่าง
           const displayFolder = data.folder ? `📁 ${data.folder}` : "หน้าหลัก (ไม่ระบุโฟลเดอร์)";
           if (data.type === "system_folder") {
               tableHtml += `<tr>
@@ -393,12 +409,11 @@
     window.renderAdminExplorer = function() {
         let foldersInCurrentPath = new Set();
         let filesInCurrentPath = [];
-        currentEmptyFolderMarkerId = null; // รีเซ็ต
+        currentEmptyFolderMarkerId = null;
 
         allJobsAdmin.forEach(file => {
             let fp = file.normalizedPath;
             if (fp === currentAdminPath) {
-                // ถ้าเป็น marker ของโฟลเดอร์ว่าง ให้เก็บไอดีไว้ ไม่เอาไปแสดงผลเป็นไฟล์
                 if (file.type === "system_folder") {
                     currentEmptyFolderMarkerId = file.id;
                 } else {
@@ -414,7 +429,6 @@
             }
         });
 
-        // จัดการแสดงปุ่ม ลบโฟลเดอร์ว่างเปล่า
         const btnDeleteEmpty = document.getElementById("btnDeleteEmptyFolder");
         if (currentAdminPath !== "" && filesInCurrentPath.length === 0 && foldersInCurrentPath.size === 0 && currentEmptyFolderMarkerId) {
             btnDeleteEmpty.style.display = "inline-block";
@@ -424,7 +438,7 @@
 
         let html = `<div class="item-grid">`;
         
-        // 1. วาดโฟลเดอร์ (เปิดคุณสมบัติ Drop Target เพื่อรับไฟล์ที่ถูกลากมาใส่ได้)
+        // 1. วาดโฟลเดอร์
         Array.from(foldersInCurrentPath).sort().forEach(folderName => {
             const safeFolderName = encodeURIComponent(folderName);
             let targetPath = currentAdminPath ? currentAdminPath + "/" + folderName : folderName;
@@ -441,7 +455,7 @@
             `;
         });
 
-        // 2. วาดไฟล์ (เปิดคุณสมบัติ Draggable ให้สามารถถูกลากย้ายไปใส่โฟลเดอร์อื่นได้)
+        // 2. วาดไฟล์
         filesInCurrentPath.forEach(file => {
             const safeData = encodeURIComponent(JSON.stringify(file));
             let iconSvg = icons.pdf;
@@ -473,7 +487,6 @@
 
         document.getElementById("adminFileExplorer").innerHTML = html;
         
-        // อัปเดตเมนูด้านบน (Nav Header)
         const navHeader = document.getElementById("adminNavHeader");
         const pathTitleEl = document.getElementById("currentAdminPathTitle");
 
@@ -486,20 +499,16 @@
         }
     }
 
-    // ===================================================
-    //  การสร้างและลบโฟลเดอร์ว่าง
-    // ===================================================
     window.createNewFolder = async function() {
         const folderName = prompt("ตั้งชื่อโฟลเดอร์ใหม่:");
         if (!folderName || folderName.trim() === "") return;
         if (folderName.includes("/")) {
-            alert("ไม่อนุญาตให้ใช้เครื่องหมาย / ในชื่อโฟลเดอร์ใหม่ที่นี่ (กรุณาสร้างทีละชั้น)");
+            alert("ไม่อนุญาตให้ใช้เครื่องหมาย / ในชื่อโฟลเดอร์ใหม่ที่นี่");
             return;
         }
 
         const newPath = currentAdminPath ? `${currentAdminPath}/${folderName.trim()}` : folderName.trim();
         
-        // ตรวจสอบว่าซ้ำไหม
         const exists = allJobsAdmin.some(f => {
             let fp = f.normalizedPath;
             return fp === newPath || fp.startsWith(newPath + "/");
@@ -516,7 +525,7 @@
                 folder: newPath,
                 type: "system_folder",
                 url: "-",
-                allowedUsers: [], // สำคัญมาก เพื่อไม่ให้ไปโผล่ในหน้าผู้ใช้
+                allowedUsers: [], 
                 searchableUsers: [],
                 updatedAt: serverTimestamp()
             };
@@ -532,7 +541,7 @@
         if (confirm("ยืนยันการลบโฟลเดอร์ว่างเปล่านี้?")) {
             try {
                 await deleteDoc(doc(db, "jobs", currentEmptyFolderMarkerId));
-                navigateAdminUp(); // เด้งกลับขึ้น 1 ระดับ
+                navigateAdminUp(); 
                 loadJobs();
             } catch(e) {
                 alert("การลบโฟลเดอร์ล้มเหลว");
@@ -540,11 +549,6 @@
         }
     }
 
-
-    // ===================================================
-    //  ระบบ DRAG & DROP FUNCTIONS
-    // ===================================================
-    
     window.handleFileDragStart = function(e) {
        let fileId = e.currentTarget.getAttribute("data-file-id");
        e.dataTransfer.setData("text/plain", fileId);
@@ -625,8 +629,6 @@
            }
        });
     }
-
-    // ===================================================
 
     window.openAdminFolder = function(encodedFolderName) {
       const folderName = decodeURIComponent(encodedFolderName);
