@@ -8,150 +8,101 @@
       background: #f5f5f7; display: flex; flex-direction: column; align-items: center; margin: 0;
       min-height: 100vh;}
     
-    /* สไตล์สำหรับกล่อง Login หน้าแอดมิน */
-    #adminLoginWrapper {
-      position: fixed;
-      top: 0; left: 0; width: 100%; height: 100%;
-      background: #f5f5f7; display: flex; justify-content: center; align-items: center;
-      z-index: 9999;
-    }
-    .login-card {
-      background: white; padding: 40px; border-radius: 20px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.08);
-      width: 100%; max-width: 400px; text-align: center; box-sizing: border-box;
-    }
-    .login-card h2 { margin-top: 0; color: #1d1d1f;
-      justify-content: center;}
+    #adminLoginWrapper { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #f5f5f7; display: flex; justify-content: center; align-items: center; z-index: 9999; }
+    .login-card { background: white; padding: 40px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); width: 100%; max-width: 400px; text-align: center; box-sizing: border-box; }
+    .login-card h2 { margin-top: 0; color: #1d1d1f; justify-content: center;}
     
-    /* สไตล์เนื้อหาหลักแอดมิน */
-    #mainAdminContent {
-      width: 100%;
-      display: none; flex-direction: column; align-items: center; padding: 30px 20px; box-sizing: border-box;
-    }
+    #mainAdminContent { width: 100%; display: none; flex-direction: column; align-items: center; padding: 30px 20px; box-sizing: border-box; }
 
-    .admin-box { background: white; padding: 30px;
-      border-radius: 16px; width: 100%; max-width: 850px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); margin-bottom: 25px; box-sizing: border-box;
-      position: relative;
-    }
-    h2 { margin-top: 0; display: flex; justify-content: space-between; align-items: center; color: #1d1d1f; font-size: 22px;
-    }
-    label { font-weight: 600; margin-top: 15px; display: block; font-size: 14px; color: #1d1d1f;
-    }
-    input, select, textarea, button { width: 100%; padding: 14px; margin-top: 8px; box-sizing: border-box;
-      border: 1px solid #d2d2d7; border-radius: 12px; font-family: inherit; font-size: 15px; transition: 0.2s;}
+    .admin-box { background: white; padding: 30px; border-radius: 16px; width: 100%; max-width: 850px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); margin-bottom: 25px; box-sizing: border-box; position: relative; }
+    h2 { margin-top: 0; display: flex; justify-content: space-between; align-items: center; color: #1d1d1f; font-size: 22px; }
+    label { font-weight: 600; margin-top: 15px; display: block; font-size: 14px; color: #1d1d1f; }
+    input, select, textarea, button { width: 100%; padding: 14px; margin-top: 8px; box-sizing: border-box; border: 1px solid #d2d2d7; border-radius: 12px; font-family: inherit; font-size: 15px; transition: 0.2s;}
     input:focus, select:focus, textarea:focus { outline: none; border-color: #0071e3; box-shadow: 0 0 0 3px rgba(0,113,227,0.1); }
-    textarea { height: 120px; resize: vertical;
-    }
-    button { color: white; border: none; cursor: pointer; font-weight: 600; margin-top: 15px; transition: 0.2s;
-    }
+    textarea { height: 120px; resize: vertical; }
+    button { color: white; border: none; cursor: pointer; font-weight: 600; margin-top: 15px; transition: 0.2s; }
     button:hover { opacity: 0.85; transform: scale(0.98); }
     button:active { transform: scale(0.95); }
     
-    .btn-blue { background: #0071e3;
-    }
+    .btn-blue { background: #0071e3; }
     .btn-green { background: #34c759; }
-    .btn-yellow { background: #ffcc00; color: #1d1d1f;
-    }
+    .btn-yellow { background: #ffcc00; color: #1d1d1f; }
     .btn-red { background: #ff3b30; }
-    .btn-gray { background: #86868b; display: none;
-    }
+    .btn-gray { background: #86868b; display: none; }
     
-    /* สไตล์ระบบจัดการโฟลเดอร์แบบ iOS Files */
-    .nav-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 20px;
-      padding-bottom: 15px;
-      border-bottom: 1px solid #d2d2d7;
-    }
-    .back-btn {
-      background: transparent;
-      color: #0071e3;
-      padding: 8px 12px;
-      width: auto;
-      margin: 0;
-      font-size: 15px;
-    }
+    .nav-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #d2d2d7; }
+    .back-btn { background: transparent; color: #0071e3; padding: 8px 12px; width: auto; margin: 0; font-size: 15px; }
     .back-btn:hover { background: rgba(0, 113, 227, 0.1); transform: none; }
     .path-title { font-size: 17px; font-weight: 600; flex-grow: 1; text-align: center; color: #1d1d1f; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin: 0 10px; }
     
-    /* สไตล์คลัง Explorer และ Drag Zone */
-    .explorer-zone {
-      border: 2px dashed transparent;
-      border-radius: 14px;
-      padding: 15px;
-      transition: all 0.3s ease;
-    }
-    .explorer-zone.dragover-active {
-      border-color: #0071e3;
-      background-color: rgba(0, 113, 227, 0.04);
-    }
+    .explorer-zone { border: 2px dashed transparent; border-radius: 14px; padding: 15px; transition: all 0.3s ease; }
+    .explorer-zone.dragover-active { border-color: #0071e3; background-color: rgba(0, 113, 227, 0.04); }
 
     .item-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px 15px; margin-top: 15px; }
     
-    .grid-item { 
-      display: flex; 
-      flex-direction: column; 
-      align-items: center; 
-      padding: 10px; 
-      border-radius: 12px; 
-      transition: background-color 0.2s, transform 0.2s;
-      user-select: none;
-      height: 175px; /* คุมขอบเขตความสูงเผื่อปุ่มแอดมิน */
-      justify-content: flex-start;
-    }
+    .grid-item { display: flex; flex-direction: column; align-items: center; padding: 10px; border-radius: 12px; transition: background-color 0.2s, transform 0.2s; user-select: none; height: 175px; justify-content: flex-start; }
     .grid-item:hover { background-color: #f5f5f7; }
-    
-    .grid-item.folder-target.dragover-active {
-      background-color: rgba(0, 71, 227, 0.15) !important;
-      transform: scale(1.05);
-      box-shadow: 0 0 0 2px #0071e3;
-    }
-    
-    .grid-item.dragging-item {
-      opacity: 0.4;
-    }
+    .grid-item.folder-target.dragover-active { background-color: rgba(0, 71, 227, 0.15) !important; transform: scale(1.05); box-shadow: 0 0 0 2px #0071e3; }
+    .grid-item.dragging-item { opacity: 0.4; }
 
-    /* ปรับสมดุลขนาดไอคอนในส่วนของแอดมินด้วย */
-    .grid-icon { 
-      margin-bottom: 10px; 
-      display: flex; 
-      justify-content: center; 
-      align-items: center; 
-      cursor: pointer; 
-      transition: transform 0.2s;
-      height: 65px; 
-      width: 100%;
-    }
+    .grid-icon { margin-bottom: 10px; display: flex; justify-content: center; align-items: center; cursor: pointer; transition: transform 0.2s; height: 65px; width: 100%; position: relative; }
     .grid-icon:hover { transform: scale(0.95); }
-    
     .grid-icon svg.icon-folder { width: 70px; height: auto; }
     .grid-icon svg.icon-file { width: 48px; height: auto; }
     .grid-icon svg.icon-wide { width: 62px; height: auto; }
 
     .grid-name { font-size: 13px; font-weight: 500; color: #1d1d1f; text-align: center; line-height: 1.3; word-break: break-word; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; width: 100%; cursor: pointer;}
-    
     .admin-actions { display: flex; gap: 5px; margin-top: auto; width: 100%; justify-content: center; }
     .admin-actions button { padding: 6px 10px; font-size: 11px; margin: 0; width: auto; border-radius: 8px; }
 
-    @media (max-width: 600px) {
-      .item-grid { grid-template-columns: repeat(3, 1fr); gap: 15px 10px; }
-    }
-    @media (max-width: 450px) {
-      .item-grid { grid-template-columns: repeat(2, 1fr); }
-    }
+    /* Color Picker Styles */
+    .color-circle { width: 28px; height: 28px; border-radius: 50%; cursor: pointer; border: 3px solid transparent; box-sizing: border-box; transition: 0.1s; }
+    .color-circle:hover { transform: scale(1.1); }
 
-    table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 15px;
-    }
-    th, td { border: 1px solid #d2d2d7; padding: 12px 10px; text-align: left; vertical-align: middle;
-    }
+    @media (max-width: 600px) { .item-grid { grid-template-columns: repeat(3, 1fr); gap: 15px 10px; } }
+    @media (max-width: 450px) { .item-grid { grid-template-columns: repeat(2, 1fr); } }
+
+    table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 15px; }
+    th, td { border: 1px solid #d2d2d7; padding: 12px 10px; text-align: left; vertical-align: middle; }
     th { background-color: #f5f5f7; text-align: center; font-weight: 600; }
     .action-btns { display: flex; gap: 5px; justify-content: center; flex-wrap: wrap; }
     .action-btns button { width: auto; padding: 6px 12px; margin: 0; font-size: 12px; border-radius: 8px;}
   </style>
 </head>
-<body>
+<body oncontextmenu="return false;">
+
+  <div id="folderSettingsModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:10000; justify-content:center; align-items:center;">
+    <div style="background:#ffffff; width:90%; max-width:320px; border-radius:24px; padding:25px; box-sizing:border-box; text-align:center; box-shadow: 0 15px 40px rgba(0,0,0,0.15);">
+        
+        <div id="folderPreviewIcon" style="width:90px; height:90px; margin:0 auto 15px; display:flex; justify-content:center; align-items:center;"></div>
+        
+        <input type="hidden" id="editFolderPath">
+        <input type="text" id="editFolderName" placeholder="ชื่อโฟลเดอร์" style="font-size:18px; font-weight:600; text-align:center; padding:10px 5px; margin-bottom:20px; width:100%; border:none; border-bottom:2px solid #e5e5ea; border-radius:0; background:transparent;">
+        
+        <div style="text-align:left; margin-bottom:20px; background:#f5f5f7; padding:12px 15px; border-radius:14px;">
+            <label style="font-size:13px; color:#86868b; margin-top:0; margin-bottom:10px; display:block; font-weight:600;">สีโฟลเดอร์ (Tags)</label>
+            <div id="colorPicker" style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px;">
+                <div class="color-circle" data-color="red" style="background:#ff3b30;" onclick="selectFolderColor('red')"></div>
+                <div class="color-circle" data-color="orange" style="background:#ff9500;" onclick="selectFolderColor('orange')"></div>
+                <div class="color-circle" data-color="yellow" style="background:#ffcc00;" onclick="selectFolderColor('yellow')"></div>
+                <div class="color-circle" data-color="green" style="background:#34c759;" onclick="selectFolderColor('green')"></div>
+                <div class="color-circle" data-color="blue" style="background:#0071e3;" onclick="selectFolderColor('blue')"></div>
+                <div class="color-circle" data-color="purple" style="background:#af52de;" onclick="selectFolderColor('purple')"></div>
+                <div class="color-circle" data-color="gray" style="background:#8e8e93;" onclick="selectFolderColor('gray')"></div>
+            </div>
+        </div>
+        
+        <div style="text-align:left; margin-bottom:25px; background:#f5f5f7; padding:12px 15px; border-radius:14px; display:flex; justify-content:space-between; align-items:center;">
+            <label style="font-size:14px; color:#1d1d1f; margin:0; font-weight:600;">อีโมจิ (Emoji)</label>
+            <input type="text" id="editFolderEmoji" maxlength="2" placeholder="😀" style="font-size:24px; text-align:center; width:50px; height:50px; padding:0; border-radius:12px; border:1px solid #d2d2d7; margin:0; background:white;">
+        </div>
+        
+        <div style="display:flex; gap:10px;">
+            <button class="btn-gray" onclick="closeFolderSettings()" style="display:block; background:#e5e5ea; color:#1d1d1f; margin-top:0; box-shadow:none;">ยกเลิก</button>
+            <button class="btn-blue" onclick="saveFolderSettings()" style="margin-top:0; box-shadow:none;">บันทึก</button>
+        </div>
+    </div>
+  </div>
 
   <div id="adminLoginWrapper">
      <div class="login-card">
@@ -165,7 +116,6 @@
   </div>
 
   <div id="mainAdminContent">
-    
     <div style="width: 100%; max-width: 850px; display: flex; justify-content: flex-end; margin-bottom: 15px;">
        <button class="btn-red" style="width: auto; padding: 10px 20px; margin: 0; border-radius: 12px;" onclick="logoutAdmin()">ออกจากระบบผู้ดูแล</button>
     </div>
@@ -173,26 +123,19 @@
     <div class="admin-box" style="border: 2px solid #34c759;">
       <h2>การอนุมัติสิทธิ์การเข้าถึงทันที (ไม่ต้องรอยื่นคำขอ)</h2>
       <label>1. เลือกระบบงาน / เอกสาร:</label>
-      <select id="directJobSelect">
-        <option value="">-- กำลังโหลดข้อมูลระบบงาน... --</option>
-      </select>
-      
+      <select id="directJobSelect"><option value="">-- กำลังโหลดข้อมูลระบบงาน... --</option></select>
       <label>2. รหัสผู้รับสิทธิ์:</label>
       <input type="text" id="directStudentId" placeholder="ระบุรหัสประจำตัวผู้รับสิทธิ์..." required>
-      
       <button class="btn-green" onclick="grantDirectDownload()">ยืนยันการให้สิทธิ์การดาวน์โหลด</button>
     </div>
 
     <div class="admin-box" id="formBox">
       <h2 id="formTitle">เพิ่มรายการเข้าสู่ระบบ</h2>
       <input type="hidden" id="editJobId"> 
-      
       <label>1. ชื่อรายการ / เอกสาร:</label>
       <input type="text" id="jobTitle" placeholder="ตัวอย่าง: เอกสารประกอบการเรียน" required>
-      
       <label>2. โฟลเดอร์ (จัดหมวดหมู่):</label>
       <input type="text" id="jobFolder" placeholder="ระบุชื่อโฟลเดอร์ (ใช้ / เพื่อซ้อนโฟลเดอร์ เช่น คณิตศาสตร์/ม.1)">
-
       <label>3. ประเภทของไฟล์:</label>
       <select id="fileType">
         <option value="youtube">วิดีโอ (ลิงก์ YouTube)</option>
@@ -200,10 +143,8 @@
         <option value="pdf">ไฟล์ PDF / Google Drive (ลิงก์เอกสาร)</option>
         <option value="link">ลิงก์เว็บไซต์ภายนอก (URL)</option>
       </select>
-
       <label>4. ข้อมูลลิงก์ (URL):</label>
       <input type="text" id="fileUrl" placeholder="ระบุลิงก์ข้อมูลที่นี่..." required>
-
       <label>5. กำหนดรายชื่อผู้มีสิทธิ์เข้าชมเบื้องต้น (คั่นด้วยลูกน้ำ หรือ ขึ้นบรรทัดใหม่):</label>
       <textarea id="allowedUsers" placeholder="ระบุรหัสประจำตัว เช่น: 6810210178, 6810210220"></textarea>
 
@@ -216,7 +157,7 @@
 
     <div class="admin-box">
       <h2>การจัดการรายการ (File Explorer)</h2>
-      <p style="color:#86868b; font-size:13px; margin-top:-5px; margin-bottom:15px;">💡 สามารถลากไฟล์ไปวางใส่โฟลเดอร์เพื่อย้ายได้ หรือลากไฟล์จากข้างนอกคอมพิวเตอร์มาวางในกล่องนี้เพื่ออัปโหลดใหม่ได้เลย</p>
+      <p style="color:#86868b; font-size:13px; margin-top:-5px; margin-bottom:15px;">💡 กดค้างที่โฟลเดอร์ (บนมือถือ) หรือคลิกขวา (บนคอม) เพื่อตั้งค่าสีและอีโมจิ</p>
       
       <div class="nav-header" id="adminNavHeader" style="display: none;">
          <button class="back-btn" onclick="navigateAdminUp()">< ย้อนกลับ</button>
@@ -253,7 +194,7 @@
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, doc, setDoc, addDoc, getDoc, deleteDoc, collection, getDocs, serverTimestamp, updateDoc, query } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getFirestore, doc, setDoc, addDoc, getDoc, deleteDoc, collection, getDocs, serverTimestamp, updateDoc, query, writeBatch } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
     import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
     
     const firebaseConfig = {
@@ -270,17 +211,39 @@
     const db = getFirestore(app);
     const auth = getAuth(app);
 
+    const appleColors = {
+        blue: ['#89C4FA', '#74B5F6', '#0071e3'],
+        red: ['#ff8a8a', '#ff5c5c', '#ff3b30'],
+        orange: ['#ffb380', '#ff944d', '#ff9500'],
+        yellow: ['#ffe082', '#ffcc33', '#ffcc00'],
+        green: ['#85e098', '#5cd675', '#34c759'],
+        purple: ['#d1a3ff', '#b870ff', '#af52de'],
+        gray: ['#c2c2c2', '#a8a8a8', '#8e8e93']
+    };
+
     const icons = {
-      folder: `<svg class="icon-folder" viewBox="0 0 100 80" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M0 12C0 5.37258 5.37258 0 12 0H36.5C39.5 0 42.2 1.5 43.8 4L51 15H88C94.6274 15 100 20.3726 100 27V68C100 74.6274 94.6274 80 88 80H12C5.37258 80 0 74.6274 0 68V12Z" fill="#89C4FA"/><path d="M0 24C0 20.6863 2.68629 18 6 18H94C97.3137 18 100 20.6863 100 24V68C100 74.6274 94.6274 80 88 80H12C5.37258 80 0 74.6274 0 68V24Z" fill="#74B5F6"/></svg>`,
       pdf: `<svg class="icon-file" viewBox="0 0 64 80" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="4" y="4" width="56" height="72" rx="6" fill="#F9F9FB" stroke="#D2D2D7" stroke-width="2"/><path d="M40 4L60 24V10C60 6.68629 57.3137 4 54 4H40Z" fill="#E5E5EA"/><path d="M40 4V18C40 21.3137 42.6863 24 46 24H60" stroke="#D2D2D7" stroke-width="2" stroke-linejoin="round"/><rect x="16" y="32" width="32" height="4" rx="2" fill="#FF3B30"/><rect x="16" y="44" width="24" height="4" rx="2" fill="#D2D2D7"/><rect x="16" y="56" width="28" height="4" rx="2" fill="#D2D2D7"/></svg>`,
       image: `<svg class="icon-wide" viewBox="0 0 80 64" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="4" y="4" width="72" height="56" rx="8" fill="#F9F9FB" stroke="#D2D2D7" stroke-width="2"/><circle cx="24" cy="24" r="6" fill="#FFCC00"/><path d="M4 48L28 28L52 48L64 38L76 48V52C76 56.4183 72.4183 60 68 60H12C7.58172 60 4 56.4183 4 52V48Z" fill="#34C759"/></svg>`,
       youtube: `<svg class="icon-wide" viewBox="0 0 80 56" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="4" y="4" width="72" height="48" rx="12" fill="#FF3B30"/><path d="M34 18L52 28L34 38V18Z" fill="white"/></svg>`,
       link: `<svg class="icon-file" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="40" cy="40" r="36" fill="#F9F9FB" stroke="#D2D2D7" stroke-width="2"/><path d="M40 10C28 10 20 25 20 40C20 55 28 70 40 70C52 70 60 55 60 40C60 25 52 10 40 10Z" stroke="#0071E3" stroke-width="2"/><path d="M10 40H70" stroke="#0071E3" stroke-width="2"/><path d="M20 25H60" stroke="#0071E3" stroke-width="2"/><path d="M20 55H60" stroke="#0071E3" stroke-width="2"/></svg>`
     };
 
+    function getFolderIcon(color, emoji) {
+        let c = appleColors[color] || appleColors.blue;
+        let svg = `<svg class="icon-folder" viewBox="0 0 100 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M0 12C0 5.37258 5.37258 0 12 0H36.5C39.5 0 42.2 1.5 43.8 4L51 15H88C94.6274 15 100 20.3726 100 27V68C100 74.6274 94.6274 80 88 80H12C5.37258 80 0 74.6274 0 68V12Z" fill="${c[0]}"/>
+            <path d="M0 24C0 20.6863 2.68629 18 6 18H94C97.3137 18 100 20.6863 100 24V68C100 74.6274 94.6274 80 88 80H12C5.37258 80 0 74.6274 0 68V24Z" fill="${c[1]}"/>`;
+        if (emoji) {
+            svg += `<text x="50%" y="55%" dominant-baseline="middle" text-anchor="middle" font-size="28">${emoji}</text>`;
+        }
+        svg += `</svg>`;
+        return svg;
+    }
+
     let allJobsAdmin = [];
     let currentAdminPath = "";
     let currentEmptyFolderMarkerId = null;
+    let folderMeta = {};
 
     window.loginAdmin = function() {
       const email = document.getElementById("adminEmail").value;
@@ -296,9 +259,7 @@
       errorMsg.style.display = "none";
       document.querySelector("#adminLoginWrapper button").innerText = "กำลังเข้าสู่ระบบ...";
       signInWithEmailAndPassword(auth, email, pwd)
-        .then(() => {
-          document.querySelector("#adminLoginWrapper button").innerText = "เข้าสู่ระบบ";
-        })
+        .then(() => { document.querySelector("#adminLoginWrapper button").innerText = "เข้าสู่ระบบ"; })
         .catch(() => {
           document.querySelector("#adminLoginWrapper button").innerText = "เข้าสู่ระบบ";
           errorMsg.style.display = "block";
@@ -344,6 +305,7 @@
       try {
         const querySnapshot = await getDocs(collection(db, "jobs"));
         allJobsAdmin = [];
+        folderMeta = {};
         let jobOptionsHtml = '<option value="">-- กรุณาเลือกระบบงาน --</option>';
         
         let tableHtml = `<table>
@@ -357,6 +319,11 @@
         querySnapshot.forEach((docSnap) => {
           const data = docSnap.data();
           let path = (data.folder || "").trim().replace(/^\/+|\/+$/g, ''); 
+          
+          if (data.type === "system_folder") {
+              folderMeta[path] = { id: docSnap.id, color: data.color || 'blue', emoji: data.emoji || '' };
+          }
+          
           allJobsAdmin.push({ id: docSnap.id, normalizedPath: path, ...data });
           
           if (data.type !== "system_folder") {
@@ -366,12 +333,12 @@
           const displayFolder = data.folder ? `📁 ${data.folder}` : "หน้าหลัก (ไม่ระบุโฟลเดอร์)";
           if (data.type === "system_folder") {
               tableHtml += `<tr>
-                        <td><b>${displayFolder}</b><br><small style="color:gray;">(โฟลเดอร์ว่าง)</small></td>
+                        <td><b>${displayFolder}</b><br><small style="color:gray;">(แฟ้มข้อมูล / กำหนดสี)</small></td>
                         <td style="text-align:center;">โฟลเดอร์</td>
                         <td style="text-align:center; color:gray;">-</td>
                         <td>
                           <div class="action-btns">
-                            <button class="btn-red" onclick="deleteJob('${docSnap.id}')">ลบ</button>
+                            <button class="btn-red" onclick="deleteJob('${docSnap.id}')">ลบโฟลเดอร์</button>
                           </div>
                         </td>
                        </tr>`;
@@ -404,6 +371,135 @@
       } catch (error) {
         explorerDiv.innerHTML = "<p style='color:red; text-align:center;'>การเรียกข้อมูลล้มเหลว</p>";
       }
+    }
+
+    // ระบบ Long Press
+    window.isLongPressing = false;
+    window.longPressTimer = null;
+
+    window.startFolderPress = function(e, encodedPath) {
+        if(e.type === 'mousedown' && e.button !== 0) return; 
+        window.isLongPressing = false;
+        window.longPressTimer = setTimeout(() => {
+            window.isLongPressing = true;
+            openFolderSettings(decodeURIComponent(encodedPath));
+        }, 500);
+    };
+
+    window.cancelFolderPress = function() {
+        clearTimeout(window.longPressTimer);
+    };
+
+    window.handleFolderClick = function(e, encodedPath) {
+        if (window.isLongPressing) {
+            e.preventDefault();
+            e.stopPropagation();
+            window.isLongPressing = false;
+            return;
+        }
+        openAdminFolder(encodedPath);
+    };
+
+    window.handleFolderContextMenu = function(e, encodedPath) {
+        e.preventDefault();
+        cancelFolderPress();
+        openFolderSettings(decodeURIComponent(encodedPath));
+    };
+
+    // เปิดหน้าตั้งค่าโฟลเดอร์
+    window.openFolderSettings = function(path) {
+       let folderName = path.split('/').pop();
+       let meta = folderMeta[path] || { color: 'blue', emoji: '' };
+       
+       document.getElementById("editFolderPath").value = path;
+       document.getElementById("editFolderName").value = folderName;
+       document.getElementById("editFolderEmoji").value = meta.emoji;
+       
+       selectFolderColor(meta.color);
+       document.getElementById("folderSettingsModal").style.display = "flex";
+    }
+
+    window.closeFolderSettings = function() {
+       document.getElementById("folderSettingsModal").style.display = "none";
+    }
+
+    window.selectFolderColor = function(colorKey) {
+        window.selectedFolderColor = colorKey;
+        let pickColorHex = appleColors[colorKey] ? appleColors[colorKey][2] : '#0071e3';
+        document.querySelectorAll('.color-circle').forEach(el => {
+            el.style.border = el.getAttribute('data-color') === colorKey ? `3px solid #1d1d1f` : '3px solid transparent';
+            if (el.getAttribute('data-color') === colorKey) el.style.transform = 'scale(1.15)';
+            else el.style.transform = 'scale(1)';
+        });
+        updateFolderPreview();
+    }
+
+    window.updateFolderPreview = function() {
+        let color = window.selectedFolderColor || 'blue';
+        let emoji = document.getElementById('editFolderEmoji').value;
+        document.getElementById('folderPreviewIcon').innerHTML = getFolderIcon(color, emoji);
+    }
+    document.getElementById('editFolderEmoji').addEventListener('input', updateFolderPreview);
+
+    window.saveFolderSettings = async function() {
+        let oldPath = document.getElementById("editFolderPath").value;
+        let newName = document.getElementById("editFolderName").value.trim();
+        let newColor = window.selectedFolderColor || 'blue';
+        let newEmoji = document.getElementById("editFolderEmoji").value.trim();
+        
+        if (!newName) { alert("กรุณาระบุชื่อโฟลเดอร์"); return; }
+        if (newName.includes("/")) { alert("ไม่อนุญาตให้ใช้เครื่องหมาย / ในชื่อโฟลเดอร์"); return; }
+
+        let pathParts = oldPath.split('/');
+        pathParts.pop();
+        let parentPath = pathParts.join('/');
+        let newPath = parentPath ? `${parentPath}/${newName}` : newName;
+        
+        const batch = writeBatch(db);
+        
+        // ถ้าย้าย/เปลี่ยนชื่อโฟลเดอร์ ให้แก้ไข Path ของไฟล์ภายในด้วย
+        if (oldPath !== newPath) {
+           allJobsAdmin.forEach(f => {
+              if (f.normalizedPath === oldPath && f.type !== 'system_folder') {
+                  batch.update(doc(db, "jobs", f.id), { folder: newPath });
+              } else if (f.normalizedPath.startsWith(oldPath + "/")) {
+                  let subPath = f.normalizedPath.substring(oldPath.length);
+                  batch.update(doc(db, "jobs", f.id), { folder: newPath + subPath });
+              }
+           });
+        }
+        
+        let meta = folderMeta[oldPath];
+        if (meta && meta.id) {
+            batch.update(doc(db, "jobs", meta.id), {
+                title: `[Folder] ${newName}`,
+                folder: newPath,
+                color: newColor,
+                emoji: newEmoji,
+                updatedAt: serverTimestamp()
+            });
+        } else {
+            let newFolderRef = doc(collection(db, "jobs"));
+            batch.set(newFolderRef, {
+                title: `[Folder] ${newName}`,
+                folder: newPath,
+                type: "system_folder",
+                color: newColor,
+                emoji: newEmoji,
+                allowedUsers: [],
+                searchableUsers: [],
+                createdAt: serverTimestamp(),
+                updatedAt: serverTimestamp()
+            });
+        }
+        
+        try {
+            await batch.commit();
+            closeFolderSettings();
+            loadJobs();
+        } catch(e) {
+            alert("เกิดข้อผิดพลาดในการบันทึกข้อมูลโฟลเดอร์");
+        }
     }
 
     window.renderAdminExplorer = function() {
@@ -442,6 +538,8 @@
         Array.from(foldersInCurrentPath).sort().forEach(folderName => {
             const safeFolderName = encodeURIComponent(folderName);
             let targetPath = currentAdminPath ? currentAdminPath + "/" + folderName : folderName;
+            const safeTarget = encodeURIComponent(targetPath);
+            let meta = folderMeta[targetPath] || { color: 'blue', emoji: '' };
             
             html += `
               <div class="grid-item folder-target" 
@@ -449,8 +547,24 @@
                    ondragover="handleDragOverFolder(event)" 
                    onDragleave="handleDragLeaveFolder(event)" 
                    ondrop="handleDropOnFolder(event)">
-                <div class="grid-icon" onclick="openAdminFolder('${safeFolderName}')">${icons.folder}</div>
-                <div class="grid-name" onclick="openAdminFolder('${safeFolderName}')">${folderName}</div>
+                <div class="grid-icon" 
+                     ontouchstart="startFolderPress(event, '${safeTarget}')"
+                     ontouchend="cancelFolderPress()"
+                     onmousedown="startFolderPress(event, '${safeTarget}')"
+                     onmouseup="cancelFolderPress()"
+                     onmouseleave="cancelFolderPress()"
+                     oncontextmenu="handleFolderContextMenu(event, '${safeTarget}')"
+                     onclick="handleFolderClick(event, '${safeFolderName}')">
+                     ${getFolderIcon(meta.color, meta.emoji)}
+                </div>
+                <div class="grid-name" 
+                     ontouchstart="startFolderPress(event, '${safeTarget}')"
+                     ontouchend="cancelFolderPress()"
+                     onmousedown="startFolderPress(event, '${safeTarget}')"
+                     onmouseup="cancelFolderPress()"
+                     onmouseleave="cancelFolderPress()"
+                     oncontextmenu="handleFolderContextMenu(event, '${safeTarget}')"
+                     onclick="handleFolderClick(event, '${safeFolderName}')">${folderName}</div>
               </div>
             `;
         });
@@ -514,16 +628,15 @@
             return fp === newPath || fp.startsWith(newPath + "/");
         });
 
-        if (exists) {
-            alert("มีโฟลเดอร์ชื่อนี้อยู่แล้วในระบบ");
-            return;
-        }
+        if (exists) { alert("มีโฟลเดอร์ชื่อนี้อยู่แล้วในระบบ"); return; }
 
         try {
             const jobData = {
                 title: `[Folder] ${folderName}`,
                 folder: newPath,
                 type: "system_folder",
+                color: "blue",
+                emoji: "",
                 url: "-",
                 allowedUsers: [], 
                 searchableUsers: [],
@@ -582,10 +695,7 @@
 
        try {
            const jobDocRef = doc(db, "jobs", fileId);
-           await updateDoc(jobDocRef, {
-               folder: targetFolder,
-               updatedAt: serverTimestamp()
-           });
+           await updateDoc(jobDocRef, { folder: targetFolder, updatedAt: serverTimestamp() });
            loadJobs();
        } catch(err) {
            alert("ไม่สามารถลากย้ายไฟล์ระบบได้ในขณะนี้");
@@ -612,17 +722,12 @@
                let droppedFile = e.dataTransfer.files[0];
                
                cancelEdit();
-               
                document.getElementById("jobTitle").value = droppedFile.name.split('.').pop() ? droppedFile.name.substring(0, droppedFile.name.lastIndexOf('.')) : droppedFile.name;
                document.getElementById("jobFolder").value = currentAdminPath;
                
-               if(droppedFile.type.includes("image")) {
-                   document.getElementById("fileType").value = "image";
-               } else if(droppedFile.type.includes("pdf")) {
-                   document.getElementById("fileType").value = "pdf";
-               } else {
-                   document.getElementById("fileType").value = "link";
-               }
+               if(droppedFile.type.includes("image")) document.getElementById("fileType").value = "image";
+               else if(droppedFile.type.includes("pdf")) document.getElementById("fileType").value = "pdf";
+               else document.getElementById("fileType").value = "link";
                
                document.getElementById("formBox").scrollIntoView({ behavior: 'smooth' });
                alert(`เตรียมบันทึกอัปโหลดไฟล์: "${droppedFile.name}" เข้าสู่โฟลเดอร์ "${currentAdminPath || 'หน้าหลัก'}" แล้ว! กรุณาใส่ URL ข้อมูลลิงก์และบันทึกระบบงาน`);
@@ -632,11 +737,8 @@
 
     window.openAdminFolder = function(encodedFolderName) {
       const folderName = decodeURIComponent(encodedFolderName);
-      if (currentAdminPath === "") {
-          currentAdminPath = folderName;
-      } else {
-          currentAdminPath = currentAdminPath + "/" + folderName;
-      }
+      if (currentAdminPath === "") currentAdminPath = folderName;
+      else currentAdminPath = currentAdminPath + "/" + folderName;
       renderAdminExplorer();
     }
 
@@ -720,7 +822,6 @@
       document.getElementById("btnSave").classList.replace("btn-blue", "btn-yellow");
       document.getElementById("btnCancel").style.display = "block";
       document.getElementById("status").innerText = "";
-      
       document.getElementById("formBox").scrollIntoView({ behavior: 'smooth' });
     }
 
@@ -731,7 +832,6 @@
       document.getElementById("jobFolder").value = "";
       document.getElementById("fileUrl").value = "";
       document.getElementById("allowedUsers").value = "";
-      
       document.getElementById("btnSave").innerText = "บันทึกข้อมูลระบบงาน";
       document.getElementById("btnSave").classList.replace("btn-yellow", "btn-blue");
       document.getElementById("btnCancel").style.display = "none";
@@ -743,8 +843,7 @@
       try {
         await deleteDoc(doc(db, "jobs", id));
         loadJobs();
-      } catch (e) { alert("การลบข้อมูลล้มเหลว");
-      }
+      } catch (e) { alert("การลบข้อมูลล้มเหลว"); }
     }
 
     window.loadRequests = async function() {
@@ -770,19 +869,12 @@
           const data = docSnap.data();
           
           let badge = "";
-          if (data.status === "pending") {
-            badge = `<span style="color:#d97706; font-weight:600;">รอการตรวจสอบ</span>`;
-          } else if (data.status === "approved") {
+          if (data.status === "pending") badge = `<span style="color:#d97706; font-weight:600;">รอการตรวจสอบ</span>`;
+          else if (data.status === "approved") {
             badge = `<span style="color:#34c759; font-weight:600;">อนุมัติการเข้าถึง</span>`;
-            if (data.expiresAt) {
-              const exp = data.expiresAt.toDate();
-              badge += `<br><small style="color:#86868b;">หมดเขต: ${exp.toLocaleString('th-TH')}</small>`;
-            } else {
-              badge += `<br><small style="color:#86868b;">ไม่มีวันหมดอายุ</small>`;
-            }
-          } else if (data.status === "rejected") {
-            badge = `<span style="color:#ff3b30; font-weight:600;">ปฏิเสธการเข้าถึง</span>`;
-          }
+            if (data.expiresAt) badge += `<br><small style="color:#86868b;">หมดเขต: ${data.expiresAt.toDate().toLocaleString('th-TH')}</small>`;
+            else badge += `<br><small style="color:#86868b;">ไม่มีวันหมดอายุ</small>`;
+          } else if (data.status === "rejected") badge = `<span style="color:#ff3b30; font-weight:600;">ปฏิเสธการเข้าถึง</span>`;
 
           html += `<tr>
                     <td style="text-align:center;"><b>${data.studentId}</b></td>
@@ -803,9 +895,7 @@
         });
         html += "</table>";
         tableDiv.innerHTML = html;
-      } catch (error) {
-        tableDiv.innerHTML = "<p style='color:red; text-align:center;'>การเรียกข้อมูลล้มเหลว</p>";
-      }
+      } catch (error) { tableDiv.innerHTML = "<p style='color:red; text-align:center;'>การเรียกข้อมูลล้มเหลว</p>"; }
     }
 
     window.deleteRequest = async function(reqId) {
@@ -813,52 +903,34 @@
       try {
         await deleteDoc(doc(db, "download_requests", reqId));
         loadRequests();
-      } catch (e) {
-        alert("การลบข้อมูลล้มเหลว");
-      }
+      } catch (e) { alert("การลบข้อมูลล้มเหลว"); }
     }
 
     window.updateRequestStatus = async function(reqId, newStatus) {
       try {
-        let updateData = {
-          status: newStatus,
-          updatedAt: serverTimestamp()
-        };
+        let updateData = { status: newStatus, updatedAt: serverTimestamp() };
         if (newStatus === 'approved') {
           const hours = prompt("กำหนดเวลาการเข้าถึง (ระบุเป็นชั่วโมง)\\n(ตัวอย่าง: 24 = 1 วัน, 72 = 3 วัน, หรือ 0 = เข้าถึงได้ถาวร)", "72");
           if (hours === null) return; 
-          
           const duration = parseInt(hours);
-          if (isNaN(duration) || duration < 0) {
-            alert("กรุณาระบุตัวเลขที่ถูกต้อง");
-            return;
-          }
+          if (isNaN(duration) || duration < 0) { alert("กรุณาระบุตัวเลขที่ถูกต้อง"); return; }
           
           if (duration > 0) {
             const expireDate = new Date();
             expireDate.setHours(expireDate.getHours() + duration);
             updateData.expiresAt = expireDate;
-          } else {
-            updateData.expiresAt = null;
-          }
+          } else { updateData.expiresAt = null; }
         }
-
         await updateDoc(doc(db, "download_requests", reqId), updateData);
         loadRequests();
-      } catch (e) {
-        alert("เกิดข้อผิดพลาดในการบันทึกข้อมูล");
-      }
+      } catch (e) { alert("เกิดข้อผิดพลาดในการบันทึกข้อมูล"); }
     }
 
     window.editExpirationTime = async function(reqId) {
       const hours = prompt("กำหนดเวลาการเข้าถึงใหม่ (ระบุเป็นชั่วโมงนับจากปัจจุบัน)\\n(ตัวอย่าง: 24 = 1 วัน, 72 = 3 วัน, หรือ 0 = เข้าถึงได้ถาวร)", "72");
       if (hours === null) return; 
-      
       const duration = parseInt(hours);
-      if (isNaN(duration) || duration < 0) {
-        alert("กรุณาระบุตัวเลขที่ถูกต้อง");
-        return;
-      }
+      if (isNaN(duration) || duration < 0) { alert("กรุณาระบุตัวเลขที่ถูกต้อง"); return; }
       
       try {
         let updateData = { updatedAt: serverTimestamp() };
@@ -866,16 +938,11 @@
           const expireDate = new Date();
           expireDate.setHours(expireDate.getHours() + duration);
           updateData.expiresAt = expireDate;
-        } else {
-          updateData.expiresAt = null;
-        }
-
+        } else { updateData.expiresAt = null; }
         await updateDoc(doc(db, "download_requests", reqId), updateData);
         alert("ปรับปรุงข้อมูลเวลาสำเร็จ");
         loadRequests();
-      } catch (e) {
-        alert("เกิดข้อผิดพลาดในการบันทึกข้อมูล");
-      }
+      } catch (e) { alert("เกิดข้อผิดพลาดในการบันทึกข้อมูล"); }
     }
 
     window.grantDirectDownload = async function() {
@@ -883,45 +950,25 @@
       const jobId = select.value;
       const jobTitle = select.options[select.selectedIndex]?.text;
       const studentId = document.getElementById("directStudentId").value.trim();
-      if (!jobId || !studentId) {
-        alert("กรุณาระบุข้อมูลรายการและรหัสผู้รับสิทธิ์ให้ครบถ้วน");
-        return;
-      }
-
+      if (!jobId || !studentId) { alert("กรุณาระบุข้อมูลรายการและรหัสผู้รับสิทธิ์ให้ครบถ้วน"); return; }
       const hours = prompt("กำหนดเวลาการเข้าถึง (ระบุเป็นชั่วโมง)\\n(ตัวอย่าง: 24 = 1 วัน, 72 = 3 วัน, หรือ 0 = เข้าถึงได้ถาวร)", "72");
       if (hours === null) return;
-      
       const duration = parseInt(hours);
-      if (isNaN(duration) || duration < 0) {
-        alert("กรุณาระบุตัวเลขที่ถูกต้อง");
-        return;
-      }
+      if (isNaN(duration) || duration < 0) { alert("กรุณาระบุตัวเลขที่ถูกต้อง"); return; }
 
       try {
-        let updateData = {
-          jobId: jobId,
-          jobTitle: jobTitle,
-          studentId: studentId,
-          status: "approved",
-          updatedAt: serverTimestamp()
-        };
+        let updateData = { jobId: jobId, jobTitle: jobTitle, studentId: studentId, status: "approved", updatedAt: serverTimestamp() };
         if (duration > 0) {
           const expireDate = new Date();
           expireDate.setHours(expireDate.getHours() + duration);
           updateData.expiresAt = expireDate;
-        } else {
-          updateData.expiresAt = null;
-        }
-
+        } else { updateData.expiresAt = null; }
         const reqId = `${jobId}_${studentId}`;
         await setDoc(doc(db, "download_requests", reqId), updateData);
-        
         alert(`ดำเนินการอนุมัติสิทธิ์ให้บัญชี ${studentId} สำเร็จ`);
         document.getElementById("directStudentId").value = ""; 
         loadRequests();
-      } catch (e) {
-        alert("เกิดข้อผิดพลาดในการประมวลผล");
-      }
+      } catch (e) { alert("เกิดข้อผิดพลาดในการประมวลผล"); }
     }
 
     window.loadHistory = async function() {
@@ -934,38 +981,22 @@
           tableDiv.innerHTML = "<p style='text-align:center; color:#86868b;'>ไม่พบข้อมูลประวัติการดาวน์โหลด</p>";
           return;
         }
-
         let histories = [];
-        querySnapshot.forEach(doc => {
-            histories.push({ id: doc.id, ...doc.data() });
-        });
+        querySnapshot.forEach(doc => { histories.push({ id: doc.id, ...doc.data() }); });
         histories.sort((a, b) => {
             const timeA = a.downloadedAt ? a.downloadedAt.toMillis() : 0;
             const timeB = b.downloadedAt ? b.downloadedAt.toMillis() : 0;
             return timeB - timeA;
         });
-        let html = `<table>
-                      <tr>
-                        <th width="20%">รหัสบัญชี</th>
-                        <th width="40%">ข้อมูลรายการที่เข้าถึง</th>
-                        <th width="40%">วัน / เวลาทำการ</th>
-                      </tr>`;
+        let html = `<table><tr><th width="20%">รหัสบัญชี</th><th width="40%">ข้อมูลรายการที่เข้าถึง</th><th width="40%">วัน / เวลาทำการ</th></tr>`;
         histories.forEach(data => {
           let dateStr = "-";
-          if (data.downloadedAt) {
-            dateStr = data.downloadedAt.toDate().toLocaleString('th-TH');
-          }
-          html += `<tr>
-                    <td style="text-align:center;"><b>${data.studentId || '-'}</b></td>
-                    <td>${data.jobTitle || '-'}</td>
-                    <td style="text-align:center;">${dateStr}</td>
-                   </tr>`;
+          if (data.downloadedAt) dateStr = data.downloadedAt.toDate().toLocaleString('th-TH');
+          html += `<tr><td style="text-align:center;"><b>${data.studentId || '-'}</b></td><td>${data.jobTitle || '-'}</td><td style="text-align:center;">${dateStr}</td></tr>`;
         });
         html += "</table>";
         tableDiv.innerHTML = html;
-      } catch (error) {
-        tableDiv.innerHTML = "<p style='color:red; text-align:center;'>การเรียกข้อมูลประวัติล้มเหลว</p>";
-      }
+      } catch (error) { tableDiv.innerHTML = "<p style='color:red; text-align:center;'>การเรียกข้อมูลประวัติล้มเหลว</p>"; }
     }
   </script>
 </body>
