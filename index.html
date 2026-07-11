@@ -4,70 +4,159 @@
   <meta charset="UTF-8">
   <title>ระบบผู้ดูแล - จัดการสิทธิ์แบบรวมศูนย์</title>
   <style>
-    body { font-family: sans-serif; background: #e9ecef; display: flex; flex-direction: column; align-items: center; margin: 0; min-height: 100vh;}
+    body { font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: #f5f5f7; display: flex; flex-direction: column; align-items: center; margin: 0;
+      min-height: 100vh;}
     
     /* สไตล์สำหรับกล่อง Login หน้าแอดมิน */
     #adminLoginWrapper {
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: #e9ecef; display: flex; justify-content: center; align-items: center;
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: #f5f5f7; display: flex; justify-content: center; align-items: center;
       z-index: 9999;
     }
     .login-card {
-      background: white; padding: 40px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      background: white; padding: 40px; border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.08);
       width: 100%; max-width: 400px; text-align: center; box-sizing: border-box;
     }
-    .login-card h2 { margin-top: 0; color: #333; justify-content: center;}
+    .login-card h2 { margin-top: 0; color: #1d1d1f;
+      justify-content: center;}
     
     /* สไตล์เนื้อหาหลักแอดมิน */
     #mainAdminContent {
-      width: 100%; display: none; flex-direction: column; align-items: center; padding: 20px; box-sizing: border-box;
+      width: 100%;
+      display: none; flex-direction: column; align-items: center; padding: 30px 20px; box-sizing: border-box;
     }
 
-    .admin-box { background: white; padding: 25px; border-radius: 10px; width: 100%; max-width: 800px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin-bottom: 25px; box-sizing: border-box; }
-    h2 { margin-top: 0; display: flex; justify-content: space-between; align-items: center; color: #333; }
-    label { font-weight: bold; margin-top: 15px; display: block; font-size: 14px; color: #333; }
-    input, select, textarea, button { width: 100%; padding: 12px; margin-top: 8px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 5px; font-family: inherit; font-size: 14px; }
-    textarea { height: 120px; resize: vertical; }
-    button { color: white; border: none; cursor: pointer; font-weight: bold; margin-top: 15px; transition: 0.2s; }
-    button:hover { opacity: 0.85; }
+    .admin-box { background: white; padding: 30px;
+      border-radius: 16px; width: 100%; max-width: 850px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); margin-bottom: 25px; box-sizing: border-box;
+      position: relative;
+    }
+    h2 { margin-top: 0; display: flex; justify-content: space-between; align-items: center; color: #1d1d1f; font-size: 22px;
+    }
+    label { font-weight: 600; margin-top: 15px; display: block; font-size: 14px; color: #1d1d1f;
+    }
+    input, select, textarea, button { width: 100%; padding: 14px; margin-top: 8px; box-sizing: border-box;
+      border: 1px solid #d2d2d7; border-radius: 12px; font-family: inherit; font-size: 15px; transition: 0.2s;}
+    input:focus, select:focus, textarea:focus { outline: none; border-color: #0071e3; box-shadow: 0 0 0 3px rgba(0,113,227,0.1); }
+    textarea { height: 120px; resize: vertical;
+    }
+    button { color: white; border: none; cursor: pointer; font-weight: 600; margin-top: 15px; transition: 0.2s;
+    }
+    button:hover { opacity: 0.85; transform: scale(0.98); }
+    button:active { transform: scale(0.95); }
     
-    .btn-blue { background: #007bff; }
-    .btn-green { background: #28a745; }
-    .btn-yellow { background: #ffc107; color: #000; }
-    .btn-red { background: #dc3545; }
-    .btn-gray { background: #6c757d; display: none; }
+    .btn-blue { background: #0071e3;
+    }
+    .btn-green { background: #34c759; }
+    .btn-yellow { background: #ffcc00; color: #1d1d1f;
+    }
+    .btn-red { background: #ff3b30; }
+    .btn-gray { background: #86868b; display: none;
+    }
     
-    table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 15px; }
-    th, td { border: 1px solid #ddd; padding: 10px; text-align: left; vertical-align: middle; }
-    th { background-color: #f8f9fa; text-align: center; }
+    /* สไตล์ระบบจัดการโฟลเดอร์แบบ iOS Files */
+    .nav-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid #d2d2d7;
+    }
+    .back-btn {
+      background: transparent;
+      color: #0071e3;
+      padding: 8px 12px;
+      width: auto;
+      margin: 0;
+      font-size: 15px;
+    }
+    .back-btn:hover { background: rgba(0, 113, 227, 0.1); transform: none; }
+    .path-title { font-size: 17px; font-weight: 600; flex-grow: 1; text-align: center; color: #1d1d1f; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin: 0 10px; }
+    
+    /* สไตล์คลัง Explorer และ Drag Zone */
+    .explorer-zone {
+      border: 2px dashed transparent;
+      border-radius: 14px;
+      padding: 15px;
+      transition: all 0.3s ease;
+    }
+    .explorer-zone.dragover-active {
+      border-color: #0071e3;
+      background-color: rgba(0, 113, 227, 0.04);
+    }
+
+    .item-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px 15px; margin-top: 15px; }
+    
+    .grid-item { 
+      display: flex; 
+      flex-direction: column; 
+      align-items: center; 
+      padding: 10px; 
+      border-radius: 12px; 
+      transition: background-color 0.2s, transform 0.2s;
+      user-select: none;
+    }
+    .grid-item:hover { background-color: #f5f5f7; }
+    
+    /* สไตล์เมื่อลากไอเทมภายในระบบมาวางทับโฟลเดอร์ */
+    .grid-item.folder-target.dragover-active {
+      background-color: rgba(0, 71, 227, 0.15) !important;
+      transform: scale(1.05);
+      box-shadow: 0 0 0 2px #0071e3;
+    }
+    
+    /* สไตล์สำหรับไอเทมที่กำลังถูกลากขยับ */
+    .grid-item.dragging-item {
+      opacity: 0.4;
+    }
+
+    .grid-icon { width: 60px; height: 60px; margin-bottom: 10px; display: flex; justify-content: center; align-items: center; cursor: pointer; transition: transform 0.2s;}
+    .grid-icon:hover { transform: scale(0.95); }
+    .grid-name { font-size: 13px; font-weight: 500; color: #1d1d1f; text-align: center; line-height: 1.3; word-break: break-word; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; width: 100%; cursor: pointer;}
+    
+    .admin-actions { display: flex; gap: 5px; margin-top: 10px; width: 100%; justify-content: center; }
+    .admin-actions button { padding: 6px 10px; font-size: 11px; margin: 0; width: auto; border-radius: 8px; }
+
+    @media (max-width: 600px) {
+      .item-grid { grid-template-columns: repeat(3, 1fr); gap: 15px 10px; }
+    }
+    @media (max-width: 450px) {
+      .item-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 15px;
+    }
+    th, td { border: 1px solid #d2d2d7; padding: 12px 10px; text-align: left; vertical-align: middle;
+    }
+    th { background-color: #f5f5f7; text-align: center; font-weight: 600; }
     .action-btns { display: flex; gap: 5px; justify-content: center; flex-wrap: wrap; }
-    .action-btns button { width: auto; padding: 6px 10px; margin: 0; font-size: 12px; }
+    .action-btns button { width: auto; padding: 6px 12px; margin: 0; font-size: 12px; border-radius: 8px;}
   </style>
 </head>
 <body>
 
-  <!-- ส่วนล็อกอินผู้ดูแลระบบ (Firebase Auth) -->
   <div id="adminLoginWrapper">
      <div class="login-card">
         <h2>ระบบจัดการสำหรับผู้ดูแล</h2>
-        <p style="color:gray; margin-bottom: 20px;">กรุณาเข้าสู่ระบบด้วยบัญชีแอดมินที่ลงทะเบียนไว้</p>
+        <p style="color:#86868b; margin-bottom: 20px; font-size: 14px;">กรุณาเข้าสู่ระบบด้วยบัญชีแอดมิน</p>
         <input type="email" id="adminEmail" placeholder="อีเมลแอดมิน..." style="text-align:center;" required>
         <input type="password" id="adminPassword" placeholder="รหัสผ่าน..." style="text-align:center;" required>
         <button class="btn-blue" onclick="loginAdmin()">เข้าสู่ระบบ</button>
-        <p id="loginError" style="color:red; display:none; margin-top:10px; font-weight:bold;">อีเมลหรือรหัสผ่านไม่ถูกต้อง</p>
+        <p id="loginError" style="color:#ff3b30; display:none; margin-top:15px; font-weight:500; font-size: 14px;">อีเมลหรือรหัสผ่านไม่ถูกต้อง</p>
      </div>
   </div>
 
-  <!-- เนื้อหาหน้าแอดมินเดิม (จะแสดงเมื่อล็อกอินสำเร็จ) -->
   <div id="mainAdminContent">
     
-    <div style="width: 100%; max-width: 800px; display: flex; justify-content: flex-end; margin-bottom: 15px;">
-       <button class="btn-red" style="width: auto; padding: 8px 15px; margin: 0;" onclick="logoutAdmin()">ออกจากระบบผู้ดูแล</button>
+    <div style="width: 100%; max-width: 850px; display: flex; justify-content: flex-end; margin-bottom: 15px;">
+       <button class="btn-red" style="width: auto; padding: 10px 20px; margin: 0; border-radius: 12px;" onclick="logoutAdmin()">ออกจากระบบผู้ดูแล</button>
     </div>
 
-    <!-- กล่อง: ให้สิทธิ์ดาวน์โหลดโดยตรง -->
-    <div class="admin-box" style="border: 2px solid #28a745;">
-      <h2>การอนุมัติสิทธิ์การเข้าถึงทันที (โดยไม่ต้องรอยื่นคำขอ)</h2>
+    <div class="admin-box" style="border: 2px solid #34c759;">
+      <h2>การอนุมัติสิทธิ์การเข้าถึงทันที (ไม่ต้องรอยื่นคำขอ)</h2>
       <label>1. เลือกระบบงาน / เอกสาร:</label>
       <select id="directJobSelect">
         <option value="">-- กำลังโหลดข้อมูลระบบงาน... --</option>
@@ -79,12 +168,17 @@
       <button class="btn-green" onclick="grantDirectDownload()">ยืนยันการให้สิทธิ์การดาวน์โหลด</button>
     </div>
 
-    <div class="admin-box">
+    <div class="admin-box" id="formBox">
       <h2 id="formTitle">เพิ่มรายการเข้าสู่ระบบ</h2>
-      <input type="hidden" id="editJobId"> <label>1. ชื่อรายการ / เอกสาร:</label>
+      <input type="hidden" id="editJobId"> 
+      
+      <label>1. ชื่อรายการ / เอกสาร:</label>
       <input type="text" id="jobTitle" placeholder="ตัวอย่าง: เอกสารประกอบการเรียน" required>
       
-      <label>2. ประเภทของไฟล์:</label>
+      <label>2. โฟลเดอร์ (จัดหมวดหมู่):</label>
+      <input type="text" id="jobFolder" placeholder="ระบุชื่อโฟลเดอร์ (ใช้ / เพื่อซ้อนโฟลเดอร์ เช่น คณิตศาสตร์/ม.1)">
+
+      <label>3. ประเภทของไฟล์:</label>
       <select id="fileType">
         <option value="youtube">วิดีโอ (ลิงก์ YouTube)</option>
         <option value="image">รูปภาพ (ลิงก์ภาพ)</option>
@@ -92,21 +186,42 @@
         <option value="link">ลิงก์เว็บไซต์ภายนอก (URL)</option>
       </select>
 
-      <label>3. ข้อมูลลิงก์ (URL):</label>
+      <label>4. ข้อมูลลิงก์ (URL):</label>
       <input type="text" id="fileUrl" placeholder="ระบุลิงก์ข้อมูลที่นี่..." required>
 
-      <label>4. กำหนดรายชื่อผู้มีสิทธิ์เข้าชมเบื้องต้น (คั่นด้วยลูกน้ำ หรือ ขึ้นบรรทัดใหม่):</label>
+      <label>5. กำหนดรายชื่อผู้มีสิทธิ์เข้าชมเบื้องต้น (คั่นด้วยลูกน้ำ หรือ ขึ้นบรรทัดใหม่):</label>
       <textarea id="allowedUsers" placeholder="ระบุรหัสประจำตัว เช่น: 6810210178, 6810210220"></textarea>
 
       <div style="display: flex; gap: 10px;">
         <button class="btn-blue" id="btnSave" onclick="saveJob()">บันทึกข้อมูลระบบงาน</button>
         <button class="btn-gray" id="btnCancel" onclick="cancelEdit()">ยกเลิกการแก้ไข</button>
       </div>
-      <p id="status" style="text-align: center; font-weight: bold; margin-bottom: 0;"></p>
+      <p id="status" style="text-align: center; font-weight: 500; margin-bottom: 0; margin-top: 15px; font-size: 15px;"></p>
     </div>
 
     <div class="admin-box">
-      <h2>การจัดการรายการระบบงาน</h2>
+      <h2>การจัดการรายการ (File Explorer)</h2>
+      <p style="color:#86868b; font-size:13px; margin-top:-5px; margin-bottom:15px;">💡 สามารถลากไฟล์ไปวางใส่โฟลเดอร์เพื่อย้ายได้ หรือลากไฟล์จากข้างนอกคอมพิวเตอร์มาวางในกล่องนี้เพื่ออัปโหลดใหม่ได้เลย</p>
+      
+      <div class="nav-header" id="adminNavHeader" style="display: none;">
+         <button class="back-btn" onclick="navigateAdminUp()">< ย้อนกลับ</button>
+         <div class="path-title" id="currentAdminPathTitle">หน้าหลัก</div>
+         <div style="width: 70px;"></div>
+      </div>
+      
+      <div style="display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap; justify-content: center;">
+         <button class="btn-blue" style="background: #e8e8ed; color: #0071e3; box-shadow: none; margin: 0; width: auto; font-size: 14px;" onclick="addNewJobHere()">+ สร้างเอกสารในหน้านี้</button>
+         <button class="btn-blue" style="background: #e8e8ed; color: #0071e3; box-shadow: none; margin: 0; width: auto; font-size: 14px;" onclick="createNewFolder()">+ สร้างโฟลเดอร์ว่าง</button>
+         <button class="btn-red" id="btnDeleteEmptyFolder" style="display: none; margin: 0; width: auto; font-size: 14px;" onclick="deleteCurrentEmptyFolder()">🗑️ ลบโฟลเดอร์นี้ (ว่าง)</button>
+      </div>
+      
+      <div id="explorerDropZone" class="explorer-zone">
+         <div id="adminFileExplorer"></div>
+      </div>
+    </div>
+
+    <div class="admin-box">
+      <h2>จัดการรายการเอกสารทั้งหมด (Table)</h2>
       <div id="jobsTable"></div>
     </div>
 
@@ -124,10 +239,7 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getFirestore, doc, setDoc, addDoc, getDoc, deleteDoc, collection, getDocs, serverTimestamp, updateDoc, query } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-    
-    // นำเข้า Firebase Authentication
     import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-
     const firebaseConfig = {
       apiKey: "AIzaSyBLyMpowfyQK_1UnredPFmXdBdtQZKpY-c",
       authDomain: "datapdf-d14d0.firebaseapp.com",
@@ -137,14 +249,21 @@
       messagingSenderId: "1034739093928",
       appId: "1:1034739093928:web:cd56cc0e208d7d00f24d9d"
     };
-
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
-    const auth = getAuth(app); // เริ่มต้นใช้งานระบบล็อกอิน
+    const auth = getAuth(app);
 
-    // ==========================================
-    // ระบบล็อกอินผู้ดูแล (Firebase Authentication)
-    // ==========================================
+    const icons = {
+      folder: `<svg viewBox="0 0 100 80" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M0 12C0 5.37258 5.37258 0 12 0H36.5C39.5 0 42.2 1.5 43.8 4L51 15H88C94.6274 15 100 20.3726 100 27V68C100 74.6274 94.6274 80 88 80H12C5.37258 80 0 74.6274 0 68V12Z" fill="#89C4FA"/><path d="M0 24C0 20.6863 2.68629 18 6 18H94C97.3137 18 100 20.6863 100 24V68C100 74.6274 94.6274 80 88 80H12C5.37258 80 0 74.6274 0 68V24Z" fill="#74B5F6"/></svg>`,
+      pdf: `<svg viewBox="0 0 64 80" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="4" y="4" width="56" height="72" rx="6" fill="#F9F9FB" stroke="#D2D2D7" stroke-width="2"/><path d="M40 4L60 24V10C60 6.68629 57.3137 4 54 4H40Z" fill="#E5E5EA"/><path d="M40 4V18C40 21.3137 42.6863 24 46 24H60" stroke="#D2D2D7" stroke-width="2" stroke-linejoin="round"/><rect x="16" y="32" width="32" height="4" rx="2" fill="#FF3B30"/><rect x="16" y="44" width="24" height="4" rx="2" fill="#D2D2D7"/><rect x="16" y="56" width="28" height="4" rx="2" fill="#D2D2D7"/></svg>`,
+      image: `<svg viewBox="0 0 80 64" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="4" y="4" width="72" height="56" rx="8" fill="#F9F9FB" stroke="#D2D2D7" stroke-width="2"/><circle cx="24" cy="24" r="6" fill="#FFCC00"/><path d="M4 48L28 28L52 48L64 38L76 48V52C76 56.4183 72.4183 60 68 60H12C7.58172 60 4 56.4183 4 52V48Z" fill="#34C759"/></svg>`,
+      youtube: `<svg viewBox="0 0 80 56" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="4" y="4" width="72" height="48" rx="12" fill="#FF3B30"/><path d="M34 18L52 28L34 38V18Z" fill="white"/></svg>`,
+      link: `<svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="40" cy="40" r="36" fill="#F9F9FB" stroke="#D2D2D7" stroke-width="2"/><path d="M40 10C28 10 20 25 20 40C20 55 28 70 40 70C52 70 60 55 60 40C60 25 52 10 40 10Z" stroke="#0071E3" stroke-width="2"/><path d="M10 40H70" stroke="#0071E3" stroke-width="2"/><path d="M20 25H60" stroke="#0071E3" stroke-width="2"/><path d="M20 55H60" stroke="#0071E3" stroke-width="2"/></svg>`
+    };
+
+    let allJobsAdmin = [];
+    let currentAdminPath = "";
+    let currentEmptyFolderMarkerId = null; // ตัวแปรเก็บ ID ของโฟลเดอร์เปล่า
 
     window.loginAdmin = function() {
       const email = document.getElementById("adminEmail").value;
@@ -159,12 +278,11 @@
 
       errorMsg.style.display = "none";
       document.querySelector("#adminLoginWrapper button").innerText = "กำลังเข้าสู่ระบบ...";
-
       signInWithEmailAndPassword(auth, email, pwd)
-        .then((userCredential) => {
+        .then(() => {
           document.querySelector("#adminLoginWrapper button").innerText = "เข้าสู่ระบบ";
         })
-        .catch((error) => {
+        .catch(() => {
           document.querySelector("#adminLoginWrapper button").innerText = "เข้าสู่ระบบ";
           errorMsg.style.display = "block";
           errorMsg.innerText = "อีเมลหรือรหัสผ่านไม่ถูกต้อง กรุณาลองใหม่";
@@ -173,38 +291,27 @@
 
     window.logoutAdmin = function() {
       if (confirm("ต้องการออกจากระบบผู้ดูแลหรือไม่?")) {
-        signOut(auth).catch((error) => {
-          alert("เกิดข้อผิดพลาดในการออกจากระบบ");
-        });
+        signOut(auth).catch(() => { alert("เกิดข้อผิดพลาดในการออกจากระบบ"); });
       }
     }
 
-    // ติดตามสถานะการเข้าสู่ระบบ
     onAuthStateChanged(auth, (user) => {
       if (user) {
-        // หากเข้าสู่ระบบแล้ว ให้ซ่อนหน้าล็อกอินและแสดงข้อมูลหลังบ้าน
         document.getElementById("adminLoginWrapper").style.display = "none";
         document.getElementById("mainAdminContent").style.display = "flex";
-        
-        // โหลดข้อมูลต่างๆ หลังจากยืนยันตัวตนสำเร็จ
+        setupExternalDragAndDrop(); // เปิดระบบลากไฟล์จากข้างนอกคอมมาวาง
         loadJobs();
         loadRequests();
         loadHistory();
       } else {
-        // หากยังไม่เข้าสู่ระบบ ให้แสดงหน้าล็อกอิน
         document.getElementById("adminLoginWrapper").style.display = "flex";
         document.getElementById("mainAdminContent").style.display = "none";
       }
     });
 
-    // ให้กด Enter เพื่อล็อกอินได้
     document.getElementById("adminPassword").addEventListener("keypress", function(e) {
       if (e.key === "Enter") loginAdmin();
     });
-
-    // ==========================================
-    // ระบบจัดการฐานข้อมูลต่างๆ (ทำงานเมื่อเข้าระบบแล้ว)
-    // ==========================================
 
     function cleanUrl(type, url) {
       if (type === "youtube" && url.includes("watch?v=")) return `https://www.youtube.com/embed/${url.split("v=")[1].split("&")[0]}`;
@@ -213,36 +320,369 @@
       return url; 
     }
 
+    window.loadJobs = async function() {
+      const explorerDiv = document.getElementById("adminFileExplorer");
+      explorerDiv.innerHTML = "<p style='text-align:center;'>กำลังโหลดข้อมูล...</p>";
+
+      try {
+        const querySnapshot = await getDocs(collection(db, "jobs"));
+        allJobsAdmin = [];
+        let jobOptionsHtml = '<option value="">-- กรุณาเลือกระบบงาน --</option>';
+        
+        let tableHtml = `<table>
+                          <tr>
+                            <th width="30%">ชื่อรายการ / เส้นทางโฟลเดอร์</th>
+                            <th width="15%">ประเภท</th>
+                            <th width="30%">สิทธิ์การเข้าชมเบื้องต้น</th>
+                            <th width="25%">การจัดการ</th>
+                          </tr>`;
+
+        querySnapshot.forEach((docSnap) => {
+          const data = docSnap.data();
+          let path = (data.folder || "").trim().replace(/^\/+|\/+$/g, ''); 
+          allJobsAdmin.push({ id: docSnap.id, normalizedPath: path, ...data });
+          
+          if (data.type !== "system_folder") {
+              jobOptionsHtml += `<option value="${docSnap.id}">${data.title}</option>`;
+          }
+
+          // จัดการส่วน Table ด้านล่าง
+          const displayFolder = data.folder ? `📁 ${data.folder}` : "หน้าหลัก (ไม่ระบุโฟลเดอร์)";
+          if (data.type === "system_folder") {
+              tableHtml += `<tr>
+                        <td><b>${displayFolder}</b><br><small style="color:gray;">(โฟลเดอร์ว่าง)</small></td>
+                        <td style="text-align:center;">โฟลเดอร์</td>
+                        <td style="text-align:center; color:gray;">-</td>
+                        <td>
+                          <div class="action-btns">
+                            <button class="btn-red" onclick="deleteJob('${docSnap.id}')">ลบ</button>
+                          </div>
+                        </td>
+                       </tr>`;
+          } else {
+              const userCount = data.allowedUsers ? data.allowedUsers.length : 0;
+              const safeData = encodeURIComponent(JSON.stringify({id: docSnap.id, ...data}));
+              tableHtml += `<tr>
+                        <td><b>${data.title}</b><br><small style="color:gray;">${displayFolder}</small></td>
+                        <td style="text-align:center;">${data.type}</td>
+                        <td style="text-align:center; color:#34c759; font-weight:bold;">${userCount} บัญชี</td>
+                        <td>
+                          <div class="action-btns">
+                            <button class="btn-yellow" onclick="editJob('${safeData}')">แก้ไข</button>
+                            <button class="btn-red" onclick="deleteJob('${docSnap.id}')">ลบ</button>
+                          </div>
+                        </td>
+                       </tr>`;
+          }
+        });
+        
+        tableHtml += "</table>";
+        if(querySnapshot.empty) {
+           tableHtml = "<p style='text-align:center; color:#86868b;'>ไม่พบข้อมูลรายการในระบบ</p>";
+        }
+
+        document.getElementById("jobsTable").innerHTML = tableHtml;
+        document.getElementById("directJobSelect").innerHTML = jobOptionsHtml;
+        
+        renderAdminExplorer();
+      } catch (error) {
+        explorerDiv.innerHTML = "<p style='color:red; text-align:center;'>การเรียกข้อมูลล้มเหลว</p>";
+      }
+    }
+
+    window.renderAdminExplorer = function() {
+        let foldersInCurrentPath = new Set();
+        let filesInCurrentPath = [];
+        currentEmptyFolderMarkerId = null; // รีเซ็ต
+
+        allJobsAdmin.forEach(file => {
+            let fp = file.normalizedPath;
+            if (fp === currentAdminPath) {
+                // ถ้าเป็น marker ของโฟลเดอร์ว่าง ให้เก็บไอดีไว้ ไม่เอาไปแสดงผลเป็นไฟล์
+                if (file.type === "system_folder") {
+                    currentEmptyFolderMarkerId = file.id;
+                } else {
+                    filesInCurrentPath.push(file);
+                }
+            } 
+            else if (fp.startsWith(currentAdminPath ? currentAdminPath + "/" : "")) {
+                let remainingPath = fp.substring(currentAdminPath ? currentAdminPath.length + 1 : 0);
+                let immediateSubfolder = remainingPath.split('/')[0];
+                if (immediateSubfolder) {
+                    foldersInCurrentPath.add(immediateSubfolder);
+                }
+            }
+        });
+
+        // จัดการแสดงปุ่ม ลบโฟลเดอร์ว่างเปล่า
+        const btnDeleteEmpty = document.getElementById("btnDeleteEmptyFolder");
+        if (currentAdminPath !== "" && filesInCurrentPath.length === 0 && foldersInCurrentPath.size === 0 && currentEmptyFolderMarkerId) {
+            btnDeleteEmpty.style.display = "inline-block";
+        } else {
+            btnDeleteEmpty.style.display = "none";
+        }
+
+        let html = `<div class="item-grid">`;
+        
+        // 1. วาดโฟลเดอร์ (เปิดคุณสมบัติ Drop Target เพื่อรับไฟล์ที่ถูกลากมาใส่ได้)
+        Array.from(foldersInCurrentPath).sort().forEach(folderName => {
+            const safeFolderName = encodeURIComponent(folderName);
+            let targetPath = currentAdminPath ? currentAdminPath + "/" + folderName : folderName;
+            
+            html += `
+              <div class="grid-item folder-target" 
+                   data-target-folder="${targetPath}"
+                   ondragover="handleDragOverFolder(event)" 
+                   onDragleave="handleDragLeaveFolder(event)" 
+                   ondrop="handleDropOnFolder(event)">
+                <div class="grid-icon" onclick="openAdminFolder('${safeFolderName}')">${icons.folder}</div>
+                <div class="grid-name" onclick="openAdminFolder('${safeFolderName}')">${folderName}</div>
+              </div>
+            `;
+        });
+
+        // 2. วาดไฟล์ (เปิดคุณสมบัติ Draggable ให้สามารถถูกลากย้ายไปใส่โฟลเดอร์อื่นได้)
+        filesInCurrentPath.forEach(file => {
+            const safeData = encodeURIComponent(JSON.stringify(file));
+            let iconSvg = icons.pdf;
+            if (file.type === "youtube") iconSvg = icons.youtube;
+            else if (file.type === "image") iconSvg = icons.image;
+            else if (file.type === "link") iconSvg = icons.link;
+
+            html += `
+              <div class="grid-item structural-file" 
+                   draggable="true" 
+                   data-file-id="${file.id}"
+                   ondragstart="handleFileDragStart(event)" 
+                   ondragend="handleFileDragEnd(event)">
+                <div class="grid-icon" onclick="editJob('${safeData}')">${iconSvg}</div>
+                <div class="grid-name" onclick="editJob('${safeData}')">${file.title}</div>
+                <div class="admin-actions">
+                  <button class="btn-yellow" onclick="editJob('${safeData}')">แก้ไข</button>
+                  <button class="btn-red" onclick="deleteJob('${file.id}')">ลบ</button>
+                </div>
+              </div>
+            `;
+        });
+        
+        html += `</div>`;
+        
+        if (foldersInCurrentPath.size === 0 && filesInCurrentPath.length === 0) {
+            html = "<p style='text-align:center; color:#86868b; margin-top:30px; margin-bottom: 20px;'>โฟลเดอร์ว่างเปล่า</p>";
+        }
+
+        document.getElementById("adminFileExplorer").innerHTML = html;
+        
+        // อัปเดตเมนูด้านบน (Nav Header)
+        const navHeader = document.getElementById("adminNavHeader");
+        const pathTitleEl = document.getElementById("currentAdminPathTitle");
+
+        if (currentAdminPath === "") {
+           navHeader.style.display = "none";
+        } else {
+           navHeader.style.display = "flex";
+           let parts = currentAdminPath.split('/');
+           pathTitleEl.innerText = parts[parts.length - 1];
+        }
+    }
+
+    // ===================================================
+    //  การสร้างและลบโฟลเดอร์ว่าง
+    // ===================================================
+    window.createNewFolder = async function() {
+        const folderName = prompt("ตั้งชื่อโฟลเดอร์ใหม่:");
+        if (!folderName || folderName.trim() === "") return;
+        if (folderName.includes("/")) {
+            alert("ไม่อนุญาตให้ใช้เครื่องหมาย / ในชื่อโฟลเดอร์ใหม่ที่นี่ (กรุณาสร้างทีละชั้น)");
+            return;
+        }
+
+        const newPath = currentAdminPath ? `${currentAdminPath}/${folderName.trim()}` : folderName.trim();
+        
+        // ตรวจสอบว่าซ้ำไหม
+        const exists = allJobsAdmin.some(f => {
+            let fp = f.normalizedPath;
+            return fp === newPath || fp.startsWith(newPath + "/");
+        });
+
+        if (exists) {
+            alert("มีโฟลเดอร์ชื่อนี้อยู่แล้วในระบบ");
+            return;
+        }
+
+        try {
+            const jobData = {
+                title: `[Folder] ${folderName}`,
+                folder: newPath,
+                type: "system_folder",
+                url: "-",
+                allowedUsers: [], // สำคัญมาก เพื่อไม่ให้ไปโผล่ในหน้าผู้ใช้
+                searchableUsers: [],
+                updatedAt: serverTimestamp()
+            };
+            await addDoc(collection(db, "jobs"), jobData);
+            loadJobs();
+        } catch (e) {
+            alert("สร้างโฟลเดอร์ล้มเหลว กรุณาลองใหม่");
+        }
+    }
+
+    window.deleteCurrentEmptyFolder = async function() {
+        if (!currentEmptyFolderMarkerId) return;
+        if (confirm("ยืนยันการลบโฟลเดอร์ว่างเปล่านี้?")) {
+            try {
+                await deleteDoc(doc(db, "jobs", currentEmptyFolderMarkerId));
+                navigateAdminUp(); // เด้งกลับขึ้น 1 ระดับ
+                loadJobs();
+            } catch(e) {
+                alert("การลบโฟลเดอร์ล้มเหลว");
+            }
+        }
+    }
+
+
+    // ===================================================
+    //  ระบบ DRAG & DROP FUNCTIONS
+    // ===================================================
+    
+    window.handleFileDragStart = function(e) {
+       let fileId = e.currentTarget.getAttribute("data-file-id");
+       e.dataTransfer.setData("text/plain", fileId);
+       e.dataTransfer.effectAllowed = "move";
+       e.currentTarget.classList.add("dragging-item");
+    }
+
+    window.handleFileDragEnd = function(e) {
+       e.currentTarget.classList.remove("dragging-item");
+    }
+
+    window.handleDragOverFolder = function(e) {
+       e.preventDefault();
+       e.stopPropagation();
+       e.currentTarget.classList.add("dragover-active");
+    }
+
+    window.handleDragLeaveFolder = function(e) {
+       e.currentTarget.classList.remove("dragover-active");
+    }
+
+    window.handleDropOnFolder = async function(e) {
+       e.preventDefault();
+       e.stopPropagation();
+       e.currentTarget.classList.remove("dragover-active");
+       
+       let fileId = e.dataTransfer.getData("text/plain");
+       let targetFolder = e.currentTarget.getAttribute("data-target-folder");
+       
+       if (!fileId) return; 
+
+       try {
+           const jobDocRef = doc(db, "jobs", fileId);
+           await updateDoc(jobDocRef, {
+               folder: targetFolder,
+               updatedAt: serverTimestamp()
+           });
+           loadJobs();
+       } catch(err) {
+           alert("ไม่สามารถลากย้ายไฟล์ระบบได้ในขณะนี้");
+       }
+    }
+
+    function setupExternalDragAndDrop() {
+       let zone = document.getElementById("explorerDropZone");
+       
+       zone.addEventListener("dragover", (e) => {
+           e.preventDefault();
+           zone.classList.add("dragover-active");
+       });
+       
+       zone.addEventListener("dragleave", () => {
+           zone.classList.remove("dragover-active");
+       });
+       
+       zone.addEventListener("drop", (e) => {
+           e.preventDefault();
+           zone.classList.remove("dragover-active");
+           
+           if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+               let droppedFile = e.dataTransfer.files[0];
+               
+               cancelEdit();
+               
+               document.getElementById("jobTitle").value = droppedFile.name.split('.').pop() ? droppedFile.name.substring(0, droppedFile.name.lastIndexOf('.')) : droppedFile.name;
+               document.getElementById("jobFolder").value = currentAdminPath;
+               
+               if(droppedFile.type.includes("image")) {
+                   document.getElementById("fileType").value = "image";
+               } else if(droppedFile.type.includes("pdf")) {
+                   document.getElementById("fileType").value = "pdf";
+               } else {
+                   document.getElementById("fileType").value = "link";
+               }
+               
+               document.getElementById("formBox").scrollIntoView({ behavior: 'smooth' });
+               alert(`เตรียมบันทึกอัปโหลดไฟล์: "${droppedFile.name}" เข้าสู่โฟลเดอร์ "${currentAdminPath || 'หน้าหลัก'}" แล้ว! กรุณาใส่ URL ข้อมูลลิงก์และบันทึกระบบงาน`);
+           }
+       });
+    }
+
+    // ===================================================
+
+    window.openAdminFolder = function(encodedFolderName) {
+      const folderName = decodeURIComponent(encodedFolderName);
+      if (currentAdminPath === "") {
+          currentAdminPath = folderName;
+      } else {
+          currentAdminPath = currentAdminPath + "/" + folderName;
+      }
+      renderAdminExplorer();
+    }
+
+    window.navigateAdminUp = function() {
+       if (currentAdminPath === "") return;
+       let parts = currentAdminPath.split('/');
+       parts.pop(); 
+       currentAdminPath = parts.join('/');
+       renderAdminExplorer();
+    }
+    
+    window.addNewJobHere = function() {
+       cancelEdit();
+       document.getElementById("jobFolder").value = currentAdminPath; 
+       document.getElementById("formBox").scrollIntoView({ behavior: 'smooth' }); 
+    }
+
     window.saveJob = async function() {
       const editId = document.getElementById("editJobId").value;
       const title = document.getElementById("jobTitle").value.trim();
+      const folder = document.getElementById("jobFolder").value.trim() || "";
       const type = document.getElementById("fileType").value;
       let url = document.getElementById("fileUrl").value.trim();
       const rawUsers = document.getElementById("allowedUsers").value;
       const statusText = document.getElementById("status");
-
+      
       if (!title || !url) {
         statusText.innerText = "กรุณาระบุข้อมูลให้ครบถ้วน";
         statusText.style.color = "red";
         return;
       }
 
-      // ดึงรายชื่อต้นฉบับมาเพื่อแสดงผล และสร้างชุดรายชื่อแบบไม่มีช่องว่างสำหรับการค้นหาให้ลื่นไหลขึ้น
       const userList = rawUsers.split(/[\n,]+/).map(id => id.trim()).filter(id => id !== "");
       const searchList = userList.map(id => id.replace(/[\s"']/g, '').toLowerCase());
       
       url = cleanUrl(type, url);
 
       statusText.innerText = "ระบบกำลังบันทึกข้อมูล...";
-      statusText.style.color = "blue";
+      statusText.style.color = "#0071e3";
 
       try {
         const jobData = {
           title: title,
+          folder: folder,
           type: type,
           url: url,
           allowedUsers: userList,
-          searchableUsers: searchList, // ชุดข้อมูลที่ถูกกรองเว้นวรรค
+          searchableUsers: searchList,
           updatedAt: serverTimestamp()
         };
 
@@ -255,7 +695,7 @@
           statusText.innerText = "สร้างข้อมูลระบบงานสำเร็จ";
         }
         
-        statusText.style.color = "green";
+        statusText.style.color = "#34c759";
         cancelEdit(); 
         loadJobs();   
       } catch (error) {
@@ -264,85 +704,36 @@
       }
     }
 
-    window.loadJobs = async function() {
-      const tableDiv = document.getElementById("jobsTable");
-      tableDiv.innerHTML = "<p style='text-align:center;'>กำลังโหลดข้อมูล...</p>";
-
-      try {
-        const querySnapshot = await getDocs(collection(db, "jobs"));
-        if (querySnapshot.empty) {
-          tableDiv.innerHTML = "<p style='text-align:center; color:gray;'>ไม่พบข้อมูลรายการในระบบ</p>";
-          document.getElementById("directJobSelect").innerHTML = '<option value="">-- ไม่พบข้อมูลรายการในระบบ --</option>';
-          return;
-        }
-
-        let html = `<table>
-                      <tr>
-                        <th width="30%">ชื่อรายการ</th>
-                        <th width="15%">ประเภท</th>
-                        <th width="30%">สิทธิ์การเข้าชมเบื้องต้น</th>
-                        <th width="25%">การจัดการ</th>
-                      </tr>`;
-        
-        let jobOptionsHtml = '<option value="">-- กรุณาเลือกระบบงาน --</option>';
-
-        querySnapshot.forEach((docSnap) => {
-          const id = docSnap.id;
-          const data = docSnap.data();
-          const userCount = data.allowedUsers ? data.allowedUsers.length : 0;
-          
-          jobOptionsHtml += `<option value="${id}">${data.title}</option>`;
-
-          const safeData = encodeURIComponent(JSON.stringify({id: id, ...data}));
-
-          html += `<tr>
-                    <td><b>${data.title}</b></td>
-                    <td style="text-align:center;">${data.type}</td>
-                    <td style="text-align:center; color:green; font-weight:bold;">${userCount} บัญชี</td>
-                    <td>
-                      <div class="action-btns">
-                        <button class="btn-yellow" onclick="editJob('${safeData}')">แก้ไข</button>
-                        <button class="btn-red" onclick="deleteJob('${id}')">ลบ</button>
-                      </div>
-                    </td>
-                   </tr>`;
-        });
-        html += "</table>";
-        tableDiv.innerHTML = html;
-        document.getElementById("directJobSelect").innerHTML = jobOptionsHtml;
-      } catch (error) {
-        tableDiv.innerHTML = "<p style='color:red; text-align:center;'>การเรียกข้อมูลล้มเหลว</p>";
-      }
-    }
-
     window.editJob = function(encodedData) {
       const data = JSON.parse(decodeURIComponent(encodedData));
-      
       document.getElementById("formTitle").innerText = "แก้ไขข้อมูลและสิทธิ์ระบบงาน";
       document.getElementById("editJobId").value = data.id;
       document.getElementById("jobTitle").value = data.title;
+      document.getElementById("jobFolder").value = data.folder || "";
       document.getElementById("fileType").value = data.type;
       document.getElementById("fileUrl").value = data.url;
       document.getElementById("allowedUsers").value = (data.allowedUsers || []).join(",\n");
-
+      
       document.getElementById("btnSave").innerText = "บันทึกการแก้ไข";
       document.getElementById("btnSave").classList.replace("btn-blue", "btn-yellow");
       document.getElementById("btnCancel").style.display = "block";
       document.getElementById("status").innerText = "";
       
-      window.scrollTo(0, 0);
+      document.getElementById("formBox").scrollIntoView({ behavior: 'smooth' });
     }
 
     window.cancelEdit = function() {
       document.getElementById("formTitle").innerText = "เพิ่มรายการเข้าสู่ระบบ";
       document.getElementById("editJobId").value = "";
       document.getElementById("jobTitle").value = "";
+      document.getElementById("jobFolder").value = "";
       document.getElementById("fileUrl").value = "";
       document.getElementById("allowedUsers").value = "";
       
       document.getElementById("btnSave").innerText = "บันทึกข้อมูลระบบงาน";
       document.getElementById("btnSave").classList.replace("btn-yellow", "btn-blue");
       document.getElementById("btnCancel").style.display = "none";
+      document.getElementById("status").innerText = "";
     }
 
     window.deleteJob = async function(id) {
@@ -350,7 +741,8 @@
       try {
         await deleteDoc(doc(db, "jobs", id));
         loadJobs();
-      } catch (e) { alert("การลบข้อมูลล้มเหลว"); }
+      } catch (e) { alert("การลบข้อมูลล้มเหลว");
+      }
     }
 
     window.loadRequests = async function() {
@@ -360,7 +752,7 @@
       try {
         const querySnapshot = await getDocs(collection(db, "download_requests"));
         if (querySnapshot.empty) {
-          tableDiv.innerHTML = "<p style='text-align:center; color:gray;'>ไม่พบข้อมูลคำขอในระบบ</p>";
+          tableDiv.innerHTML = "<p style='text-align:center; color:#86868b;'>ไม่พบข้อมูลคำขอในระบบ</p>";
           return;
         }
 
@@ -371,24 +763,23 @@
                         <th width="25%">สถานะปัจจุบัน</th>
                         <th width="25%">การจัดการ</th>
                       </tr>`;
-        
         querySnapshot.forEach((docSnap) => {
           const id = docSnap.id;
           const data = docSnap.data();
           
           let badge = "";
           if (data.status === "pending") {
-            badge = `<span style="color:#856404; font-weight:bold;">รอการตรวจสอบ</span>`;
+            badge = `<span style="color:#d97706; font-weight:600;">รอการตรวจสอบ</span>`;
           } else if (data.status === "approved") {
-            badge = `<span style="color:#28a745; font-weight:bold;">อนุมัติการเข้าถึง</span>`;
+            badge = `<span style="color:#34c759; font-weight:600;">อนุมัติการเข้าถึง</span>`;
             if (data.expiresAt) {
               const exp = data.expiresAt.toDate();
-              badge += `<br><small style="color:gray;">หมดเขต: ${exp.toLocaleString('th-TH')}</small>`;
+              badge += `<br><small style="color:#86868b;">หมดเขต: ${exp.toLocaleString('th-TH')}</small>`;
             } else {
-              badge += `<br><small style="color:gray;">ไม่มีวันหมดอายุ</small>`;
+              badge += `<br><small style="color:#86868b;">ไม่มีวันหมดอายุ</small>`;
             }
           } else if (data.status === "rejected") {
-            badge = `<span style="color:#dc3545; font-weight:bold;">ปฏิเสธการเข้าถึง</span>`;
+            badge = `<span style="color:#ff3b30; font-weight:600;">ปฏิเสธการเข้าถึง</span>`;
           }
 
           html += `<tr>
@@ -398,12 +789,12 @@
                     <td>
                       <div class="action-btns">
                         ${data.status !== 'approved' 
-                          ? `<button class="btn-green" onclick="updateRequestStatus('${id}', 'approved')">อนุมัติ</button>` 
-                          : `<button class="btn-yellow" onclick="editExpirationTime('${id}')">กำหนดเวลา</button>`}
+                           ? `<button class="btn-green" onclick="updateRequestStatus('${id}', 'approved')">อนุมัติ</button>` 
+                           : `<button class="btn-yellow" onclick="editExpirationTime('${id}')">กำหนดเวลา</button>`}
                         ${data.status !== 'rejected' 
                           ? `<button class="btn-blue" onclick="updateRequestStatus('${id}', 'rejected')">ปฏิเสธ</button>` 
                           : ''}
-                        <button class="btn-red" onclick="deleteRequest('${id}')">ลบคำขอ</button>
+                        <button class="btn-red" onclick="deleteRequest('${id}')">ลบ</button>
                       </div>
                     </td>
                    </tr>`;
@@ -431,10 +822,8 @@
           status: newStatus,
           updatedAt: serverTimestamp()
         };
-
         if (newStatus === 'approved') {
           const hours = prompt("กำหนดเวลาการเข้าถึง (ระบุเป็นชั่วโมง)\\n(ตัวอย่าง: 24 = 1 วัน, 72 = 3 วัน, หรือ 0 = เข้าถึงได้ถาวร)", "72");
-          
           if (hours === null) return; 
           
           const duration = parseInt(hours);
@@ -448,7 +837,7 @@
             expireDate.setHours(expireDate.getHours() + duration);
             updateData.expiresAt = expireDate;
           } else {
-            updateData.expiresAt = null; 
+            updateData.expiresAt = null;
           }
         }
 
@@ -461,7 +850,6 @@
 
     window.editExpirationTime = async function(reqId) {
       const hours = prompt("กำหนดเวลาการเข้าถึงใหม่ (ระบุเป็นชั่วโมงนับจากปัจจุบัน)\\n(ตัวอย่าง: 24 = 1 วัน, 72 = 3 วัน, หรือ 0 = เข้าถึงได้ถาวร)", "72");
-      
       if (hours === null) return; 
       
       const duration = parseInt(hours);
@@ -493,7 +881,6 @@
       const jobId = select.value;
       const jobTitle = select.options[select.selectedIndex]?.text;
       const studentId = document.getElementById("directStudentId").value.trim();
-
       if (!jobId || !studentId) {
         alert("กรุณาระบุข้อมูลรายการและรหัสผู้รับสิทธิ์ให้ครบถ้วน");
         return;
@@ -516,7 +903,6 @@
           status: "approved",
           updatedAt: serverTimestamp()
         };
-
         if (duration > 0) {
           const expireDate = new Date();
           expireDate.setHours(expireDate.getHours() + duration);
@@ -543,7 +929,7 @@
       try {
         const querySnapshot = await getDocs(collection(db, "download_history"));
         if (querySnapshot.empty) {
-          tableDiv.innerHTML = "<p style='text-align:center; color:gray;'>ไม่พบข้อมูลประวัติการดาวน์โหลด</p>";
+          tableDiv.innerHTML = "<p style='text-align:center; color:#86868b;'>ไม่พบข้อมูลประวัติการดาวน์โหลด</p>";
           return;
         }
 
@@ -551,20 +937,17 @@
         querySnapshot.forEach(doc => {
             histories.push({ id: doc.id, ...doc.data() });
         });
-
         histories.sort((a, b) => {
             const timeA = a.downloadedAt ? a.downloadedAt.toMillis() : 0;
             const timeB = b.downloadedAt ? b.downloadedAt.toMillis() : 0;
             return timeB - timeA;
         });
-
         let html = `<table>
                       <tr>
                         <th width="20%">รหัสบัญชี</th>
                         <th width="40%">ข้อมูลรายการที่เข้าถึง</th>
                         <th width="40%">วัน / เวลาทำการ</th>
                       </tr>`;
-        
         histories.forEach(data => {
           let dateStr = "-";
           if (data.downloadedAt) {
