@@ -73,7 +73,6 @@
 </head>
 <body oncontextmenu="return false;">
 
-  <!-- Modal สำหรับตั้งค่า Folder แบบแตะค้าง -->
   <div id="folderSettingsModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:10000; justify-content:center; align-items:center;">
     <div style="background:#ffffff; width:90%; max-width:320px; border-radius:24px; padding:25px; box-sizing:border-box; text-align:center; box-shadow: 0 15px 40px rgba(0,0,0,0.15);">
         
@@ -82,7 +81,6 @@
         <input type="hidden" id="editFolderPath">
         <input type="text" id="editFolderName" placeholder="ชื่อโฟลเดอร์" style="font-size:18px; font-weight:600; text-align:center; padding:10px 5px; margin-bottom:20px; width:100%; border:none; border-bottom:2px solid #e5e5ea; border-radius:0; background:transparent;">
         
-        <!-- Password สำหรับโฟลเดอร์ -->
         <div style="text-align:left; margin-bottom:15px; background:#f5f5f7; padding:12px 15px; border-radius:14px;">
             <label style="font-size:14px; color:#1d1d1f; margin:0 0 8px 0; font-weight:600; display:block;">รหัสผ่านโฟลเดอร์</label>
             <input type="text" id="editFolderPassword" placeholder="เว้นว่างหากไม่ล็อก..." style="width:100%; border:1px solid #d2d2d7; border-radius:10px; padding:10px; box-sizing:border-box; font-size:14px; font-family:inherit; margin:0;">
@@ -128,8 +126,29 @@
     <div style="width: 100%; max-width: 850px; display: flex; justify-content: flex-end; margin-bottom: 15px;">
        <button class="btn-red" style="width: auto; padding: 10px 20px; margin: 0; border-radius: 12px;" onclick="logoutAdmin()">ออกจากระบบผู้ดูแล</button>
     </div>
+    
+    <div class="admin-box" style="border: 2px solid #0071e3;">
+      <h2>จัดการป้ายโฆษณา (Banners)</h2>
+      <p style="color:#86868b; font-size:13px; margin-top:-5px; margin-bottom:15px;">
+        💡 ระบบจะแสดงป้ายโฆษณาที่ด้านบนของหน้าเว็บผู้ใช้ และจะเลื่อนอัตโนมัติทุกๆ 1 นาที (ขนาดแนะนำ 1200 x 600 px)
+      </p>
+      
+      <input type="hidden" id="editBannerId">
+      
+      <label>1. ลิงก์รูปภาพ (Image URL):</label>
+      <input type="text" id="bannerImageUrl" placeholder="ระบุ URL รูปภาพโฆษณา..." required>
+      
+      <label>2. ลิงก์ปลายทาง (Target URL - แตะแล้วเปิดลิงก์นี้, ไม่บังคับ):</label>
+      <input type="text" id="bannerLinkUrl" placeholder="ระบุ URL ลิงก์ปลายทาง (ถ้ามี)...">
 
-    <!-- กล่อง: ให้สิทธิ์ดาวน์โหลดโดยตรง -->
+      <div style="display: flex; gap: 10px;">
+        <button class="btn-blue" id="btnSaveBanner" onclick="saveBanner()">เพิ่มป้ายโฆษณา</button>
+        <button class="btn-gray" id="btnCancelBanner" onclick="cancelEditBanner()">ยกเลิกการแก้ไข</button>
+      </div>
+
+      <div id="bannersTable" style="margin-top: 25px;"></div>
+    </div>
+
     <div class="admin-box" style="border: 2px solid #34c759;">
       <h2>การอนุมัติสิทธิ์การเข้าถึงทันที (ไม่ต้องรอยื่นคำขอ)</h2>
       <label>1. เลือกระบบงาน / เอกสาร:</label>
@@ -158,7 +177,6 @@
       <label>5. กำหนดรายชื่อผู้มีสิทธิ์เข้าชมเบื้องต้น (คั่นด้วยลูกน้ำ หรือ ขึ้นบรรทัดใหม่):</label>
       <textarea id="allowedUsers" placeholder="ระบุรหัสประจำตัว เช่น: 6810210178, 6810210220"></textarea>
 
-      <!-- ฟีเจอร์ใหม่: เปิดปิดลายน้ำและตั้งรหัสผ่านเอกสาร -->
       <label>6. เปิดใช้งานลายน้ำในเอกสาร (Watermark):</label>
       <select id="showWatermark">
         <option value="true">เปิด (แสดงลายน้ำ)</option>
@@ -309,6 +327,7 @@
         document.getElementById("adminLoginWrapper").style.display = "none";
         document.getElementById("mainAdminContent").style.display = "flex";
         setupExternalDragAndDrop();
+        loadBanners(); // ฟังก์ชันสำหรับโหลดป้ายโฆษณาในส่วนแอดมิน
         loadJobs();
         loadRequests();
         loadHistory();
@@ -321,6 +340,88 @@
     document.getElementById("adminPassword").addEventListener("keypress", function(e) {
       if (e.key === "Enter") loginAdmin();
     });
+
+    // =====================================
+    // ฟังก์ชันจัดการป้ายโฆษณา (Banners) - แอดมิน
+    // =====================================
+    window.loadBanners = async function() {
+      const div = document.getElementById("bannersTable");
+      div.innerHTML = "<p style='text-align:center;'>กำลังโหลดข้อมูลโฆษณา...</p>";
+      try {
+        const snap = await getDocs(collection(db, "banners"));
+        if(snap.empty) { div.innerHTML = "<p style='text-align:center; color:#86868b;'>ไม่มีป้ายโฆษณาในระบบ</p>"; return; }
+        
+        let html = `<table><tr><th width="40%">รูปภาพ (Image)</th><th width="40%">ลิงก์ปลายทาง (Target URL)</th><th width="20%">จัดการ</th></tr>`;
+        snap.forEach(docSnap => {
+           const data = docSnap.data();
+           const safeData = encodeURIComponent(JSON.stringify({id: docSnap.id, ...data}));
+           html += `<tr>
+             <td style="text-align:center;"><img src="${data.imageUrl}" style="max-width:150px; border-radius:8px; border:1px solid #d2d2d7;"></td>
+             <td style="word-break: break-all;">${data.link || '-'}</td>
+             <td style="text-align:center;">
+                <div class="action-btns">
+                    <button class="btn-yellow" onclick="editBanner('${safeData}')">แก้ไข</button>
+                    <button class="btn-red" onclick="deleteBanner('${docSnap.id}')">ลบ</button>
+                </div>
+             </td>
+           </tr>`;
+        });
+        html += `</table>`;
+        div.innerHTML = html;
+      } catch (e) {
+        div.innerHTML = "<p style='color:red; text-align:center;'>การเรียกข้อมูลโฆษณาล้มเหลว</p>";
+      }
+    }
+
+    window.saveBanner = async function() {
+      const editId = document.getElementById("editBannerId").value;
+      const imageUrl = document.getElementById("bannerImageUrl").value.trim();
+      const linkUrl = document.getElementById("bannerLinkUrl").value.trim();
+      
+      if(!imageUrl) return alert("กรุณาระบุ URL รูปภาพโฆษณา");
+      
+      try {
+        if(editId) {
+            await updateDoc(doc(db, "banners", editId), { imageUrl: imageUrl, link: linkUrl, updatedAt: serverTimestamp() });
+        } else {
+            await addDoc(collection(db, "banners"), { imageUrl: imageUrl, link: linkUrl, createdAt: serverTimestamp() });
+        }
+        cancelEditBanner();
+        loadBanners();
+      } catch(e) {
+        alert("บันทึกป้ายโฆษณาล้มเหลว");
+      }
+    }
+
+    window.editBanner = function(encodedData) {
+      const data = JSON.parse(decodeURIComponent(encodedData));
+      document.getElementById("editBannerId").value = data.id;
+      document.getElementById("bannerImageUrl").value = data.imageUrl;
+      document.getElementById("bannerLinkUrl").value = data.link || "";
+      document.getElementById("btnSaveBanner").innerText = "บันทึกการแก้ไขโฆษณา";
+      document.getElementById("btnCancelBanner").style.display = "block";
+    }
+
+    window.cancelEditBanner = function() {
+      document.getElementById("editBannerId").value = "";
+      document.getElementById("bannerImageUrl").value = "";
+      document.getElementById("bannerLinkUrl").value = "";
+      document.getElementById("btnSaveBanner").innerText = "เพิ่มป้ายโฆษณา";
+      document.getElementById("btnCancelBanner").style.display = "none";
+    }
+
+    window.deleteBanner = async function(id) {
+      if(!confirm("ยืนยันการลบป้ายโฆษณานี้?")) return;
+      try {
+        await deleteDoc(doc(db, "banners", id));
+        loadBanners();
+      } catch(e) { alert("ลบป้ายโฆษณาล้มเหลว"); }
+    }
+
+
+    // =====================================
+    // ฟังก์ชันเอกสาร (File Explorer)
+    // =====================================
 
     function cleanUrl(type, url) {
       if (type === "youtube" && url.includes("watch?v=")) return `https://www.youtube.com/embed/${url.split("v=")[1].split("&")[0]}`;
@@ -371,7 +472,7 @@
           if (data.type === "system_folder") {
               let lockTxt = data.password ? " 🔒" : "";
               tableHtml += `<tr>
-                        <td><b>${displayFolder}${lockTxt}</b><br><small style="color:gray;">(แฟ้มข้อมูล / กำหนดสี)</small></td>
+                        <td><b>${displayFolder}</b>${lockTxt}<br><small style="color:gray;">(แฟ้มข้อมูล / กำหนดสี)</small></td>
                         <td style="text-align:center;">โฟลเดอร์</td>
                         <td style="text-align:center; color:gray;">-</td>
                         <td>
@@ -385,7 +486,7 @@
               const safeData = encodeURIComponent(JSON.stringify({id: docSnap.id, ...data}));
               let lockTxt = data.password ? " 🔒" : "";
               tableHtml += `<tr>
-                        <td><b>${data.title}${lockTxt}</b><br><small style="color:gray;">${displayFolder}</small></td>
+                        <td><b>${data.title}</b>${lockTxt}<br><small style="color:gray;">${displayFolder}</small></td>
                         <td style="text-align:center;">${data.type}</td>
                         <td style="text-align:center; color:#34c759; font-weight:bold;">${userCount} บัญชี</td>
                         <td>
