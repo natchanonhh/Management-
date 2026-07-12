@@ -38,9 +38,9 @@
     .explorer-zone { border: 2px dashed transparent; border-radius: 14px; padding: 15px; transition: all 0.3s ease; }
     .explorer-zone.dragover-active { border-color: #0071e3; background-color: rgba(0, 113, 227, 0.04); }
 
-    .item-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px 15px; margin-top: 15px; }
+    .item-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px 15px; margin-top: 15px; align-items: start; }
     
-    .grid-item { display: flex; flex-direction: column; align-items: center; padding: 10px; border-radius: 12px; transition: background-color 0.2s, transform 0.2s; user-select: none; height: 175px; justify-content: flex-start; }
+    .grid-item { display: flex; flex-direction: column; align-items: center; padding: 10px; border-radius: 12px; transition: background-color 0.2s, transform 0.2s; user-select: none; height: auto; min-height: 190px; justify-content: flex-start; }
     .grid-item:hover { background-color: #f5f5f7; }
     .grid-item.folder-target.dragover-active { background-color: rgba(0, 71, 227, 0.15) !important; transform: scale(1.05); box-shadow: 0 0 0 2px #0071e3; }
     .grid-item.dragging-item { opacity: 0.4; }
@@ -51,11 +51,13 @@
     .grid-icon svg.icon-file { width: 48px; height: auto; }
     .grid-icon svg.icon-wide { width: 62px; height: auto; }
 
-    .grid-name { font-size: 13px; font-weight: 500; color: #1d1d1f; text-align: center; line-height: 1.3; word-break: break-word; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; width: 100%; cursor: pointer;}
-    .admin-actions { display: flex; gap: 5px; margin-top: auto; width: 100%; justify-content: center; }
+    .grid-name { font-size: 13px; font-weight: 500; color: #1d1d1f; text-align: center; line-height: 1.4; word-break: break-word; width: 100%; cursor: pointer;}
+    .grid-lock { font-size: 12px; margin-top: 6px; color: #1d1d1f; text-align: center; }
+    .grid-time { font-size: 11px; color: #86868b; margin-top: 6px; text-align: center; line-height: 1.3; }
+
+    .admin-actions { display: flex; gap: 5px; margin-top: 15px; width: 100%; justify-content: center; }
     .admin-actions button { padding: 6px 10px; font-size: 11px; margin: 0; width: auto; border-radius: 8px; }
 
-    /* Color Picker Styles */
     .color-circle { width: 28px; height: 28px; border-radius: 50%; cursor: pointer; border: 3px solid transparent; box-sizing: border-box; transition: 0.1s; }
     .color-circle:hover { transform: scale(1.1); }
 
@@ -71,6 +73,7 @@
 </head>
 <body oncontextmenu="return false;">
 
+  <!-- Modal สำหรับตั้งค่า Folder แบบแตะค้าง -->
   <div id="folderSettingsModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:10000; justify-content:center; align-items:center;">
     <div style="background:#ffffff; width:90%; max-width:320px; border-radius:24px; padding:25px; box-sizing:border-box; text-align:center; box-shadow: 0 15px 40px rgba(0,0,0,0.15);">
         
@@ -79,7 +82,13 @@
         <input type="hidden" id="editFolderPath">
         <input type="text" id="editFolderName" placeholder="ชื่อโฟลเดอร์" style="font-size:18px; font-weight:600; text-align:center; padding:10px 5px; margin-bottom:20px; width:100%; border:none; border-bottom:2px solid #e5e5ea; border-radius:0; background:transparent;">
         
-        <div style="text-align:left; margin-bottom:20px; background:#f5f5f7; padding:12px 15px; border-radius:14px;">
+        <!-- Password สำหรับโฟลเดอร์ -->
+        <div style="text-align:left; margin-bottom:15px; background:#f5f5f7; padding:12px 15px; border-radius:14px;">
+            <label style="font-size:14px; color:#1d1d1f; margin:0 0 8px 0; font-weight:600; display:block;">รหัสผ่านโฟลเดอร์</label>
+            <input type="text" id="editFolderPassword" placeholder="เว้นว่างหากไม่ล็อก..." style="width:100%; border:1px solid #d2d2d7; border-radius:10px; padding:10px; box-sizing:border-box; font-size:14px; font-family:inherit; margin:0;">
+        </div>
+
+        <div style="text-align:left; margin-bottom:15px; background:#f5f5f7; padding:12px 15px; border-radius:14px;">
             <label style="font-size:13px; color:#86868b; margin-top:0; margin-bottom:10px; display:block; font-weight:600;">สีโฟลเดอร์ (Tags)</label>
             <div id="colorPicker" style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px;">
                 <div class="color-circle" data-color="red" style="background:#ff3b30;" onclick="selectFolderColor('red')"></div>
@@ -120,6 +129,7 @@
        <button class="btn-red" style="width: auto; padding: 10px 20px; margin: 0; border-radius: 12px;" onclick="logoutAdmin()">ออกจากระบบผู้ดูแล</button>
     </div>
 
+    <!-- กล่อง: ให้สิทธิ์ดาวน์โหลดโดยตรง -->
     <div class="admin-box" style="border: 2px solid #34c759;">
       <h2>การอนุมัติสิทธิ์การเข้าถึงทันที (ไม่ต้องรอยื่นคำขอ)</h2>
       <label>1. เลือกระบบงาน / เอกสาร:</label>
@@ -148,6 +158,16 @@
       <label>5. กำหนดรายชื่อผู้มีสิทธิ์เข้าชมเบื้องต้น (คั่นด้วยลูกน้ำ หรือ ขึ้นบรรทัดใหม่):</label>
       <textarea id="allowedUsers" placeholder="ระบุรหัสประจำตัว เช่น: 6810210178, 6810210220"></textarea>
 
+      <!-- ฟีเจอร์ใหม่: เปิดปิดลายน้ำและตั้งรหัสผ่านเอกสาร -->
+      <label>6. เปิดใช้งานลายน้ำในเอกสาร (Watermark):</label>
+      <select id="showWatermark">
+        <option value="true">เปิด (แสดงลายน้ำ)</option>
+        <option value="false">ปิด (ซ่อนลายน้ำ)</option>
+      </select>
+      
+      <label>7. รหัสผ่านเอกสาร (เว้นว่างหากไม่ต้องการล็อก):</label>
+      <input type="text" id="jobPassword" placeholder="ตั้งรหัสผ่านสำหรับเอกสารนี้...">
+
       <div style="display: flex; gap: 10px;">
         <button class="btn-blue" id="btnSave" onclick="saveJob()">บันทึกข้อมูลระบบงาน</button>
         <button class="btn-gray" id="btnCancel" onclick="cancelEdit()">ยกเลิกการแก้ไข</button>
@@ -157,7 +177,7 @@
 
     <div class="admin-box">
       <h2>การจัดการรายการ (File Explorer)</h2>
-      <p style="color:#86868b; font-size:13px; margin-top:-5px; margin-bottom:15px;">💡 กดค้างที่โฟลเดอร์ (บนมือถือ) หรือคลิกขวา (บนคอม) เพื่อตั้งค่าสีและอีโมจิ</p>
+      <p style="color:#86868b; font-size:13px; margin-top:-5px; margin-bottom:15px;">💡 กดค้างที่โฟลเดอร์เพื่อตั้งค่าสี, อีโมจิ หรือใส่รหัสผ่านโฟลเดอร์</p>
       
       <div class="nav-header" id="adminNavHeader" style="display: none;">
          <button class="back-btn" onclick="navigateAdminUp()">< ย้อนกลับ</button>
@@ -238,6 +258,17 @@
         }
         svg += `</svg>`;
         return svg;
+    }
+
+    function formatTime(timestamp) {
+        if (!timestamp) return "";
+        try {
+            const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+            return date.toLocaleDateString('th-TH', { 
+                year: 'numeric', month: 'short', day: 'numeric', 
+                hour: '2-digit', minute: '2-digit' 
+            }) + " น.";
+        } catch(e) { return ""; }
     }
 
     let allJobsAdmin = [];
@@ -321,7 +352,13 @@
           let path = (data.folder || "").trim().replace(/^\/+|\/+$/g, ''); 
           
           if (data.type === "system_folder") {
-              folderMeta[path] = { id: docSnap.id, color: data.color || 'blue', emoji: data.emoji || '' };
+              folderMeta[path] = { 
+                  id: docSnap.id, 
+                  color: data.color || 'blue', 
+                  emoji: data.emoji || '', 
+                  password: data.password || '',
+                  updatedAt: data.updatedAt || data.createdAt || null
+              };
           }
           
           allJobsAdmin.push({ id: docSnap.id, normalizedPath: path, ...data });
@@ -332,8 +369,9 @@
 
           const displayFolder = data.folder ? `📁 ${data.folder}` : "หน้าหลัก (ไม่ระบุโฟลเดอร์)";
           if (data.type === "system_folder") {
+              let lockTxt = data.password ? " 🔒" : "";
               tableHtml += `<tr>
-                        <td><b>${displayFolder}</b><br><small style="color:gray;">(แฟ้มข้อมูล / กำหนดสี)</small></td>
+                        <td><b>${displayFolder}${lockTxt}</b><br><small style="color:gray;">(แฟ้มข้อมูล / กำหนดสี)</small></td>
                         <td style="text-align:center;">โฟลเดอร์</td>
                         <td style="text-align:center; color:gray;">-</td>
                         <td>
@@ -345,8 +383,9 @@
           } else {
               const userCount = data.allowedUsers ? data.allowedUsers.length : 0;
               const safeData = encodeURIComponent(JSON.stringify({id: docSnap.id, ...data}));
+              let lockTxt = data.password ? " 🔒" : "";
               tableHtml += `<tr>
-                        <td><b>${data.title}</b><br><small style="color:gray;">${displayFolder}</small></td>
+                        <td><b>${data.title}${lockTxt}</b><br><small style="color:gray;">${displayFolder}</small></td>
                         <td style="text-align:center;">${data.type}</td>
                         <td style="text-align:center; color:#34c759; font-weight:bold;">${userCount} บัญชี</td>
                         <td>
@@ -409,11 +448,12 @@
     // เปิดหน้าตั้งค่าโฟลเดอร์
     window.openFolderSettings = function(path) {
        let folderName = path.split('/').pop();
-       let meta = folderMeta[path] || { color: 'blue', emoji: '' };
+       let meta = folderMeta[path] || { color: 'blue', emoji: '', password: '' };
        
        document.getElementById("editFolderPath").value = path;
        document.getElementById("editFolderName").value = folderName;
        document.getElementById("editFolderEmoji").value = meta.emoji;
+       document.getElementById("editFolderPassword").value = meta.password || "";
        
        selectFolderColor(meta.color);
        document.getElementById("folderSettingsModal").style.display = "flex";
@@ -446,6 +486,7 @@
         let newName = document.getElementById("editFolderName").value.trim();
         let newColor = window.selectedFolderColor || 'blue';
         let newEmoji = document.getElementById("editFolderEmoji").value.trim();
+        let newPassword = document.getElementById("editFolderPassword").value.trim();
         
         if (!newName) { alert("กรุณาระบุชื่อโฟลเดอร์"); return; }
         if (newName.includes("/")) { alert("ไม่อนุญาตให้ใช้เครื่องหมาย / ในชื่อโฟลเดอร์"); return; }
@@ -457,7 +498,6 @@
         
         const batch = writeBatch(db);
         
-        // ถ้าย้าย/เปลี่ยนชื่อโฟลเดอร์ ให้แก้ไข Path ของไฟล์ภายในด้วย
         if (oldPath !== newPath) {
            allJobsAdmin.forEach(f => {
               if (f.normalizedPath === oldPath && f.type !== 'system_folder') {
@@ -476,6 +516,7 @@
                 folder: newPath,
                 color: newColor,
                 emoji: newEmoji,
+                password: newPassword,
                 updatedAt: serverTimestamp()
             });
         } else {
@@ -486,6 +527,7 @@
                 type: "system_folder",
                 color: newColor,
                 emoji: newEmoji,
+                password: newPassword,
                 allowedUsers: [],
                 searchableUsers: [],
                 createdAt: serverTimestamp(),
@@ -539,7 +581,10 @@
             const safeFolderName = encodeURIComponent(folderName);
             let targetPath = currentAdminPath ? currentAdminPath + "/" + folderName : folderName;
             const safeTarget = encodeURIComponent(targetPath);
-            let meta = folderMeta[targetPath] || { color: 'blue', emoji: '' };
+            let meta = folderMeta[targetPath] || { color: 'blue', emoji: '', password: '', updatedAt: null };
+            
+            let lockHtml = meta.password ? `<div class="grid-lock">🔒</div>` : "";
+            let timeStr = formatTime(meta.updatedAt);
             
             html += `
               <div class="grid-item folder-target" 
@@ -565,6 +610,8 @@
                      onmouseleave="cancelFolderPress()"
                      oncontextmenu="handleFolderContextMenu(event, '${safeTarget}')"
                      onclick="handleFolderClick(event, '${safeFolderName}')">${folderName}</div>
+                <div class="grid-time">${timeStr}</div>
+                ${lockHtml}
               </div>
             `;
         });
@@ -577,6 +624,9 @@
             else if (file.type === "image") iconSvg = icons.image;
             else if (file.type === "link") iconSvg = icons.link;
 
+            let lockHtml = file.password ? `<div class="grid-lock">🔒</div>` : "";
+            let fileTimeStr = file.updatedAt ? formatTime(file.updatedAt) : (file.createdAt ? formatTime(file.createdAt) : "");
+
             html += `
               <div class="grid-item structural-file" 
                    draggable="true" 
@@ -585,6 +635,8 @@
                    ondragend="handleFileDragEnd(event)">
                 <div class="grid-icon" onclick="editJob('${safeData}')">${iconSvg}</div>
                 <div class="grid-name" onclick="editJob('${safeData}')">${file.title}</div>
+                <div class="grid-time">${fileTimeStr}</div>
+                ${lockHtml}
                 <div class="admin-actions">
                   <button class="btn-yellow" onclick="editJob('${safeData}')">แก้ไข</button>
                   <button class="btn-red" onclick="deleteJob('${file.id}')">ลบ</button>
@@ -637,6 +689,7 @@
                 type: "system_folder",
                 color: "blue",
                 emoji: "",
+                password: "",
                 url: "-",
                 allowedUsers: [], 
                 searchableUsers: [],
@@ -737,8 +790,18 @@
 
     window.openAdminFolder = function(encodedFolderName) {
       const folderName = decodeURIComponent(encodedFolderName);
-      if (currentAdminPath === "") currentAdminPath = folderName;
-      else currentAdminPath = currentAdminPath + "/" + folderName;
+      let targetPath = currentAdminPath === "" ? folderName : currentAdminPath + "/" + folderName;
+      let meta = folderMeta[targetPath];
+      
+      if (meta && meta.password) {
+          let pwd = prompt("โฟลเดอร์นี้ถูกล็อก กรุณาใส่รหัสผ่าน:");
+          if (pwd !== meta.password) {
+              alert("รหัสผ่านไม่ถูกต้อง");
+              return;
+          }
+      }
+      
+      currentAdminPath = targetPath;
       renderAdminExplorer();
     }
 
@@ -763,6 +826,8 @@
       const type = document.getElementById("fileType").value;
       let url = document.getElementById("fileUrl").value.trim();
       const rawUsers = document.getElementById("allowedUsers").value;
+      const showWatermark = document.getElementById("showWatermark").value === "true";
+      const password = document.getElementById("jobPassword").value.trim();
       const statusText = document.getElementById("status");
       
       if (!title || !url) {
@@ -787,6 +852,8 @@
           url: url,
           allowedUsers: userList,
           searchableUsers: searchList,
+          showWatermark: showWatermark,
+          password: password,
           updatedAt: serverTimestamp()
         };
 
@@ -818,6 +885,9 @@
       document.getElementById("fileUrl").value = data.url;
       document.getElementById("allowedUsers").value = (data.allowedUsers || []).join(",\n");
       
+      document.getElementById("showWatermark").value = data.showWatermark !== false ? "true" : "false";
+      document.getElementById("jobPassword").value = data.password || "";
+      
       document.getElementById("btnSave").innerText = "บันทึกการแก้ไข";
       document.getElementById("btnSave").classList.replace("btn-blue", "btn-yellow");
       document.getElementById("btnCancel").style.display = "block";
@@ -832,6 +902,9 @@
       document.getElementById("jobFolder").value = "";
       document.getElementById("fileUrl").value = "";
       document.getElementById("allowedUsers").value = "";
+      document.getElementById("showWatermark").value = "true";
+      document.getElementById("jobPassword").value = "";
+      
       document.getElementById("btnSave").innerText = "บันทึกข้อมูลระบบงาน";
       document.getElementById("btnSave").classList.replace("btn-yellow", "btn-blue");
       document.getElementById("btnCancel").style.display = "none";
@@ -903,7 +976,9 @@
       try {
         await deleteDoc(doc(db, "download_requests", reqId));
         loadRequests();
-      } catch (e) { alert("การลบข้อมูลล้มเหลว"); }
+      } catch (e) {
+        alert("การลบข้อมูลล้มเหลว");
+      }
     }
 
     window.updateRequestStatus = async function(reqId, newStatus) {
