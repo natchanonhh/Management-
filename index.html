@@ -124,48 +124,34 @@ font-size: 12px; border-radius: 8px;}
         <div id="folderPreviewIcon" style="width:90px; height:90px; margin:0 auto 15px; display:flex; justify-content:center; align-items:center;"></div>
         
         <input type="hidden" id="editFolderPath">
-        <input type="text" id="editFolderName" placeholder="ชื่อโฟลเดอร์" style="font-size:18px; font-weight:600; text-align:center; padding:10px 5px; margin-bottom:20px; width:100%; border:none; border-bottom:2px 
-solid #e5e5ea; border-radius:0; background:transparent;">
+        <input type="text" id="editFolderName" placeholder="ชื่อโฟลเดอร์" style="font-size:18px; font-weight:600; text-align:center; padding:10px 5px; margin-bottom:20px; width:100%; border:none; border-bottom:2px solid #e5e5ea; border-radius:0; background:transparent;">
         
-        <div style="text-align:left; margin-bottom:15px;
-background:#f5f5f7; padding:12px 15px; border-radius:14px;">
-            <label style="font-size:14px; color:#1d1d1f;
-margin:0 0 8px 0; font-weight:600; display:block;">รหัสผ่านโฟลเดอร์</label>
-            <input type="text" id="editFolderPassword" placeholder="เว้นว่างหากไม่ล็อก..." style="width:100%;
-border:1px solid #d2d2d7; border-radius:10px; padding:10px; box-sizing:border-box; font-size:14px; font-family:inherit; margin:0;">
+        <div style="text-align:left; margin-bottom:15px; background:#f5f5f7; padding:12px 15px; border-radius:14px;">
+            <label style="font-size:14px; color:#1d1d1f; margin:0 0 8px 0; font-weight:600; display:block;">รหัสผ่านโฟลเดอร์</label>
+            <input type="text" id="editFolderPassword" placeholder="เว้นว่างหากไม่ล็อก..." style="width:100%; border:1px solid #d2d2d7; border-radius:10px; padding:10px; box-sizing:border-box; font-size:14px; font-family:inherit; margin:0;">
         </div>
 
-        <div style="text-align:left;
-margin-bottom:15px; background:#f5f5f7; padding:12px 15px; border-radius:14px;">
-            <label style="font-size:13px; color:#86868b; margin-top:0;
-margin-bottom:10px; display:block; font-weight:600;">สีโฟลเดอร์ (Tags)</label>
-            <div id="colorPicker" style="display:flex; justify-content:space-between; flex-wrap:wrap;
-gap:8px;">
+        <div style="text-align:left; margin-bottom:15px; background:#f5f5f7; padding:12px 15px; border-radius:14px;">
+            <label style="font-size:13px; color:#86868b; margin-top:0; margin-bottom:10px; display:block; font-weight:600;">สีโฟลเดอร์ (Tags)</label>
+            <div id="colorPicker" style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px;">
                 <div class="color-circle" data-color="red" style="background:#ff3b30;" onclick="selectFolderColor('red')"></div>
                 <div class="color-circle" data-color="orange" style="background:#ff9500;" onclick="selectFolderColor('orange')"></div>
                 <div class="color-circle" data-color="yellow" style="background:#ffcc00;" onclick="selectFolderColor('yellow')"></div>
                 <div class="color-circle" data-color="green" style="background:#34c759;" onclick="selectFolderColor('green')"></div>
-                <div class="color-circle" data-color="blue" style="background:#0071e3;" 
-onclick="selectFolderColor('blue')"></div>
+                <div class="color-circle" data-color="blue" style="background:#0071e3;" onclick="selectFolderColor('blue')"></div>
                 <div class="color-circle" data-color="purple" style="background:#af52de;" onclick="selectFolderColor('purple')"></div>
                 <div class="color-circle" data-color="gray" style="background:#8e8e93;" onclick="selectFolderColor('gray')"></div>
             </div>
         </div>
         
-        <div style="text-align:left;
-margin-bottom:25px; background:#f5f5f7; padding:12px 15px; border-radius:14px; display:flex; justify-content:space-between; align-items:center;">
-            <label style="font-size:14px;
-color:#1d1d1f; margin:0; font-weight:600;">อีโมจิ (Emoji)</label>
-            <input type="text" id="editFolderEmoji" maxlength="2" placeholder="😀" style="font-size:24px;
-text-align:center; width:50px; height:50px; padding:0; border-radius:12px; border:1px solid #d2d2d7; margin:0; background:white;">
+        <div style="text-align:left; margin-bottom:25px; background:#f5f5f7; padding:12px 15px; border-radius:14px; display:flex; justify-content:space-between; align-items:center;">
+            <label style="font-size:14px; color:#1d1d1f; margin:0; font-weight:600;">อีโมจิ (Emoji)</label>
+            <input type="text" id="editFolderEmoji" maxlength="2" placeholder="😀" style="font-size:24px; text-align:center; width:50px; height:50px; padding:0; border-radius:12px; border:1px solid #d2d2d7; margin:0; background:white;">
         </div>
         
-        <div style="display:flex;
-gap:10px;">
-            <button class="btn-gray" onclick="closeFolderSettings()" style="display:block; background:#e5e5ea; color:#1d1d1f; margin-top:0;
-box-shadow:none;">ยกเลิก</button>
-            <button class="btn-blue" onclick="saveFolderSettings()" style="margin-top:0;
-box-shadow:none;">บันทึก</button>
+        <div style="display:flex; gap:10px;">
+            <button class="btn-gray" onclick="closeFolderSettings()" style="display:block; background:#e5e5ea; color:#1d1d1f; margin-top:0; box-shadow:none;">ยกเลิก</button>
+            <button class="btn-blue" onclick="saveFolderSettings()" style="margin-top:0; box-shadow:none;">บันทึก</button>
         </div>
     </div>
   </div>
@@ -173,27 +159,22 @@ box-shadow:none;">บันทึก</button>
   <div id="adminLoginWrapper">
      <div class="login-card">
         <h2>ระบบจัดการสำหรับผู้ดูแล</h2>
-        <p style="color:#86868b;
-margin-bottom: 20px; font-size: 14px;">กรุณาเข้าสู่ระบบด้วยบัญชีแอดมิน</p>
+        <p style="color:#86868b; margin-bottom: 20px; font-size: 14px;">กรุณาเข้าสู่ระบบด้วยบัญชีแอดมิน</p>
         <input type="email" id="adminEmail" placeholder="อีเมลแอดมิน..." style="text-align:center;" required>
         <input type="password" id="adminPassword" placeholder="รหัสผ่าน..." style="text-align:center;" required>
         <button class="btn-blue" onclick="loginAdmin()">เข้าสู่ระบบ</button>
-        <p id="loginError" style="color:#ff3b30;
-display:none; margin-top:15px; font-weight:500; font-size: 14px;">อีเมลหรือรหัสผ่านไม่ถูกต้อง</p>
+        <p id="loginError" style="color:#ff3b30; display:none; margin-top:15px; font-weight:500; font-size: 14px;">อีเมลหรือรหัสผ่านไม่ถูกต้อง</p>
      </div>
   </div>
 
   <div id="mainAdminContent">
-    <div style="width: 100%;
-max-width: 850px; display: flex; justify-content: flex-end; margin-bottom: 15px;">
-       <button class="btn-red" style="width: auto;
-padding: 10px 20px; margin: 0; border-radius: 12px;" onclick="logoutAdmin()">ออกจากระบบผู้ดูแล</button>
+    <div style="width: 100%; max-width: 850px; display: flex; justify-content: flex-end; margin-bottom: 15px;">
+       <button class="btn-red" style="width: auto; padding: 10px 20px; margin: 0; border-radius: 12px;" onclick="logoutAdmin()">ออกจากระบบผู้ดูแล</button>
     </div>
     
     <div class="admin-box" style="border: 2px solid #0071e3;">
       <h2>จัดการป้ายโฆษณา (Banners)</h2>
-      <p style="color:#86868b;
-font-size:13px; margin-top:-5px; margin-bottom:15px;">
+      <p style="color:#86868b; font-size:13px; margin-top:-5px; margin-bottom:15px;">
         💡 ระบบจะแสดงป้ายโฆษณาที่ด้านบนของหน้าเว็บผู้ใช้ และจะเลื่อนอัตโนมัติทุกๆ 1 นาที (ขนาดแนะนำ 1200 x 600 px)
       </p>
       
@@ -205,8 +186,7 @@ font-size:13px; margin-top:-5px; margin-bottom:15px;">
       <label>2. ลิงก์ปลายทาง (Target URL - แตะแล้วเปิดลิงก์นี้, ไม่บังคับ):</label>
       <input type="text" id="bannerLinkUrl" placeholder="ระบุ URL ลิงก์ปลายทาง (ถ้ามี)...">
 
-    
-  <div style="display: flex; gap: 10px;">
+      <div style="display: flex; gap: 10px;">
         <button class="btn-blue" id="btnSaveBanner" onclick="saveBanner()">เพิ่มป้ายโฆษณา</button>
         <button class="btn-gray" id="btnCancelBanner" onclick="cancelEditBanner()">ยกเลิกการแก้ไข</button>
       </div>
@@ -229,33 +209,27 @@ font-size:13px; margin-top:-5px; margin-bottom:15px;">
       <input type="hidden" id="editJobId"> 
       <label>1. ชื่อรายการ / เอกสาร:</label>
       <input type="text" id="jobTitle" placeholder="ตัวอย่าง: เอกสารประกอบการเรียน" required>
-      <label>2.
-โฟลเดอร์ (จัดหมวดหมู่):</label>
+      <label>2. โฟลเดอร์ (จัดหมวดหมู่):</label>
       <input type="text" id="jobFolder" placeholder="ระบุชื่อโฟลเดอร์ (ใช้ / เพื่อซ้อนโฟลเดอร์ เช่น คณิตศาสตร์/ม.1)">
-      <label>3.
-ประเภทของไฟล์:</label>
+      <label>3. ประเภทของไฟล์:</label>
       <select id="fileType">
         <option value="youtube">วิดีโอ (ลิงก์ YouTube)</option>
         <option value="image">รูปภาพ (ลิงก์ภาพ)</option>
         <option value="pdf">ไฟล์ PDF / Google Drive (ลิงก์เอกสาร)</option>
         <option value="link">ลิงก์เว็บไซต์ภายนอก (URL)</option>
       </select>
-      <label>4.
-ข้อมูลลิงก์ (URL):</label>
+      <label>4. ข้อมูลลิงก์ (URL):</label>
       <input type="text" id="fileUrl" placeholder="ระบุลิงก์ข้อมูลที่นี่..." required>
-      <label>5.
-กำหนดรายชื่อผู้มีสิทธิ์เข้าชมเบื้องต้น (คั่นด้วยลูกน้ำ หรือ ขึ้นบรรทัดใหม่):</label>
+      <label>5. กำหนดรายชื่อผู้มีสิทธิ์เข้าชมเบื้องต้น (คั่นด้วยลูกน้ำ หรือ ขึ้นบรรทัดใหม่):</label>
       <textarea id="allowedUsers" placeholder="ระบุรหัสประจำตัว เช่น: 6810210178, 6810210220"></textarea>
 
-      <label>6.
-เปิดใช้งานลายน้ำในเอกสาร (Watermark):</label>
+      <label>6. เปิดใช้งานลายน้ำในเอกสาร (Watermark):</label>
       <select id="showWatermark">
         <option value="true">เปิด (แสดงลายน้ำ)</option>
         <option value="false">ปิด (ซ่อนลายน้ำ)</option>
       </select>
       
-      <label>7.
-รหัสผ่านเอกสาร (เว้นว่างหากไม่ต้องการล็อก):</label>
+      <label>7. รหัสผ่านเอกสาร (เว้นว่างหากไม่ต้องการล็อก):</label>
       <input type="text" id="jobPassword" placeholder="ตั้งรหัสผ่านสำหรับเอกสารนี้...">
 
       <div style="display: flex; gap: 10px;">
@@ -269,21 +243,16 @@ font-size:13px; margin-top:-5px; margin-bottom:15px;">
       <h2>การจัดการรายการ (File Explorer)</h2>
       <p style="color:#86868b; font-size:13px; margin-top:-5px; margin-bottom:15px;">💡 กดค้างที่โฟลเดอร์เพื่อตั้งค่าสี, อีโมจิ หรือใส่รหัสผ่านโฟลเดอร์</p>
      
-  
       <div class="nav-header" id="adminNavHeader" style="display: none;">
          <button class="back-btn" onclick="navigateAdminUp()">< ย้อนกลับ</button>
          <div class="path-title" id="currentAdminPathTitle">หน้าหลัก</div>
          <div style="width: 70px;"></div>
       </div>
       
-      <div style="display: flex;
-gap: 10px; margin-bottom: 15px; flex-wrap: wrap; justify-content: center;">
-         <button class="btn-blue" style="background: #e8e8ed;
-color: #0071e3; box-shadow: none; margin: 0; width: auto; font-size: 14px;" onclick="addNewJobHere()">+ สร้างเอกสารในหน้านี้</button>
-         <button class="btn-blue" style="background: #e8e8ed;
-color: #0071e3; box-shadow: none; margin: 0; width: auto; font-size: 14px;" onclick="createNewFolder()">+ สร้างโฟลเดอร์ว่าง</button>
-         <button class="btn-red" id="btnDeleteEmptyFolder" style="display: none;
-margin: 0; width: auto; font-size: 14px;" onclick="deleteCurrentEmptyFolder()">🗑️ ลบโฟลเดอร์นี้ (ว่าง)</button>
+      <div style="display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap; justify-content: center;">
+         <button class="btn-blue" style="background: #e8e8ed; color: #0071e3; box-shadow: none; margin: 0; width: auto; font-size: 14px;" onclick="addNewJobHere()">+ สร้างเอกสารในหน้านี้</button>
+         <button class="btn-blue" style="background: #e8e8ed; color: #0071e3; box-shadow: none; margin: 0; width: auto; font-size: 14px;" onclick="createNewFolder()">+ สร้างโฟลเดอร์ว่าง</button>
+         <button class="btn-red" id="btnDeleteEmptyFolder" style="display: none; margin: 0; width: auto; font-size: 14px;" onclick="deleteCurrentEmptyFolder()">🗑️ ลบโฟลเดอร์นี้ (ว่าง)</button>
       </div>
       
       <div id="explorerDropZone" class="explorer-zone">
@@ -302,8 +271,7 @@ margin: 0; width: auto; font-size: 14px;" onclick="deleteCurrentEmptyFolder()">�
     </div>
 
     <div class="admin-box">
-  
-     <h2>ประวัติการดาวน์โหลด (ผู้ชม)</h2>
+      <h2>ประวัติการดาวน์โหลด (ผู้ชม)</h2>
       <div id="historyTable"></div>
     </div>
   </div>
@@ -312,7 +280,8 @@ margin: 0; width: auto; font-size: 14px;" onclick="deleteCurrentEmptyFolder()">�
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getFirestore, doc, setDoc, addDoc, getDoc, deleteDoc, collection, getDocs, serverTimestamp, updateDoc, query, writeBatch } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
     import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-const firebaseConfig = {
+    
+    const firebaseConfig = {
       apiKey: "AIzaSyBLyMpowfyQK_1UnredPFmXdBdtQZKpY-c",
       authDomain: "datapdf-d14d0.firebaseapp.com",
       databaseURL: "https://datapdf-d14d0-default-rtdb.asia-southeast1.firebasedatabase.app",
@@ -321,10 +290,12 @@ const firebaseConfig = {
       messagingSenderId: "1034739093928",
       appId: "1:1034739093928:web:cd56cc0e208d7d00f24d9d"
     };
-const app = initializeApp(firebaseConfig);
+    
+    const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     const auth = getAuth(app);
-const appleColors = {
+    
+    const appleColors = {
         blue: ['#89C4FA', '#74B5F6', '#0071e3'],
         red: ['#ff8a8a', '#ff5c5c', '#ff3b30'],
         orange: ['#ffb380', '#ff944d', '#ff9500'],
@@ -333,67 +304,68 @@ const appleColors = {
         purple: ['#d1a3ff', '#b870ff', '#af52de'],
         gray: ['#c2c2c2', '#a8a8a8', '#8e8e93']
     };
-const icons = {
+    
+    const icons = {
       pdf: `<svg class="icon-file" viewBox="0 0 64 80" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="4" y="4" width="56" height="72" rx="6" fill="#F9F9FB" stroke="#D2D2D7" stroke-width="2"/><path d="M40 4L60 24V10C60 6.68629 57.3137 4 54 4H40Z" fill="#E5E5EA"/><path d="M40 4V18C40 21.3137 42.6863 24 46 24H60" stroke="#D2D2D7" stroke-width="2" stroke-linejoin="round"/><rect x="16" y="32" width="32" height="4" rx="2" fill="#FF3B30"/><rect x="16" y="44" width="24" height="4" rx="2" fill="#D2D2D7"/><rect x="16" y="56" width="28" height="4" rx="2" fill="#D2D2D7"/></svg>`,
-      image: `<svg class="icon-wide" viewBox="0 0 80 64" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="4" y="4" width="72" height="56" rx="8" fill="#F9F9FB" stroke="#D2D2D7" stroke-width="2"/><circle cx="24" cy="24" r="6" fill="#FFCC00"/><path d="M4 48L28 28L52 48L64 38L76 48V52C76 56.4183 72.4183 60 68 60H12C7.58172 
-60 4 56.4183 4 52V48Z" fill="#34C759"/></svg>`,
+      image: `<svg class="icon-wide" viewBox="0 0 80 64" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="4" y="4" width="72" height="56" rx="8" fill="#F9F9FB" stroke="#D2D2D7" stroke-width="2"/><circle cx="24" cy="24" r="6" fill="#FFCC00"/><path d="M4 48L28 28L52 48L64 38L76 48V52C76 56.4183 72.4183 60 68 60H12C7.58172 60 4 56.4183 4 52V48Z" fill="#34C759"/></svg>`,
       youtube: `<svg class="icon-wide" viewBox="0 0 80 56" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="4" y="4" width="72" height="48" rx="12" fill="#FF3B30"/><path d="M34 18L52 28L34 38V18Z" fill="white"/></svg>`,
       link: `<svg class="icon-file" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="40" cy="40" r="36" fill="#F9F9FB" stroke="#D2D2D7" stroke-width="2"/><path d="M40 10C28 10 20 25 20 40C20 55 28 70 40 70C52 70 60 55 60 40C60 25 52 10 40 10Z" stroke="#0071E3" stroke-width="2"/><path d="M10 40H70" stroke="#0071E3" stroke-width="2"/><path d="M20 25H60" stroke="#0071E3" stroke-width="2"/><path d="M20 55H60" stroke="#0071E3" stroke-width="2"/></svg>`
     };
-function getFolderIcon(color, emoji) {
+    
+    function getFolderIcon(color, emoji) {
         let c = appleColors[color] || appleColors.blue;
-let svg = `<svg class="icon-folder" viewBox="0 0 100 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+        let svg = `<svg class="icon-folder" viewBox="0 0 100 80" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M0 12C0 5.37258 5.37258 0 12 0H36.5C39.5 0 42.2 1.5 43.8 4L51 15H88C94.6274 15 100 20.3726 100 27V68C100 74.6274 94.6274 80 88 80H12C5.37258 80 0 74.6274 0 68V12Z" fill="${c[0]}"/>
             <path d="M0 24C0 20.6863 2.68629 18 6 18H94C97.3137 18 100 20.6863 100 24V68C100 74.6274 94.6274 80 88 80H12C5.37258 80 0 74.6274 0 68V24Z" fill="${c[1]}"/>`;
-if (emoji) {
+        if (emoji) {
             svg += `<text x="50%" y="55%" dominant-baseline="middle" text-anchor="middle" font-size="28">${emoji}</text>`;
-}
+        }
         svg += `</svg>`;
         return svg;
-}
+    }
 
     function formatTime(timestamp) {
         if (!timestamp) return "";
-try {
-            const date = timestamp.toDate ?
-timestamp.toDate() : new Date(timestamp);
+        try {
+            const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
             return date.toLocaleDateString('th-TH', { 
                 year: 'numeric', month: 'short', day: 'numeric', 
                 hour: '2-digit', minute: '2-digit' 
             }) + " น.";
-} catch(e) { return ""; }
+        } catch(e) { return ""; }
     }
 
     let allJobsAdmin = [];
-let currentAdminPath = "";
+    let currentAdminPath = "";
     let currentEmptyFolderMarkerId = null;
     let folderMeta = {};
-window.loginAdmin = function() {
+    
+    window.loginAdmin = function() {
       const email = document.getElementById("adminEmail").value;
       const pwd = document.getElementById("adminPassword").value;
-const errorMsg = document.getElementById("loginError");
+      const errorMsg = document.getElementById("loginError");
 
       if (!email || !pwd) {
         errorMsg.innerText = "กรุณากรอกอีเมลและรหัสผ่านให้ครบถ้วน";
-errorMsg.style.display = "block";
+        errorMsg.style.display = "block";
         return;
       }
 
       errorMsg.style.display = "none";
       document.querySelector("#adminLoginWrapper button").innerText = "กำลังเข้าสู่ระบบ...";
-signInWithEmailAndPassword(auth, email, pwd)
+      signInWithEmailAndPassword(auth, email, pwd)
         .then(() => { document.querySelector("#adminLoginWrapper button").innerText = "เข้าสู่ระบบ"; })
         .catch(() => {
           document.querySelector("#adminLoginWrapper button").innerText = "เข้าสู่ระบบ";
           errorMsg.style.display = "block";
           errorMsg.innerText = "อีเมลหรือรหัสผ่านไม่ถูกต้อง กรุณาลองใหม่";
         });
-}
+    }
 
     window.logoutAdmin = function() {
       if (confirm("ต้องการออกจากระบบผู้ดูแลหรือไม่?")) {
         signOut(auth).catch(() => { alert("เกิดข้อผิดพลาดในการออกจากระบบ"); });
-}
+      }
     }
 
     onAuthStateChanged(auth, (user) => {
@@ -401,99 +373,96 @@ signInWithEmailAndPassword(auth, email, pwd)
         document.getElementById("adminLoginWrapper").style.display = "none";
         document.getElementById("mainAdminContent").style.display = "flex";
         setupExternalDragAndDrop();
-        loadBanners(); // ฟังก์ชันสำหรับโหลดป้ายโฆษณาในส่วนแอดมิน
+        loadBanners(); 
         loadJobs();
         loadRequests();
         loadHistory();
         setTimeout(() => processDiscordActions(), 1000);
       } else {
         document.getElementById("adminLoginWrapper").style.display = "flex";
- 
-       document.getElementById("mainAdminContent").style.display = "none";
+        document.getElementById("mainAdminContent").style.display = "none";
       }
     });
-document.getElementById("adminPassword").addEventListener("keypress", function(e) {
+    
+    document.getElementById("adminPassword").addEventListener("keypress", function(e) {
       if (e.key === "Enter") loginAdmin();
     });
-// =====================================
+    
+    // =====================================
     // ฟังก์ชันจัดการป้ายโฆษณา (Banners) - แอดมิน
     // =====================================
     window.loadBanners = async function() {
       const div = document.getElementById("bannersTable");
-div.innerHTML = "<p style='text-align:center;'>กำลังโหลดข้อมูลโฆษณา...</p>";
+      div.innerHTML = "<p style='text-align:center;'>กำลังโหลดข้อมูลโฆษณา...</p>";
       try {
         const snap = await getDocs(collection(db, "banners"));
-if(snap.empty) { div.innerHTML = "<p style='text-align:center; color:#86868b;'>ไม่มีป้ายโฆษณาในระบบ</p>"; return; }
+        if(snap.empty) { div.innerHTML = "<p style='text-align:center; color:#86868b;'>ไม่มีป้ายโฆษณาในระบบ</p>"; return; }
         
         let html = `<table><tr><th width="40%">รูปภาพ (Image)</th><th width="40%">ลิงก์ปลายทาง (Target URL)</th><th width="20%">จัดการ</th></tr>`;
-snap.forEach(docSnap => {
+        snap.forEach(docSnap => {
            const data = docSnap.data();
            const safeData = encodeURIComponent(JSON.stringify({id: docSnap.id, ...data}));
            html += `<tr>
              <td style="text-align:center;"><img src="${data.imageUrl}" style="max-width:150px; border-radius:8px; border:1px solid #d2d2d7;"></td>
              <td style="word-break: break-all;">${data.link || '-'}</td>
              <td style="text-align:center;">
-    
-            <div class="action-btns">
+                <div class="action-btns">
                     <button class="btn-yellow" onclick="editBanner('${safeData}')">แก้ไข</button>
                     <button class="btn-red" onclick="deleteBanner('${docSnap.id}')">ลบ</button>
                 </div>
              </td>
            </tr>`;
-   
-     });
+        });
         html += `</table>`;
         div.innerHTML = html;
-} catch (e) {
+      } catch (e) {
         div.innerHTML = "<p style='color:red; text-align:center;'>การเรียกข้อมูลโฆษณาล้มเหลว</p>";
-}
+      }
     }
 
     window.saveBanner = async function() {
       const editId = document.getElementById("editBannerId").value;
-const imageUrl = document.getElementById("bannerImageUrl").value.trim();
+      const imageUrl = document.getElementById("bannerImageUrl").value.trim();
       const linkUrl = document.getElementById("bannerLinkUrl").value.trim();
       
       if(!imageUrl) return alert("กรุณาระบุ URL รูปภาพโฆษณา");
-try {
+      try {
         if(editId) {
             await updateDoc(doc(db, "banners", editId), { imageUrl: imageUrl, link: linkUrl, updatedAt: serverTimestamp() });
-} else {
+        } else {
             await addDoc(collection(db, "banners"), { imageUrl: imageUrl, link: linkUrl, createdAt: serverTimestamp() });
-}
+        }
         cancelEditBanner();
         loadBanners();
-} catch(e) {
+      } catch(e) {
         alert("บันทึกป้ายโฆษณาล้มเหลว");
-}
+      }
     }
 
     window.editBanner = function(encodedData) {
       const data = JSON.parse(decodeURIComponent(encodedData));
-document.getElementById("editBannerId").value = data.id;
+      document.getElementById("editBannerId").value = data.id;
       document.getElementById("bannerImageUrl").value = data.imageUrl;
       document.getElementById("bannerLinkUrl").value = data.link || "";
       document.getElementById("btnSaveBanner").innerText = "บันทึกการแก้ไขโฆษณา";
       document.getElementById("btnCancelBanner").style.display = "block";
-}
+    }
 
     window.cancelEditBanner = function() {
       document.getElementById("editBannerId").value = "";
       document.getElementById("bannerImageUrl").value = "";
-document.getElementById("bannerLinkUrl").value = "";
+      document.getElementById("bannerLinkUrl").value = "";
       document.getElementById("btnSaveBanner").innerText = "เพิ่มป้ายโฆษณา";
       document.getElementById("btnCancelBanner").style.display = "none";
     }
 
     window.deleteBanner = async function(id) {
       if(!confirm("ยืนยันการลบป้ายโฆษณานี้?")) return;
-try {
+      try {
         await deleteDoc(doc(db, "banners", id));
         loadBanners();
-      } catch(e) { alert("ลบป้ายโฆษณาล้มเหลว");
-}
+      } catch(e) { alert("ลบป้ายโฆษณาล้มเหลว"); }
     }
-
 
     // =====================================
     // ฟังก์ชันเอกสาร (File Explorer)
@@ -501,43 +470,41 @@ try {
 
     function cleanUrl(type, url) {
       if (type === "youtube" && url.includes("watch?v=")) return `https://www.youtube.com/embed/${url.split("v=")[1].split("&")[0]}`;
-if (type === "youtube" && url.includes("youtu.be/")) return `https://www.youtube.com/embed/${url.split("youtu.be/")[1].split("?")[0]}`;
+      if (type === "youtube" && url.includes("youtu.be/")) return `https://www.youtube.com/embed/${url.split("youtu.be/")[1].split("?")[0]}`;
       if (type === "pdf" && url.includes("drive.google.com") && url.includes("/view")) return url.split("/view")[0] + "/preview";
-return url; 
+      return url; 
     }
 
     window.loadJobs = async function() {
       const explorerDiv = document.getElementById("adminFileExplorer");
-explorerDiv.innerHTML = "<p style='text-align:center;'>กำลังโหลดข้อมูล...</p>";
+      explorerDiv.innerHTML = "<p style='text-align:center;'>กำลังโหลดข้อมูล...</p>";
 
       try {
         const querySnapshot = await getDocs(collection(db, "jobs"));
-allJobsAdmin = [];
+        allJobsAdmin = [];
         folderMeta = {};
         let jobOptionsHtml = '<option value="">-- กรุณาเลือกระบบงาน --</option>';
-let tableHtml = `<table>
+        let tableHtml = `<table>
                           <tr>
                             <th width="30%">ชื่อรายการ / เส้นทางโฟลเดอร์</th>
                             <th width="15%">ประเภท</th>
-           
-                 <th width="30%">สิทธิ์การเข้าชมเบื้องต้น</th>
+                            <th width="30%">สิทธิ์การเข้าชมเบื้องต้น</th>
                             <th width="25%">การจัดการ</th>
                           </tr>`;
-querySnapshot.forEach((docSnap) => {
+                          
+        querySnapshot.forEach((docSnap) => {
           const data = docSnap.data();
           let path = (data.folder || "").trim().replace(/^\/+|\/+$/g, ''); 
           
           if (data.type === "system_folder") {
               folderMeta[path] = { 
                   id: docSnap.id, 
-       
-           color: data.color || 'blue', 
+                  color: data.color || 'blue', 
                   emoji: data.emoji || '', 
                   password: data.password || '',
                   updatedAt: data.updatedAt || data.createdAt || null
               };
-     
-     }
+          }
           
           allJobsAdmin.push({ id: docSnap.id, normalizedPath: path, ...data });
           
@@ -545,50 +512,40 @@ querySnapshot.forEach((docSnap) => {
               jobOptionsHtml += `<option value="${docSnap.id}">${data.title}</option>`;
           }
 
-          const displayFolder = data.folder ? `📁 ${data.folder}` : 
-"หน้าหลัก (ไม่ระบุโฟลเดอร์)";
+          const displayFolder = data.folder ? `📁 ${data.folder}` : "หน้าหลัก (ไม่ระบุโฟลเดอร์)";
           if (data.type === "system_folder") {
               let lockTxt = data.password ? " 🔒" : "";
               tableHtml += `<tr>
                         <td><b>${displayFolder}</b>${lockTxt}<br><small style="color:gray;">(แฟ้มข้อมูล / กำหนดสี)</small></td>
-                    
-    <td style="text-align:center;">โฟลเดอร์</td>
-                        <td style="text-align:center;
-color:gray;">-</td>
+                        <td style="text-align:center;">โฟลเดอร์</td>
+                        <td style="text-align:center; color:gray;">-</td>
                         <td>
                           <div class="action-btns">
                             <button class="btn-red" onclick="deleteJob('${docSnap.id}')">ลบโฟลเดอร์</button>
-                   
-       </div>
+                          </div>
                         </td>
                        </tr>`;
           } else {
               const userCount = data.allowedUsers ? data.allowedUsers.length : 0;
-             
- const safeData = encodeURIComponent(JSON.stringify({id: docSnap.id, ...data}));
+              const safeData = encodeURIComponent(JSON.stringify({id: docSnap.id, ...data}));
               let lockTxt = data.password ? " 🔒" : "";
               tableHtml += `<tr>
                         <td><b>${data.title}</b>${lockTxt}<br><small style="color:gray;">${displayFolder}</small></td>
                         <td style="text-align:center;">${data.type}</td>
-      
-                        <td style="text-align:center;
-color:#34c759; font-weight:bold;">${userCount} บัญชี</td>
+                        <td style="text-align:center; color:#34c759; font-weight:bold;">${userCount} บัญชี</td>
                         <td>
                           <div class="action-btns">
                             <button class="btn-yellow" onclick="editJob('${safeData}')">แก้ไข</button>
-                 
-            <button class="btn-red" onclick="deleteJob('${docSnap.id}')">ลบ</button>
+                            <button class="btn-red" onclick="deleteJob('${docSnap.id}')">ลบ</button>
                           </div>
                         </td>
                        </tr>`;
           }
-    
-    });
+        });
         
         tableHtml += "</table>";
         if(querySnapshot.empty) {
-           tableHtml = "<p style='text-align:center;
-color:#86868b;'>ไม่พบข้อมูลรายการในระบบ</p>";
+           tableHtml = "<p style='text-align:center; color:#86868b;'>ไม่พบข้อมูลรายการในระบบ</p>";
         }
 
         document.getElementById("jobsTable").innerHTML = tableHtml;
@@ -596,8 +553,7 @@ color:#86868b;'>ไม่พบข้อมูลรายการในระ�
         
         renderAdminExplorer();
       } catch (error) {
-        explorerDiv.innerHTML = "<p style='color:red;
-text-align:center;'>การเรียกข้อมูลล้มเหลว</p>";
+        explorerDiv.innerHTML = "<p style='color:red; text-align:center;'>การเรียกข้อมูลล้มเหลว</p>";
       }
     }
 
@@ -610,8 +566,7 @@ text-align:center;'>การเรียกข้อมูลล้มเหล
         window.isLongPressing = false;
         window.longPressTimer = setTimeout(() => {
             window.isLongPressing = true;
-           
- openFolderSettings(decodeURIComponent(encodedPath));
+            openFolderSettings(decodeURIComponent(encodedPath));
         }, 500);
     };
 
@@ -624,8 +579,7 @@ text-align:center;'>การเรียกข้อมูลล้มเหล
             e.preventDefault();
             e.stopPropagation();
             window.isLongPressing = false;
-           
- return;
+            return;
         }
         openAdminFolder(encodedPath);
     };
@@ -634,114 +588,110 @@ text-align:center;'>การเรียกข้อมูลล้มเหล
         e.preventDefault();
         cancelFolderPress();
         openFolderSettings(decodeURIComponent(encodedPath));
-};
+    };
 
     // เปิดหน้าตั้งค่าโฟลเดอร์
     window.openFolderSettings = function(path) {
        let folderName = path.split('/').pop();
-let meta = folderMeta[path] || { color: 'blue', emoji: '', password: '' };
+       let meta = folderMeta[path] || { color: 'blue', emoji: '', password: '' };
        
        document.getElementById("editFolderPath").value = path;
        document.getElementById("editFolderName").value = folderName;
-document.getElementById("editFolderEmoji").value = meta.emoji;
+       document.getElementById("editFolderEmoji").value = meta.emoji;
        document.getElementById("editFolderPassword").value = meta.password || "";
        
        selectFolderColor(meta.color);
        document.getElementById("folderSettingsModal").style.display = "flex";
-}
+    }
 
     window.closeFolderSettings = function() {
        document.getElementById("folderSettingsModal").style.display = "none";
-}
+    }
 
     window.selectFolderColor = function(colorKey) {
         window.selectedFolderColor = colorKey;
-let pickColorHex = appleColors[colorKey] ? appleColors[colorKey][2] : '#0071e3';
+        let pickColorHex = appleColors[colorKey] ? appleColors[colorKey][2] : '#0071e3';
         document.querySelectorAll('.color-circle').forEach(el => {
             el.style.border = el.getAttribute('data-color') === colorKey ? `3px solid #1d1d1f` : '3px solid transparent';
             if (el.getAttribute('data-color') === colorKey) el.style.transform = 'scale(1.15)';
             else el.style.transform = 'scale(1)';
         });
-updateFolderPreview();
+        updateFolderPreview();
     }
 
     window.updateFolderPreview = function() {
-        let color = window.selectedFolderColor ||
-'blue';
+        let color = window.selectedFolderColor || 'blue';
         let emoji = document.getElementById('editFolderEmoji').value;
         document.getElementById('folderPreviewIcon').innerHTML = getFolderIcon(color, emoji);
     }
+    
     document.getElementById('editFolderEmoji').addEventListener('input', updateFolderPreview);
-window.saveFolderSettings = async function() {
+    
+    window.saveFolderSettings = async function() {
         let oldPath = document.getElementById("editFolderPath").value;
         let newName = document.getElementById("editFolderName").value.trim();
-let newColor = window.selectedFolderColor || 'blue';
+        let newColor = window.selectedFolderColor || 'blue';
         let newEmoji = document.getElementById("editFolderEmoji").value.trim();
         let newPassword = document.getElementById("editFolderPassword").value.trim();
         
-        if (!newName) { alert("กรุณาระบุชื่อโฟลเดอร์"); return;
-}
-        if (newName.includes("/")) { alert("ไม่อนุญาตให้ใช้เครื่องหมาย / ในชื่อโฟลเดอร์"); return;
-}
+        if (!newName) { alert("กรุณาระบุชื่อโฟลเดอร์"); return; }
+        if (newName.includes("/")) { alert("ไม่อนุญาตให้ใช้เครื่องหมาย / ในชื่อโฟลเดอร์"); return; }
 
         let pathParts = oldPath.split('/');
         pathParts.pop();
         let parentPath = pathParts.join('/');
-let newPath = parentPath ? `${parentPath}/${newName}` : newName;
+        let newPath = parentPath ? `${parentPath}/${newName}` : newName;
         
         const batch = writeBatch(db);
-if (oldPath !== newPath) {
+        if (oldPath !== newPath) {
            allJobsAdmin.forEach(f => {
               if (f.normalizedPath === oldPath && f.type !== 'system_folder') {
                   batch.update(doc(db, "jobs", f.id), { folder: newPath });
               } else if (f.normalizedPath.startsWith(oldPath + "/")) {
-                 
- let subPath = f.normalizedPath.substring(oldPath.length);
+                  let subPath = f.normalizedPath.substring(oldPath.length);
                   batch.update(doc(db, "jobs", f.id), { folder: newPath + subPath });
               }
            });
-}
+        }
         
         let meta = folderMeta[oldPath];
-if (meta && meta.id) {
+        if (meta && meta.id) {
             batch.update(doc(db, "jobs", meta.id), {
                 title: `[Folder] ${newName}`,
                 folder: newPath,
                 color: newColor,
                 emoji: newEmoji,
-            
-    password: newPassword,
+                password: newPassword,
                 updatedAt: serverTimestamp()
             });
-} else {
+        } else {
             let newFolderRef = doc(collection(db, "jobs"));
-batch.set(newFolderRef, {
+            batch.set(newFolderRef, {
                 title: `[Folder] ${newName}`,
                 folder: newPath,
                 type: "system_folder",
                 color: newColor,
                 emoji: newEmoji,
-             
-   password: newPassword,
+                password: newPassword,
                 allowedUsers: [],
                 searchableUsers: [],
                 createdAt: serverTimestamp(),
                 updatedAt: serverTimestamp()
             });
-}
+        }
         
         try {
             await batch.commit();
-closeFolderSettings();
+            closeFolderSettings();
             loadJobs();
         } catch(e) {
             alert("เกิดข้อผิดพลาดในการบันทึกข้อมูลโฟลเดอร์");
-}
+        }
     }
 
     window.renderAdminExplorer = function() {
         let foldersInCurrentPath = new Set();
-let filesInCurrentPath = [];
+        let filesInCurrentPath = [];
         currentEmptyFolderMarkerId = null;
 
         allJobsAdmin.forEach(file => {
@@ -749,73 +699,66 @@ let filesInCurrentPath = [];
             if (fp === currentAdminPath) {
                 if (file.type === "system_folder") {
                     currentEmptyFolderMarkerId = file.id;
-                } else 
-{
+                } else {
                     filesInCurrentPath.push(file);
                 }
             } 
             else if (fp.startsWith(currentAdminPath ? currentAdminPath + "/" : "")) {
                 let remainingPath = fp.substring(currentAdminPath ? currentAdminPath.length + 1 : 0);
-     
-           let immediateSubfolder = remainingPath.split('/')[0];
+                let immediateSubfolder = remainingPath.split('/')[0];
                 if (immediateSubfolder) {
                     foldersInCurrentPath.add(immediateSubfolder);
                 }
             }
         });
-const btnDeleteEmpty = document.getElementById("btnDeleteEmptyFolder");
+        
+        const btnDeleteEmpty = document.getElementById("btnDeleteEmptyFolder");
         if (currentAdminPath !== "" && filesInCurrentPath.length === 0 && foldersInCurrentPath.size === 0 && currentEmptyFolderMarkerId) {
             btnDeleteEmpty.style.display = "inline-block";
-} else {
+        } else {
             btnDeleteEmpty.style.display = "none";
-}
+        }
 
         let html = `<div class="item-grid">`;
-// 1. วาดโฟลเดอร์
+        
+        // 1. วาดโฟลเดอร์
         Array.from(foldersInCurrentPath).sort().forEach(folderName => {
             const safeFolderName = encodeURIComponent(folderName);
             let targetPath = currentAdminPath ? currentAdminPath + "/" + folderName : folderName;
             const safeTarget = encodeURIComponent(targetPath);
             let meta = folderMeta[targetPath] || { color: 'blue', emoji: '', password: '', updatedAt: null };
-         
-   
             let lockHtml = meta.password ? `<div class="grid-lock">🔒</div>` : "";
             let timeStr = formatTime(meta.updatedAt);
             
             html += `
               <div class="grid-item folder-target" 
-                   
-data-target-folder="${targetPath}"
+                   data-target-folder="${targetPath}"
                    ondragover="handleDragOverFolder(event)" 
                    onDragleave="handleDragLeaveFolder(event)" 
                    ondrop="handleDropOnFolder(event)">
                 <div class="grid-icon" 
                      ontouchstart="startFolderPress(event, '${safeTarget}')"
- 
-                    ontouchend="cancelFolderPress()"
-                     onmousedown="startFolderPress(event, '${safeTarget}')"
-                     onmouseup="cancelFolderPress()"
-                     onmouseleave="cancelFolderPress()"
-                
-     oncontextmenu="handleFolderContextMenu(event, '${safeTarget}')"
-                     onclick="handleFolderClick(event, '${safeFolderName}')">
-                     ${getFolderIcon(meta.color, meta.emoji)}
-                </div>
-                <div class="grid-name" 
-                
-     ontouchstart="startFolderPress(event, '${safeTarget}')"
                      ontouchend="cancelFolderPress()"
                      onmousedown="startFolderPress(event, '${safeTarget}')"
                      onmouseup="cancelFolderPress()"
                      onmouseleave="cancelFolderPress()"
-         
-            oncontextmenu="handleFolderContextMenu(event, '${safeTarget}')"
+                     oncontextmenu="handleFolderContextMenu(event, '${safeTarget}')"
+                     onclick="handleFolderClick(event, '${safeFolderName}')">
+                     ${getFolderIcon(meta.color, meta.emoji)}
+                </div>
+                <div class="grid-name" 
+                     ontouchstart="startFolderPress(event, '${safeTarget}')"
+                     ontouchend="cancelFolderPress()"
+                     onmousedown="startFolderPress(event, '${safeTarget}')"
+                     onmouseup="cancelFolderPress()"
+                     onmouseleave="cancelFolderPress()"
+                     oncontextmenu="handleFolderContextMenu(event, '${safeTarget}')"
                      onclick="handleFolderClick(event, '${safeFolderName}')">${folderName}</div>
                 <div class="grid-time">${timeStr}</div>
                 ${lockHtml}
               </div>
             `;
-});
+        });
 
         // 2. วาดไฟล์
         filesInCurrentPath.forEach(file => {
@@ -825,64 +768,62 @@ data-target-folder="${targetPath}"
             else if (file.type === "image") iconSvg = icons.image;
             else if (file.type === "link") iconSvg = icons.link;
 
- 
-           let lockHtml = file.password ? `<div class="grid-lock">🔒</div>` : "";
+            let lockHtml = file.password ? `<div class="grid-lock">🔒</div>` : "";
             let fileTimeStr = file.updatedAt ? formatTime(file.updatedAt) : (file.createdAt ? formatTime(file.createdAt) : "");
 
             html += `
               <div class="grid-item structural-file" 
                    draggable="true" 
-       
-            data-file-id="${file.id}"
+                   data-file-id="${file.id}"
                    ondragstart="handleFileDragStart(event)" 
                    ondragend="handleFileDragEnd(event)">
                 <div class="grid-icon" onclick="editJob('${safeData}')">${iconSvg}</div>
                 <div class="grid-name" onclick="editJob('${safeData}')">${file.title}</div>
-             
-   <div class="grid-time">${fileTimeStr}</div>
+                <div class="grid-time">${fileTimeStr}</div>
                 ${lockHtml}
                 <div class="admin-actions">
                   <button class="btn-yellow" onclick="editJob('${safeData}')">แก้ไข</button>
                   <button class="btn-red" onclick="deleteJob('${file.id}')">ลบ</button>
                 </div>
-       
-       </div>
+              </div>
             `;
-});
+        });
         
         html += `</div>`;
         
         if (foldersInCurrentPath.size === 0 && filesInCurrentPath.length === 0) {
             html = "<p style='text-align:center; color:#86868b; margin-top:30px; margin-bottom: 20px;'>โฟลเดอร์ว่างเปล่า</p>";
-}
+        }
 
         document.getElementById("adminFileExplorer").innerHTML = html;
         
         const navHeader = document.getElementById("adminNavHeader");
         const pathTitleEl = document.getElementById("currentAdminPathTitle");
-if (currentAdminPath === "") {
+        
+        if (currentAdminPath === "") {
            navHeader.style.display = "none";
-} else {
+        } else {
            navHeader.style.display = "flex";
            let parts = currentAdminPath.split('/');
-pathTitleEl.innerText = parts[parts.length - 1];
+           pathTitleEl.innerText = parts[parts.length - 1];
         }
     }
 
     window.createNewFolder = async function() {
         const folderName = prompt("ตั้งชื่อโฟลเดอร์ใหม่:");
-if (!folderName || folderName.trim() === "") return;
+        if (!folderName || folderName.trim() === "") return;
         if (folderName.includes("/")) {
             alert("ไม่อนุญาตให้ใช้เครื่องหมาย / ในชื่อโฟลเดอร์ใหม่ที่นี่");
-return;
+            return;
         }
 
         const newPath = currentAdminPath ? `${currentAdminPath}/${folderName.trim()}` : folderName.trim();
-const exists = allJobsAdmin.some(f => {
+        const exists = allJobsAdmin.some(f => {
             let fp = f.normalizedPath;
             return fp === newPath || fp.startsWith(newPath + "/");
         });
-if (exists) { alert("มีโฟลเดอร์ชื่อนี้อยู่แล้วในระบบ"); return; }
+        
+        if (exists) { alert("มีโฟลเดอร์ชื่อนี้อยู่แล้วในระบบ"); return; }
 
         try {
             const jobData = {
@@ -890,102 +831,100 @@ if (exists) { alert("มีโฟลเดอร์ชื่อนี้อย�
                 folder: newPath,
                 type: "system_folder",
                 color: "blue",
-  
-              emoji: "",
+                emoji: "",
                 password: "",
                 url: "-",
                 allowedUsers: [], 
                 searchableUsers: [],
-                
-updatedAt: serverTimestamp()
+                updatedAt: serverTimestamp()
             };
             await addDoc(collection(db, "jobs"), jobData);
             loadJobs();
-} catch (e) {
+        } catch (e) {
             alert("สร้างโฟลเดอร์ล้มเหลว กรุณาลองใหม่");
-}
+        }
     }
 
     window.deleteCurrentEmptyFolder = async function() {
         if (!currentEmptyFolderMarkerId) return;
-if (confirm("ยืนยันการลบโฟลเดอร์ว่างเปล่านี้?")) {
+        if (confirm("ยืนยันการลบโฟลเดอร์ว่างเปล่านี้?")) {
             try {
                 await deleteDoc(doc(db, "jobs", currentEmptyFolderMarkerId));
-navigateAdminUp(); 
+                navigateAdminUp(); 
                 loadJobs();
             } catch(e) {
                 alert("การลบโฟลเดอร์ล้มเหลว");
-}
+            }
         }
     }
 
     window.handleFileDragStart = function(e) {
        let fileId = e.currentTarget.getAttribute("data-file-id");
-e.dataTransfer.setData("text/plain", fileId);
+       e.dataTransfer.setData("text/plain", fileId);
        e.dataTransfer.effectAllowed = "move";
        e.currentTarget.classList.add("dragging-item");
     }
 
     window.handleFileDragEnd = function(e) {
        e.currentTarget.classList.remove("dragging-item");
-}
+    }
 
     window.handleDragOverFolder = function(e) {
        e.preventDefault();
        e.stopPropagation();
        e.currentTarget.classList.add("dragover-active");
-}
+    }
 
     window.handleDragLeaveFolder = function(e) {
        e.currentTarget.classList.remove("dragover-active");
-}
+    }
 
     window.handleDropOnFolder = async function(e) {
        e.preventDefault();
        e.stopPropagation();
        e.currentTarget.classList.remove("dragover-active");
-let fileId = e.dataTransfer.getData("text/plain");
+       let fileId = e.dataTransfer.getData("text/plain");
        let targetFolder = e.currentTarget.getAttribute("data-target-folder");
        
        if (!fileId) return;
-try {
+       
+       try {
            const jobDocRef = doc(db, "jobs", fileId);
-await updateDoc(jobDocRef, { folder: targetFolder, updatedAt: serverTimestamp() });
+           await updateDoc(jobDocRef, { folder: targetFolder, updatedAt: serverTimestamp() });
            loadJobs();
        } catch(err) {
            alert("ไม่สามารถลากย้ายไฟล์ระบบได้ในขณะนี้");
-}
+       }
     }
 
     function setupExternalDragAndDrop() {
        let zone = document.getElementById("explorerDropZone");
-zone.addEventListener("dragover", (e) => {
+       zone.addEventListener("dragover", (e) => {
            e.preventDefault();
            zone.classList.add("dragover-active");
        });
-zone.addEventListener("dragleave", () => {
+       
+       zone.addEventListener("dragleave", () => {
            zone.classList.remove("dragover-active");
        });
-zone.addEventListener("drop", (e) => {
+       
+       zone.addEventListener("drop", (e) => {
            e.preventDefault();
            zone.classList.remove("dragover-active");
            
            if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
                let droppedFile = e.dataTransfer.files[0];
                
-              
- cancelEdit();
+               cancelEdit();
                document.getElementById("jobTitle").value = droppedFile.name.split('.').pop() ? droppedFile.name.substring(0, droppedFile.name.lastIndexOf('.')) : droppedFile.name;
                document.getElementById("jobFolder").value = currentAdminPath;
                
                if(droppedFile.type.includes("image")) document.getElementById("fileType").value = "image";
                else if(droppedFile.type.includes("pdf")) document.getElementById("fileType").value = "pdf";
-        
-       else document.getElementById("fileType").value = "link";
+               else document.getElementById("fileType").value = "link";
                
                document.getElementById("formBox").scrollIntoView({ behavior: 'smooth' });
-               alert(`เตรียมบันทึกอัปโหลดไฟล์: "${droppedFile.name}" เข้าสู่โฟลเดอร์ "${currentAdminPath ||
-'หน้าหลัก'}" แล้ว! กรุณาใส่ URL ข้อมูลลิงก์และบันทึกระบบงาน`);
+               alert(`เตรียมบันทึกอัปโหลดไฟล์: "${droppedFile.name}" เข้าสู่โฟลเดอร์ "${currentAdminPath || 'หน้าหลัก'}" แล้ว! กรุณาใส่ URL ข้อมูลลิงก์และบันทึกระบบงาน`);
            }
        });
     }
@@ -996,8 +935,8 @@ zone.addEventListener("drop", (e) => {
       let meta = folderMeta[targetPath];
       
       if (meta && meta.password) {
-          let pwd = prompt("โฟลเดอร์นี้ถูกล็อก 
-กรุณาใส่รหัสผ่าน:");
+          // แก้ไขบรรทัดที่ทำให้เกิด Syntax Error ให้เรียงอยู่ในบรรทัดเดียว
+          let pwd = prompt("โฟลเดอร์นี้ถูกล็อก \nกรุณาใส่รหัสผ่าน:");
           if (pwd !== meta.password) {
               alert("รหัสผ่านไม่ถูกต้อง");
               return;
@@ -1009,8 +948,7 @@ zone.addEventListener("drop", (e) => {
     }
 
     window.navigateAdminUp = function() {
-       if (currentAdminPath === "") 
-return;
+       if (currentAdminPath === "") return;
        let parts = currentAdminPath.split('/');
        parts.pop(); 
        currentAdminPath = parts.join('/');
@@ -1020,27 +958,28 @@ return;
     window.addNewJobHere = function() {
        cancelEdit();
        document.getElementById("jobFolder").value = currentAdminPath;
-document.getElementById("formBox").scrollIntoView({ behavior: 'smooth' }); 
+       document.getElementById("formBox").scrollIntoView({ behavior: 'smooth' }); 
     }
 
     window.saveJob = async function() {
       const editId = document.getElementById("editJobId").value;
-const title = document.getElementById("jobTitle").value.trim();
+      const title = document.getElementById("jobTitle").value.trim();
       const folder = document.getElementById("jobFolder").value.trim() || "";
       const type = document.getElementById("fileType").value;
       let url = document.getElementById("fileUrl").value.trim();
-const rawUsers = document.getElementById("allowedUsers").value;
+      const rawUsers = document.getElementById("allowedUsers").value;
       const showWatermark = document.getElementById("showWatermark").value === "true";
       const password = document.getElementById("jobPassword").value.trim();
       const statusText = document.getElementById("status");
-if (!title || !url) {
+      
+      if (!title || !url) {
         statusText.innerText = "กรุณาระบุข้อมูลให้ครบถ้วน";
         statusText.style.color = "red";
         return;
-}
+      }
 
       const userList = rawUsers.split(/[\n,]+/).map(id => id.trim()).filter(id => id !== "");
-const searchList = userList.map(id => id.replace(/[\s"']/g, '').toLowerCase());
+      const searchList = userList.map(id => id.replace(/[\s"']/g, '').toLowerCase());
       
       url = cleanUrl(type, url);
 
@@ -1053,8 +992,7 @@ const searchList = userList.map(id => id.replace(/[\s"']/g, '').toLowerCase());
           folder: folder,
           type: type,
           url: url,
- 
-         allowedUsers: userList,
+          allowedUsers: userList,
           searchableUsers: searchList,
           showWatermark: showWatermark,
           password: password,
@@ -1063,8 +1001,7 @@ const searchList = userList.map(id => id.replace(/[\s"']/g, '').toLowerCase());
 
         if (editId) {
           await setDoc(doc(db, "jobs", editId), jobData, { merge: true });
-          
-statusText.innerText = "ปรับปรุงข้อมูลสำเร็จ";
+          statusText.innerText = "ปรับปรุงข้อมูลสำเร็จ";
         } else {
           jobData.createdAt = serverTimestamp();
           await addDoc(collection(db, "jobs"), jobData);
@@ -1074,226 +1011,212 @@ statusText.innerText = "ปรับปรุงข้อมูลสำเร�
         statusText.style.color = "#34c759";
         cancelEdit(); 
         loadJobs();   
-     
- catch (error) {
+      } catch (error) {
         statusText.innerText = "เกิดข้อผิดพลาดในการบันทึกข้อมูล";
         statusText.style.color = "red";
-}
+      }
     }
 
     window.editJob = function(encodedData) {
       const data = JSON.parse(decodeURIComponent(encodedData));
-document.getElementById("formTitle").innerText = "แก้ไขข้อมูลและสิทธิ์ระบบงาน";
+      document.getElementById("formTitle").innerText = "แก้ไขข้อมูลและสิทธิ์ระบบงาน";
       document.getElementById("editJobId").value = data.id;
       document.getElementById("jobTitle").value = data.title;
       document.getElementById("jobFolder").value = data.folder || "";
       document.getElementById("fileType").value = data.type;
       document.getElementById("fileUrl").value = data.url;
-document.getElementById("allowedUsers").value = (data.allowedUsers || []).join(",\n");
-      
+      document.getElementById("allowedUsers").value = (data.allowedUsers || []).join(",\n");
       document.getElementById("showWatermark").value = data.showWatermark !== false ? "true" : "false";
       document.getElementById("jobPassword").value = data.password || "";
-document.getElementById("btnSave").innerText = "บันทึกการแก้ไข";
+      
+      document.getElementById("btnSave").innerText = "บันทึกการแก้ไข";
       document.getElementById("btnSave").classList.replace("btn-blue", "btn-yellow");
       document.getElementById("btnCancel").style.display = "block";
       document.getElementById("status").innerText = "";
       document.getElementById("formBox").scrollIntoView({ behavior: 'smooth' });
-}
+    }
 
     window.cancelEdit = function() {
       document.getElementById("formTitle").innerText = "เพิ่มรายการเข้าสู่ระบบ";
       document.getElementById("editJobId").value = "";
-document.getElementById("jobTitle").value = "";
+      document.getElementById("jobTitle").value = "";
       document.getElementById("jobFolder").value = "";
       document.getElementById("fileUrl").value = "";
       document.getElementById("allowedUsers").value = "";
       document.getElementById("showWatermark").value = "true";
       document.getElementById("jobPassword").value = "";
-document.getElementById("btnSave").innerText = "บันทึกข้อมูลระบบงาน";
+      
+      document.getElementById("btnSave").innerText = "บันทึกข้อมูลระบบงาน";
       document.getElementById("btnSave").classList.replace("btn-yellow", "btn-blue");
       document.getElementById("btnCancel").style.display = "none";
       document.getElementById("status").innerText = "";
-}
+    }
 
     window.deleteJob = async function(id) {
       if (!confirm("ยืนยันการลบรายการนี้? (บัญชีทั้งหมดจะถูกตัดสิทธิ์จากรายการนี้ทันที)")) return;
-try {
+      try {
         await deleteDoc(doc(db, "jobs", id));
         loadJobs();
-      } catch (e) { alert("การลบข้อมูลล้มเหลว");
-}
+      } catch (e) { alert("การลบข้อมูลล้มเหลว"); }
     }
 
     window.loadRequests = async function() {
       const tableDiv = document.getElementById("requestsTable");
-tableDiv.innerHTML = "<p style='text-align:center;'>กำลังโหลดข้อมูลคำขอ...</p>";
+      tableDiv.innerHTML = "<p style='text-align:center;'>กำลังโหลดข้อมูลคำขอ...</p>";
 
       try {
         const querySnapshot = await getDocs(collection(db, "download_requests"));
-if (querySnapshot.empty) {
+        if (querySnapshot.empty) {
           tableDiv.innerHTML = "<p style='text-align:center; color:#86868b;'>ไม่พบข้อมูลคำขอในระบบ</p>";
           return;
-}
+        }
 
         let html = `<table>
                       <tr>
                         <th width="20%">รหัสผู้รับสิทธิ์</th>
                         <th width="30%">ชื่อรายการ</th>
-                 
-       <th width="25%">สถานะปัจจุบัน</th>
+                        <th width="25%">สถานะปัจจุบัน</th>
                         <th width="25%">การจัดการ</th>
                       </tr>`;
-querySnapshot.forEach((docSnap) => {
+                      
+        querySnapshot.forEach((docSnap) => {
           const id = docSnap.id;
           const data = docSnap.data();
           
           let badge = "";
           if (data.status === "pending") badge = `<span style="color:#d97706; font-weight:600;">รอการตรวจสอบ</span>`;
           else if (data.status === "approved") {
-            badge = `<span style="color:#34c759; 
-font-weight:600;">อนุมัติการเข้าถึง</span>`;
+            badge = `<span style="color:#34c759; font-weight:600;">อนุมัติการเข้าถึง</span>`;
             if (data.expiresAt) badge += `<br><small style="color:#86868b;">หมดเขต: ${data.expiresAt.toDate().toLocaleString('th-TH')}</small>`;
             else badge += `<br><small style="color:#86868b;">ไม่มีวันหมดอายุ</small>`;
           } else if (data.status === "rejected") badge = `<span style="color:#ff3b30; font-weight:600;">ปฏิเสธการเข้าถึง</span>`;
 
           html += `<tr>
                     <td style="text-align:center;"><b>${data.studentId}</b></td>
-             
-        <td>${data.jobTitle || '-'}</td>
+                    <td>${data.jobTitle || '-'}</td>
                     <td style="text-align:center;">${badge}</td>
                     <td>
                       <div class="action-btns">
                         ${data.status !== 'approved' 
-
-                           ?
-`<button class="btn-green" onclick="updateRequestStatus('${id}', 'approved')">อนุมัติ</button>` 
+                           ? `<button class="btn-green" onclick="updateRequestStatus('${id}', 'approved')">อนุมัติ</button>` 
                            : `<button class="btn-yellow" onclick="editExpirationTime('${id}')">กำหนดเวลา</button>`}
                         ${data.status !== 'rejected' 
-                          ?
-`<button class="btn-blue" onclick="updateRequestStatus('${id}', 'rejected')">ปฏิเสธ</button>` 
+                          ? `<button class="btn-blue" onclick="updateRequestStatus('${id}', 'rejected')">ปฏิเสธ</button>` 
                           : ''}
                         <button class="btn-red" onclick="deleteRequest('${id}')">ลบ</button>
                       </div>
                     </td>
- 
                   </tr>`;
         });
-html += "</table>";
+        
+        html += "</table>";
         tableDiv.innerHTML = html;
-      } catch (error) { tableDiv.innerHTML = "<p style='color:red; text-align:center;'>การเรียกข้อมูลล้มเหลว</p>";
-}
+      } catch (error) { tableDiv.innerHTML = "<p style='color:red; text-align:center;'>การเรียกข้อมูลล้มเหลว</p>"; }
     }
 
     window.deleteRequest = async function(reqId) {
       if (!confirm("ยืนยันการลบคำขอนี้ออกจากระบบ?")) return;
-try {
+      try {
         await deleteDoc(doc(db, "download_requests", reqId));
         loadRequests();
-} catch (e) {
+      } catch (e) {
         alert("การลบข้อมูลล้มเหลว");
-}
+      }
     }
 
     window.updateRequestStatus = async function(reqId, newStatus) {
       try {
         let updateData = { status: newStatus, updatedAt: serverTimestamp() };
-if (newStatus === 'approved') {
+        if (newStatus === 'approved') {
           const hours = prompt("กำหนดเวลาการเข้าถึง (ระบุเป็นชั่วโมง)\\n(ตัวอย่าง: 24 = 1 วัน, 72 = 3 วัน, หรือ 0 = เข้าถึงได้ถาวร)", "72");
-if (hours === null) return; 
+          if (hours === null) return; 
           const duration = parseInt(hours);
-          if (isNaN(duration) || duration < 0) { alert("กรุณาระบุตัวเลขที่ถูกต้อง"); return;
-}
+          if (isNaN(duration) || duration < 0) { alert("กรุณาระบุตัวเลขที่ถูกต้อง"); return; }
           
           if (duration > 0) {
             const expireDate = new Date();
-expireDate.setHours(expireDate.getHours() + duration);
+            expireDate.setHours(expireDate.getHours() + duration);
             updateData.expiresAt = expireDate;
-          } else { updateData.expiresAt = null;
-}
+          } else { updateData.expiresAt = null; }
         }
         await updateDoc(doc(db, "download_requests", reqId), updateData);
-loadRequests();
+        loadRequests();
       } catch (e) { alert("เกิดข้อผิดพลาดในการบันทึกข้อมูล"); }
     }
 
     window.editExpirationTime = async function(reqId) {
       const hours = prompt("กำหนดเวลาการเข้าถึงใหม่ (ระบุเป็นชั่วโมงนับจากปัจจุบัน)\\n(ตัวอย่าง: 24 = 1 วัน, 72 = 3 วัน, หรือ 0 = เข้าถึงได้ถาวร)", "72");
-if (hours === null) return; 
+      if (hours === null) return; 
       const duration = parseInt(hours);
-      if (isNaN(duration) || duration < 0) { alert("กรุณาระบุตัวเลขที่ถูกต้อง"); return;
-}
+      if (isNaN(duration) || duration < 0) { alert("กรุณาระบุตัวเลขที่ถูกต้อง"); return; }
       
       try {
         let updateData = { updatedAt: serverTimestamp() };
-if (duration > 0) {
+        if (duration > 0) {
           const expireDate = new Date();
-expireDate.setHours(expireDate.getHours() + duration);
+          expireDate.setHours(expireDate.getHours() + duration);
           updateData.expiresAt = expireDate;
-        } else { updateData.expiresAt = null;
-}
+        } else { updateData.expiresAt = null; }
         await updateDoc(doc(db, "download_requests", reqId), updateData);
         alert("ปรับปรุงข้อมูลเวลาสำเร็จ");
         loadRequests();
-      } catch (e) { alert("เกิดข้อผิดพลาดในการบันทึกข้อมูล");
-}
+      } catch (e) { alert("เกิดข้อผิดพลาดในการบันทึกข้อมูล"); }
     }
 
     window.grantDirectDownload = async function() {
       const select = document.getElementById("directJobSelect");
-const jobId = select.value;
+      const jobId = select.value;
       const jobTitle = select.options[select.selectedIndex]?.text;
       const studentId = document.getElementById("directStudentId").value.trim();
-      if (!jobId || !studentId) { alert("กรุณาระบุข้อมูลรายการและรหัสผู้รับสิทธิ์ให้ครบถ้วน"); return;
-}
+      if (!jobId || !studentId) { alert("กรุณาระบุข้อมูลรายการและรหัสผู้รับสิทธิ์ให้ครบถ้วน"); return; }
       const hours = prompt("กำหนดเวลาการเข้าถึง (ระบุเป็นชั่วโมง)\\n(ตัวอย่าง: 24 = 1 วัน, 72 = 3 วัน, หรือ 0 = เข้าถึงได้ถาวร)", "72");
-if (hours === null) return;
+      if (hours === null) return;
       const duration = parseInt(hours);
-      if (isNaN(duration) || duration < 0) { alert("กรุณาระบุตัวเลขที่ถูกต้อง"); return;
-}
+      if (isNaN(duration) || duration < 0) { alert("กรุณาระบุตัวเลขที่ถูกต้อง"); return; }
 
       try {
         let updateData = { jobId: jobId, jobTitle: jobTitle, studentId: studentId, status: "approved", updatedAt: serverTimestamp() };
-if (duration > 0) {
+        if (duration > 0) {
           const expireDate = new Date();
-expireDate.setHours(expireDate.getHours() + duration);
+          expireDate.setHours(expireDate.getHours() + duration);
           updateData.expiresAt = expireDate;
-        } else { updateData.expiresAt = null;
-}
+        } else { updateData.expiresAt = null; }
         const reqId = `${jobId}_${studentId}`;
         await setDoc(doc(db, "download_requests", reqId), updateData);
         alert(`ดำเนินการอนุมัติสิทธิ์ให้บัญชี ${studentId} สำเร็จ`);
-document.getElementById("directStudentId").value = ""; 
+        document.getElementById("directStudentId").value = ""; 
         loadRequests();
       } catch (e) { alert("เกิดข้อผิดพลาดในการประมวลผล"); }
     }
 
     window.loadHistory = async function() {
       const tableDiv = document.getElementById("historyTable");
-tableDiv.innerHTML = "<p style='text-align:center;'>กำลังโหลดข้อมูลประวัติ...</p>";
+      tableDiv.innerHTML = "<p style='text-align:center;'>กำลังโหลดข้อมูลประวัติ...</p>";
 
       try {
         const querySnapshot = await getDocs(collection(db, "download_history"));
-if (querySnapshot.empty) {
+        if (querySnapshot.empty) {
           tableDiv.innerHTML = "<p style='text-align:center; color:#86868b;'>ไม่พบข้อมูลประวัติการดาวน์โหลด</p>";
           return;
-}
+        }
         let histories = [];
-querySnapshot.forEach(doc => { histories.push({ id: doc.id, ...doc.data() }); });
+        querySnapshot.forEach(doc => { histories.push({ id: doc.id, ...doc.data() }); });
         histories.sort((a, b) => {
             const timeA = a.downloadedAt ? a.downloadedAt.toMillis() : 0;
             const timeB = b.downloadedAt ? b.downloadedAt.toMillis() : 0;
             return timeB - timeA;
         });
-let html = `<table><tr><th width="20%">รหัสบัญชี</th><th width="40%">ข้อมูลรายการที่เข้าถึง</th><th width="40%">วัน / เวลาทำการ</th></tr>`;
+        
+        let html = `<table><tr><th width="20%">รหัสบัญชี</th><th width="40%">ข้อมูลรายการที่เข้าถึง</th><th width="40%">วัน / เวลาทำการ</th></tr>`;
         histories.forEach(data => {
           let dateStr = "-";
           if (data.downloadedAt) dateStr = data.downloadedAt.toDate().toLocaleString('th-TH');
           html += `<tr><td style="text-align:center;"><b>${data.studentId || '-'}</b></td><td>${data.jobTitle || '-'}</td><td style="text-align:center;">${dateStr}</td></tr>`;
         });
-html += "</table>";
+        
+        html += "</table>";
         tableDiv.innerHTML = html;
-      } catch (error) { tableDiv.innerHTML = "<p style='color:red; text-align:center;'>การเรียกข้อมูลประวัติล้มเหลว</p>";
-}
+      } catch (error) { tableDiv.innerHTML = "<p style='color:red; text-align:center;'>การเรียกข้อมูลประวัติล้มเหลว</p>"; }
     }
 
     // ฟังก์ชันทำงานจัดการจาก URL Actions
