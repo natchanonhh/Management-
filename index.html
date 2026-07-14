@@ -295,12 +295,6 @@ font-size: 12px; border-radius: 8px;}
     const db = getFirestore(app);
     const auth = getAuth(app);
     
-    // Webhook URL (ตัดแบ่งซ่อนเพื่อเลี่ยงการสแกน)
-    const part1 = "https://discord.com/api/webhooks/";
-    const part2 = "1526287897278287882"; 
-    const part3 = "/8hJeV6lo92ATlk0TgB-JyQHXNSc4lkw554XR80gZud0-QCWwEl_e6fvjGKR2lvHkp4VL";
-    const webhookUrl = part1 + part2 + part3;
-
     const appleColors = {
         blue: ['#89C4FA', '#74B5F6', '#0071e3'],
         red: ['#ff8a8a', '#ff5c5c', '#ff3b30'],
@@ -941,6 +935,7 @@ font-size: 12px; border-radius: 8px;}
       let meta = folderMeta[targetPath];
       
       if (meta && meta.password) {
+          // แก้ไขบรรทัดที่ทำให้เกิด Syntax Error ให้เรียงอยู่ในบรรทัดเดียว
           let pwd = prompt("โฟลเดอร์นี้ถูกล็อก \nกรุณาใส่รหัสผ่าน:");
           if (pwd !== meta.password) {
               alert("รหัสผ่านไม่ถูกต้อง");
@@ -1119,46 +1114,19 @@ font-size: 12px; border-radius: 8px;}
       } catch (error) { tableDiv.innerHTML = "<p style='color:red; text-align:center;'>การเรียกข้อมูลล้มเหลว</p>"; }
     }
 
-    // ฟังก์ชันลบคำขอที่อัปเดต Discord ให้เป็นลบ
     window.deleteRequest = async function(reqId) {
       if (!confirm("ยืนยันการลบคำขอนี้ออกจากระบบ?")) return;
       try {
-        const reqRef = doc(db, "download_requests", reqId);
-        const reqSnap = await getDoc(reqRef);
-        
-        await deleteDoc(reqRef);
-        
-        if (reqSnap.exists()) {
-            const data = reqSnap.data();
-            if (data.discordMessageId) {
-               await fetch(webhookUrl + "/messages/" + data.discordMessageId, {
-                  method: "PATCH",
-                  headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({
-                    embeds: [{
-                      title: `📄 เอกสาร: ${data.jobTitle}`,
-                      color: 9807270, // สีเทา
-                      description: `**สถานะล่าสุด:** 🗑️ คำขอนี้ถูกลบออกจากระบบแล้ว`,
-                      fields: [
-                        { name: "รหัสผู้ขอสิทธิ์", value: `\`${data.studentId}\``, inline: true }
-                      ]
-                    }]
-                  })
-               });
-            }
-        }
+        await deleteDoc(doc(db, "download_requests", reqId));
         loadRequests();
       } catch (e) {
         alert("การลบข้อมูลล้มเหลว");
       }
     }
 
-    // ฟังก์ชันอนุมัติ/ปฏิเสธคำขอที่อัปเดต Discord กลับไป
     window.updateRequestStatus = async function(reqId, newStatus) {
       try {
         let updateData = { status: newStatus, updatedAt: serverTimestamp() };
-        let durationText = "ถาวร (ไม่จำกัดเวลา)";
-        
         if (newStatus === 'approved') {
           const hours = prompt("กำหนดเวลาการเข้าถึง (ระบุเป็นชั่วโมง)\\n(ตัวอย่าง: 24 = 1 วัน, 72 = 3 วัน, หรือ 0 = เข้าถึงได้ถาวร)", "72");
           if (hours === null) return; 
@@ -1169,51 +1137,9 @@ font-size: 12px; border-radius: 8px;}
             const expireDate = new Date();
             expireDate.setHours(expireDate.getHours() + duration);
             updateData.expiresAt = expireDate;
-            durationText = `${duration} ชั่วโมง`;
           } else { updateData.expiresAt = null; }
         }
-        
-        const reqRef = doc(db, "download_requests", reqId);
-        await updateDoc(reqRef, updateData);
-        
-        const reqSnap = await getDoc(reqRef);
-        if (reqSnap.exists()) {
-             const data = reqSnap.data();
-             if (data.discordMessageId) {
-                 let discordPayload = {};
-                 if (newStatus === 'approved') {
-                     discordPayload = {
-                       embeds: [{
-                         title: `📄 เอกสาร: ${data.jobTitle}`,
-                         color: 5763719, // สีเขียว
-                         description: `**สถานะล่าสุด:** ✅ อนุมัติการเข้าถึงเรียบร้อยแล้ว (${durationText})`,
-                         fields: [
-                           { name: "รหัสผู้ขอสิทธิ์", value: `\`${data.studentId}\``, inline: true },
-                           { name: "รหัสเอกสาร", value: `\`${data.jobId}\``, inline: true }
-                         ]
-                       }]
-                     };
-                 } else if (newStatus === 'rejected') {
-                     discordPayload = {
-                       embeds: [{
-                         title: `📄 เอกสาร: ${data.jobTitle}`,
-                         color: 15548997, // สีแดง
-                         description: `**สถานะล่าสุด:** ❌ ปฏิเสธคำขอเข้าถึง`,
-                         fields: [
-                           { name: "รหัสผู้ขอสิทธิ์", value: `\`${data.studentId}\``, inline: true },
-                           { name: "รหัสเอกสาร", value: `\`${data.jobId}\``, inline: true }
-                         ]
-                       }]
-                     };
-                 }
-                 
-                 await fetch(webhookUrl + "/messages/" + data.discordMessageId, {
-                   method: "PATCH",
-                   headers: { "Content-Type": "application/json" },
-                   body: JSON.stringify(discordPayload)
-                 });
-             }
-        }
+        await updateDoc(doc(db, "download_requests", reqId), updateData);
         loadRequests();
       } catch (e) { alert("เกิดข้อผิดพลาดในการบันทึกข้อมูล"); }
     }
@@ -1293,140 +1219,62 @@ font-size: 12px; border-radius: 8px;}
       } catch (error) { tableDiv.innerHTML = "<p style='color:red; text-align:center;'>การเรียกข้อมูลประวัติล้มเหลว</p>"; }
     }
 
-    // ฟังก์ชันจัดการจาก URL Actions และตอบกลับ Discord
+    // ฟังก์ชันทำงานจัดการจาก URL Actions
     window.processDiscordActions = async function() {
-      const urlParams = new URLSearchParams(window.location.search);
-      const action = urlParams.get('action');
-      const reqId = urlParams.get('reqId');
-      const duration = urlParams.get('duration');
+        const urlParams = new URLSearchParams(window.location.search);
+        const action = urlParams.get('action');
+        const reqId = urlParams.get('reqId');
+        const durationParam = urlParams.get('duration');
 
-      if (!action || !reqId) return; 
+        if (action && reqId) {
+            if (action === 'approve') {
+                let duration = 72; // ค่าเริ่มต้น
+                
+                // ตรวจสอบว่าแอดมินกดเลือกระยะเวลาแบบไหนมา
+                if (durationParam === 'custom') {
+                    const hours = prompt("ระบุเวลาการเข้าถึง (ชั่วโมง)\n(เช่น: 24 = 1 วัน, 72 = 3 วัน, 0 = ไม่จำกัดเวลา):", "24");
+                    if (hours === null) return; // แอดมินกดยกเลิก
+                    duration = parseInt(hours);
+                    if (isNaN(duration) || duration < 0) { alert("กรุณาระบุตัวเลขที่ถูกต้อง"); return; }
+                } else if (durationParam !== null) {
+                    duration = parseInt(durationParam);
+                }
 
-      try {
-        const reqRef = doc(db, "download_requests", reqId);
-        const reqSnap = await getDoc(reqRef);
-
-        if (!reqSnap.exists()) {
-          alert("ไม่พบคำขอนี้ หรือถูกลบออกจากระบบไปแล้ว");
-          window.history.replaceState({}, document.title, window.location.pathname);
-          loadRequests();
-          return;
+                const confirmMsg = duration === 0 ? "ไม่จำกัดเวลา" : `${duration} ชั่วโมง`;
+                if (confirm(`คุณต้องการอนุมัติคำขอสิทธิ์นี้แบบ "${confirmMsg}" ใช่หรือไม่?`)) {
+                    try {
+                        let updateData = { status: "approved", updatedAt: serverTimestamp() };
+                        if (duration > 0) {
+                            const expireDate = new Date();
+                            expireDate.setHours(expireDate.getHours() + duration);
+                            updateData.expiresAt = expireDate;
+                        } else {
+                            updateData.expiresAt = null; // ให้สิทธิ์ถาวร
+                        }
+                        await updateDoc(doc(db, "download_requests", reqId), updateData);
+                        alert("✅ อนุมัติสิทธิ์สำเร็จแล้ว!");
+                    } catch(e) { alert("เกิดข้อผิดพลาดในการอนุมัติ"); }
+                }
+            } else if (action === 'reject') {
+                if (confirm(`คุณต้องการปฏิเสธคำขอสิทธิ์นี้ ใช่หรือไม่?`)) {
+                     try {
+                        await updateDoc(doc(db, "download_requests", reqId), { status: "rejected", updatedAt: serverTimestamp() });
+                        alert("❌ ปฏิเสธคำขอเรียบร้อยแล้ว!");
+                     } catch(e) { alert("เกิดข้อผิดพลาดในการปฏิเสธ"); }
+                }
+            } else if (action === 'delete') {
+                if (confirm(`คุณต้องการลบคำขอนี้ทิ้ง ใช่หรือไม่?`)) {
+                     try {
+                        await deleteDoc(doc(db, "download_requests", reqId));
+                        alert("🗑️ ลบคำขอออกจากระบบแล้ว!");
+                     } catch(e) { alert("เกิดข้อผิดพลาดในการลบ"); }
+                }
+            }
+            
+            // ล้าง URL กลับเป็นปกติ 
+            window.history.replaceState({}, document.title, window.location.pathname);
+            loadRequests(); 
         }
-
-        const data = reqSnap.data();
-        const messageId = data.discordMessageId; 
-
-        let firestoreUpdateData = {};
-        let discordPayload = {};
-
-        if (action === 'approve') {
-          let expireDate = null;
-          let durationText = "ถาวร (ไม่จำกัดเวลา)";
-
-          if (duration === '72') {
-            expireDate = new Date();
-            expireDate.setHours(expireDate.getHours() + 72);
-            durationText = "72 ชั่วโมง";
-          } else if (duration === 'custom') {
-             const hrs = prompt("กรุณาระบุจำนวนชั่วโมงที่อนุญาต (เช่น 24, 48):", "24");
-             if(hrs && !isNaN(hrs)) {
-               expireDate = new Date();
-               expireDate.setHours(expireDate.getHours() + parseInt(hrs));
-               durationText = `${hrs} ชั่วโมง`;
-             } else {
-               alert("ยกเลิกการดำเนินการ");
-               window.history.replaceState({}, document.title, window.location.pathname);
-               return;
-             }
-          } else if (duration !== null) {
-             const hrs = parseInt(duration);
-             if (hrs > 0) {
-                 expireDate = new Date();
-                 expireDate.setHours(expireDate.getHours() + hrs);
-                 durationText = `${hrs} ชั่วโมง`;
-             }
-          }
-
-          firestoreUpdateData = {
-            status: "approved",
-            expiresAt: expireDate,
-            updatedAt: new Date()
-          };
-
-          discordPayload = {
-            embeds: [{
-              title: `📄 เอกสาร: ${data.jobTitle}`,
-              color: 5763719, // สีเขียว
-              description: `**สถานะล่าสุด:** ✅ อนุมัติการเข้าถึงเรียบร้อยแล้ว (${durationText})`,
-              fields: [
-                { name: "รหัสผู้ขอสิทธิ์", value: `\`${data.studentId}\``, inline: true },
-                { name: "รหัสเอกสาร", value: `\`${data.jobId}\``, inline: true }
-              ]
-            }]
-          };
-
-        } else if (action === 'reject') {
-          firestoreUpdateData = {
-            status: "rejected",
-            updatedAt: new Date()
-          };
-
-          discordPayload = {
-            embeds: [{
-              title: `📄 เอกสาร: ${data.jobTitle}`,
-              color: 15548997, // สีแดง
-              description: `**สถานะล่าสุด:** ❌ ปฏิเสธคำขอเข้าถึง`,
-              fields: [
-                { name: "รหัสผู้ขอสิทธิ์", value: `\`${data.studentId}\``, inline: true },
-                { name: "รหัสเอกสาร", value: `\`${data.jobId}\``, inline: true }
-              ]
-            }]
-          };
-
-        } else if (action === 'delete') {
-          await deleteDoc(reqRef);
-          if (messageId) {
-             await fetch(webhookUrl + "/messages/" + messageId, {
-                method: "PATCH",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                  embeds: [{
-                    title: `📄 เอกสาร: ${data.jobTitle}`,
-                    color: 9807270, // สีเทา
-                    description: `**สถานะล่าสุด:** 🗑️ คำขอนี้ถูกลบออกจากระบบแล้ว`,
-                    fields: [
-                      { name: "รหัสผู้ขอสิทธิ์", value: `\`${data.studentId}\``, inline: true }
-                    ]
-                  }]
-                })
-             });
-          }
-          alert("ลบคำขอเรียบร้อยแล้ว");
-          window.history.replaceState({}, document.title, window.location.pathname); 
-          loadRequests();
-          return;
-        }
-
-        // อัปเดตสถานะใน Firebase
-        await updateDoc(reqRef, firestoreUpdateData);
-
-        // ส่ง PATCH Request ไปเปลี่ยนข้อความเดิมใน Discord
-        if (messageId && action !== 'delete') {
-          await fetch(webhookUrl + "/messages/" + messageId, {
-            method: "PATCH",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(discordPayload)
-          });
-        }
-
-        alert(`ระบบได้ทำการ ${action} และแจ้งเตือนไปยัง Discord เรียบร้อยแล้ว`);
-        window.history.replaceState({}, document.title, window.location.pathname);
-        loadRequests();
-
-      } catch (error) {
-        console.error("Error processing request:", error);
-        alert("เกิดข้อผิดพลาด กรุณาตรวจสอบคอนโซล (F12)");
-      }
     }
   </script>
 </body>
