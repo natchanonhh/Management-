@@ -114,6 +114,68 @@ transition: 0.1s; }
 gap: 5px; justify-content: center; flex-wrap: wrap; }
     .action-btns button { width: auto; padding: 6px 12px; margin: 0;
 font-size: 12px; border-radius: 8px;}
+
+    /* =========================================
+       ระบบพับเก็บข้อมูล (Accordion) สำหรับ Admin Box - แบบทันสมัย
+       ========================================= */
+    .admin-box.collapsible-box h2 {
+        cursor: pointer;
+        user-select: none;
+        transition: all 0.3s ease;
+        padding: 12px 15px;
+        margin: -12px -15px 15px -15px; /* Offset to make hover full width */
+        border-radius: 12px;
+        background: transparent;
+    }
+    .admin-box.collapsible-box h2:hover {
+        background-color: #f5f5f7;
+    }
+    .toggle-arrow {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background-color: #e5e5ea;
+        color: #1d1d1f;
+        transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.2s;
+        margin-left: auto;
+    }
+    .admin-box.collapsible-box h2:hover .toggle-arrow {
+        background-color: #d2d2d7;
+    }
+    .admin-box.collapsed .toggle-arrow {
+        transform: rotate(180deg);
+    }
+    
+    /* Smooth Transition using CSS Grid */
+    .accordion-content {
+        display: grid;
+        grid-template-rows: 1fr;
+        transition: grid-template-rows 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease, margin 0.4s ease;
+        opacity: 1;
+    }
+    .accordion-content > .accordion-inner {
+        overflow: hidden;
+    }
+    .admin-box.collapsed .accordion-content {
+        grid-template-rows: 0fr;
+        opacity: 0;
+        margin-top: -10px;
+    }
+
+    /* Notification Bell Animation */
+    @keyframes bell-ring {
+      0%, 100% { transform: rotate(0); }
+      10%, 30%, 50% { transform: rotate(15deg); }
+      20%, 40% { transform: rotate(-15deg); }
+    }
+    .bell-icon.ringing {
+        display: inline-block;
+        animation: bell-ring 1.5s ease-in-out infinite;
+        transform-origin: top center;
+    }
   </style>
 </head>
 <body oncontextmenu="return false;">
@@ -200,7 +262,6 @@ font-size: 12px; border-radius: 8px;}
       <select id="directJobSelect"><option value="">-- กำลังโหลดข้อมูลระบบงาน... --</option></select>
       <label>2. รหัสผู้รับสิทธิ์:</label>
       <input type="text" id="directStudentId" placeholder="ระบุรหัสประจำตัวผู้รับสิทธิ์..." required>
- 
       <button class="btn-green" onclick="grantDirectDownload()">ยืนยันการให้สิทธิ์การดาวน์โหลด</button>
     </div>
 
@@ -266,7 +327,15 @@ font-size: 12px; border-radius: 8px;}
     </div>
 
     <div class="admin-box">
-      <h2>จัดการคำขอสิทธิ์การเข้าถึง/ดาวน์โหลด</h2>
+      <h2>
+        <div style="display:flex; align-items:center;">
+          จัดการคำขอสิทธิ์การเข้าถึง/ดาวน์โหลด
+          <div id="requestBadge" style="display:none; background: #ff3b30; color: white; border-radius: 20px; padding: 4px 12px; font-size: 12px; margin-left: 12px; font-weight: 600; align-items: center; gap: 4px; box-shadow: 0 4px 10px rgba(255,59,48,0.3);">
+              <span class="bell-icon" style="font-size: 14px;">🔔</span>
+              <span id="requestBadgeCount">0</span>
+          </div>
+        </div>
+      </h2>
       <div id="requestsTable"></div>
     </div>
 
@@ -280,7 +349,7 @@ font-size: 12px; border-radius: 8px;}
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getFirestore, doc, setDoc, addDoc, getDoc, deleteDoc, collection, getDocs, serverTimestamp, updateDoc, query, writeBatch } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
     import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-    
+
     const firebaseConfig = {
       apiKey: "AIzaSyBLyMpowfyQK_1UnredPFmXdBdtQZKpY-c",
       authDomain: "datapdf-d14d0.firebaseapp.com",
@@ -290,11 +359,11 @@ font-size: 12px; border-radius: 8px;}
       messagingSenderId: "1034739093928",
       appId: "1:1034739093928:web:cd56cc0e208d7d00f24d9d"
     };
-    
+
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     const auth = getAuth(app);
-    
+
     const appleColors = {
         blue: ['#89C4FA', '#74B5F6', '#0071e3'],
         red: ['#ff8a8a', '#ff5c5c', '#ff3b30'],
@@ -304,14 +373,14 @@ font-size: 12px; border-radius: 8px;}
         purple: ['#d1a3ff', '#b870ff', '#af52de'],
         gray: ['#c2c2c2', '#a8a8a8', '#8e8e93']
     };
-    
+
     const icons = {
       pdf: `<svg class="icon-file" viewBox="0 0 64 80" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="4" y="4" width="56" height="72" rx="6" fill="#F9F9FB" stroke="#D2D2D7" stroke-width="2"/><path d="M40 4L60 24V10C60 6.68629 57.3137 4 54 4H40Z" fill="#E5E5EA"/><path d="M40 4V18C40 21.3137 42.6863 24 46 24H60" stroke="#D2D2D7" stroke-width="2" stroke-linejoin="round"/><rect x="16" y="32" width="32" height="4" rx="2" fill="#FF3B30"/><rect x="16" y="44" width="24" height="4" rx="2" fill="#D2D2D7"/><rect x="16" y="56" width="28" height="4" rx="2" fill="#D2D2D7"/></svg>`,
       image: `<svg class="icon-wide" viewBox="0 0 80 64" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="4" y="4" width="72" height="56" rx="8" fill="#F9F9FB" stroke="#D2D2D7" stroke-width="2"/><circle cx="24" cy="24" r="6" fill="#FFCC00"/><path d="M4 48L28 28L52 48L64 38L76 48V52C76 56.4183 72.4183 60 68 60H12C7.58172 60 4 56.4183 4 52V48Z" fill="#34C759"/></svg>`,
       youtube: `<svg class="icon-wide" viewBox="0 0 80 56" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="4" y="4" width="72" height="48" rx="12" fill="#FF3B30"/><path d="M34 18L52 28L34 38V18Z" fill="white"/></svg>`,
       link: `<svg class="icon-file" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="40" cy="40" r="36" fill="#F9F9FB" stroke="#D2D2D7" stroke-width="2"/><path d="M40 10C28 10 20 25 20 40C20 55 28 70 40 70C52 70 60 55 60 40C60 25 52 10 40 10Z" stroke="#0071E3" stroke-width="2"/><path d="M10 40H70" stroke="#0071E3" stroke-width="2"/><path d="M20 25H60" stroke="#0071E3" stroke-width="2"/><path d="M20 55H60" stroke="#0071E3" stroke-width="2"/></svg>`
     };
-    
+
     function getFolderIcon(color, emoji) {
         let c = appleColors[color] || appleColors.blue;
         let svg = `<svg class="icon-folder" viewBox="0 0 100 80" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -339,7 +408,7 @@ font-size: 12px; border-radius: 8px;}
     let currentAdminPath = "";
     let currentEmptyFolderMarkerId = null;
     let folderMeta = {};
-    
+
     window.loginAdmin = function() {
       const email = document.getElementById("adminEmail").value;
       const pwd = document.getElementById("adminPassword").value;
@@ -383,14 +452,11 @@ font-size: 12px; border-radius: 8px;}
         document.getElementById("mainAdminContent").style.display = "none";
       }
     });
-    
+
     document.getElementById("adminPassword").addEventListener("keypress", function(e) {
       if (e.key === "Enter") loginAdmin();
     });
-    
-    // =====================================
-    // ฟังก์ชันจัดการป้ายโฆษณา (Banners) - แอดมิน
-    // =====================================
+
     window.loadBanners = async function() {
       const div = document.getElementById("bannersTable");
       div.innerHTML = "<p style='text-align:center;'>กำลังโหลดข้อมูลโฆษณา...</p>";
@@ -463,10 +529,6 @@ font-size: 12px; border-radius: 8px;}
         loadBanners();
       } catch(e) { alert("ลบป้ายโฆษณาล้มเหลว"); }
     }
-
-    // =====================================
-    // ฟังก์ชันเอกสาร (File Explorer)
-    // =====================================
 
     function cleanUrl(type, url) {
       if (type === "youtube" && url.includes("watch?v=")) return `https://www.youtube.com/embed/${url.split("v=")[1].split("&")[0]}`;
@@ -557,7 +619,6 @@ font-size: 12px; border-radius: 8px;}
       }
     }
 
-    // ระบบ Long Press
     window.isLongPressing = false;
     window.longPressTimer = null;
 
@@ -590,7 +651,6 @@ font-size: 12px; border-radius: 8px;}
         openFolderSettings(decodeURIComponent(encodedPath));
     };
 
-    // เปิดหน้าตั้งค่าโฟลเดอร์
     window.openFolderSettings = function(path) {
        let folderName = path.split('/').pop();
        let meta = folderMeta[path] || { color: 'blue', emoji: '', password: '' };
@@ -610,7 +670,6 @@ font-size: 12px; border-radius: 8px;}
 
     window.selectFolderColor = function(colorKey) {
         window.selectedFolderColor = colorKey;
-        let pickColorHex = appleColors[colorKey] ? appleColors[colorKey][2] : '#0071e3';
         document.querySelectorAll('.color-circle').forEach(el => {
             el.style.border = el.getAttribute('data-color') === colorKey ? `3px solid #1d1d1f` : '3px solid transparent';
             if (el.getAttribute('data-color') === colorKey) el.style.transform = 'scale(1.15)';
@@ -721,7 +780,6 @@ font-size: 12px; border-radius: 8px;}
 
         let html = `<div class="item-grid">`;
         
-        // 1. วาดโฟลเดอร์
         Array.from(foldersInCurrentPath).sort().forEach(folderName => {
             const safeFolderName = encodeURIComponent(folderName);
             let targetPath = currentAdminPath ? currentAdminPath + "/" + folderName : folderName;
@@ -760,7 +818,6 @@ font-size: 12px; border-radius: 8px;}
             `;
         });
 
-        // 2. วาดไฟล์
         filesInCurrentPath.forEach(file => {
             const safeData = encodeURIComponent(JSON.stringify(file));
             let iconSvg = icons.pdf;
@@ -785,7 +842,7 @@ font-size: 12px; border-radius: 8px;}
                   <button class="btn-yellow" onclick="editJob('${safeData}')">แก้ไข</button>
                   <button class="btn-red" onclick="deleteJob('${file.id}')">ลบ</button>
                 </div>
-              </div>
+               </div>
             `;
         });
         
@@ -799,7 +856,6 @@ font-size: 12px; border-radius: 8px;}
         
         const navHeader = document.getElementById("adminNavHeader");
         const pathTitleEl = document.getElementById("currentAdminPathTitle");
-        
         if (currentAdminPath === "") {
            navHeader.style.display = "none";
         } else {
@@ -822,7 +878,6 @@ font-size: 12px; border-radius: 8px;}
             let fp = f.normalizedPath;
             return fp === newPath || fp.startsWith(newPath + "/");
         });
-        
         if (exists) { alert("มีโฟลเดอร์ชื่อนี้อยู่แล้วในระบบ"); return; }
 
         try {
@@ -887,7 +942,6 @@ font-size: 12px; border-radius: 8px;}
        let targetFolder = e.currentTarget.getAttribute("data-target-folder");
        
        if (!fileId) return;
-       
        try {
            const jobDocRef = doc(db, "jobs", fileId);
            await updateDoc(jobDocRef, { folder: targetFolder, updatedAt: serverTimestamp() });
@@ -903,18 +957,15 @@ font-size: 12px; border-radius: 8px;}
            e.preventDefault();
            zone.classList.add("dragover-active");
        });
-       
        zone.addEventListener("dragleave", () => {
            zone.classList.remove("dragover-active");
        });
-       
        zone.addEventListener("drop", (e) => {
            e.preventDefault();
            zone.classList.remove("dragover-active");
            
            if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
                let droppedFile = e.dataTransfer.files[0];
-               
                cancelEdit();
                document.getElementById("jobTitle").value = droppedFile.name.split('.').pop() ? droppedFile.name.substring(0, droppedFile.name.lastIndexOf('.')) : droppedFile.name;
                document.getElementById("jobFolder").value = currentAdminPath;
@@ -935,7 +986,6 @@ font-size: 12px; border-radius: 8px;}
       let meta = folderMeta[targetPath];
       
       if (meta && meta.password) {
-          // แก้ไขบรรทัดที่ทำให้เกิด Syntax Error ให้เรียงอยู่ในบรรทัดเดียว
           let pwd = prompt("โฟลเดอร์นี้ถูกล็อก \nกรุณาใส่รหัสผ่าน:");
           if (pwd !== meta.password) {
               alert("รหัสผ่านไม่ถูกต้อง");
@@ -1011,7 +1061,7 @@ font-size: 12px; border-radius: 8px;}
         statusText.style.color = "#34c759";
         cancelEdit(); 
         loadJobs();   
-      } catch (error) {
+      } catch (error) { 
         statusText.innerText = "เกิดข้อผิดพลาดในการบันทึกข้อมูล";
         statusText.style.color = "red";
       }
@@ -1028,7 +1078,6 @@ font-size: 12px; border-radius: 8px;}
       document.getElementById("allowedUsers").value = (data.allowedUsers || []).join(",\n");
       document.getElementById("showWatermark").value = data.showWatermark !== false ? "true" : "false";
       document.getElementById("jobPassword").value = data.password || "";
-      
       document.getElementById("btnSave").innerText = "บันทึกการแก้ไข";
       document.getElementById("btnSave").classList.replace("btn-blue", "btn-yellow");
       document.getElementById("btnCancel").style.display = "block";
@@ -1045,7 +1094,6 @@ font-size: 12px; border-radius: 8px;}
       document.getElementById("allowedUsers").value = "";
       document.getElementById("showWatermark").value = "true";
       document.getElementById("jobPassword").value = "";
-      
       document.getElementById("btnSave").innerText = "บันทึกข้อมูลระบบงาน";
       document.getElementById("btnSave").classList.replace("btn-yellow", "btn-blue");
       document.getElementById("btnCancel").style.display = "none";
@@ -1060,14 +1108,34 @@ font-size: 12px; border-radius: 8px;}
       } catch (e) { alert("การลบข้อมูลล้มเหลว"); }
     }
 
+    // ฟังก์ชันอัปเดตกระดิ่งแจ้งเตือนคำขอ
+    window.updateRequestBadge = function(count) {
+        const badge = document.getElementById("requestBadge");
+        const countEl = document.getElementById("requestBadgeCount");
+        if (!badge || !countEl) return;
+        
+        const bellIcon = badge.querySelector('.bell-icon');
+        if (count > 0) {
+            badge.style.display = "flex";
+            countEl.innerText = count + " คำขอใหม่";
+            bellIcon.classList.add('ringing');
+        } else {
+            badge.style.display = "none";
+            bellIcon.classList.remove('ringing');
+        }
+    }
+
     window.loadRequests = async function() {
       const tableDiv = document.getElementById("requestsTable");
       tableDiv.innerHTML = "<p style='text-align:center;'>กำลังโหลดข้อมูลคำขอ...</p>";
 
       try {
         const querySnapshot = await getDocs(collection(db, "download_requests"));
+        let pendingCount = 0;
+
         if (querySnapshot.empty) {
           tableDiv.innerHTML = "<p style='text-align:center; color:#86868b;'>ไม่พบข้อมูลคำขอในระบบ</p>";
+          window.updateRequestBadge(0);
           return;
         }
 
@@ -1082,6 +1150,8 @@ font-size: 12px; border-radius: 8px;}
         querySnapshot.forEach((docSnap) => {
           const id = docSnap.id;
           const data = docSnap.data();
+          
+          if (data.status === "pending") pendingCount++;
           
           let badge = "";
           if (data.status === "pending") badge = `<span style="color:#d97706; font-weight:600;">รอการตรวจสอบ</span>`;
@@ -1106,11 +1176,12 @@ font-size: 12px; border-radius: 8px;}
                         <button class="btn-red" onclick="deleteRequest('${id}')">ลบ</button>
                       </div>
                     </td>
-                  </tr>`;
+                 </tr>`;
         });
         
         html += "</table>";
         tableDiv.innerHTML = html;
+        window.updateRequestBadge(pendingCount);
       } catch (error) { tableDiv.innerHTML = "<p style='color:red; text-align:center;'>การเรียกข้อมูลล้มเหลว</p>"; }
     }
 
@@ -1168,6 +1239,7 @@ font-size: 12px; border-radius: 8px;}
       const jobId = select.value;
       const jobTitle = select.options[select.selectedIndex]?.text;
       const studentId = document.getElementById("directStudentId").value.trim();
+      
       if (!jobId || !studentId) { alert("กรุณาระบุข้อมูลรายการและรหัสผู้รับสิทธิ์ให้ครบถ้วน"); return; }
       const hours = prompt("กำหนดเวลาการเข้าถึง (ระบุเป็นชั่วโมง)\\n(ตัวอย่าง: 24 = 1 วัน, 72 = 3 วัน, หรือ 0 = เข้าถึงได้ถาวร)", "72");
       if (hours === null) return;
@@ -1213,27 +1285,24 @@ font-size: 12px; border-radius: 8px;}
           if (data.downloadedAt) dateStr = data.downloadedAt.toDate().toLocaleString('th-TH');
           html += `<tr><td style="text-align:center;"><b>${data.studentId || '-'}</b></td><td>${data.jobTitle || '-'}</td><td style="text-align:center;">${dateStr}</td></tr>`;
         });
-        
         html += "</table>";
         tableDiv.innerHTML = html;
       } catch (error) { tableDiv.innerHTML = "<p style='color:red; text-align:center;'>การเรียกข้อมูลประวัติล้มเหลว</p>"; }
     }
 
-    // ฟังก์ชันทำงานจัดการจาก URL Actions
     window.processDiscordActions = async function() {
         const urlParams = new URLSearchParams(window.location.search);
         const action = urlParams.get('action');
         const reqId = urlParams.get('reqId');
         const durationParam = urlParams.get('duration');
-
+        
         if (action && reqId) {
             if (action === 'approve') {
-                let duration = 72; // ค่าเริ่มต้น
+                let duration = 72;
                 
-                // ตรวจสอบว่าแอดมินกดเลือกระยะเวลาแบบไหนมา
                 if (durationParam === 'custom') {
                     const hours = prompt("ระบุเวลาการเข้าถึง (ชั่วโมง)\n(เช่น: 24 = 1 วัน, 72 = 3 วัน, 0 = ไม่จำกัดเวลา):", "24");
-                    if (hours === null) return; // แอดมินกดยกเลิก
+                    if (hours === null) return; 
                     duration = parseInt(hours);
                     if (isNaN(duration) || duration < 0) { alert("กรุณาระบุตัวเลขที่ถูกต้อง"); return; }
                 } else if (durationParam !== null) {
@@ -1249,7 +1318,7 @@ font-size: 12px; border-radius: 8px;}
                             expireDate.setHours(expireDate.getHours() + duration);
                             updateData.expiresAt = expireDate;
                         } else {
-                            updateData.expiresAt = null; // ให้สิทธิ์ถาวร
+                            updateData.expiresAt = null;
                         }
                         await updateDoc(doc(db, "download_requests", reqId), updateData);
                         alert("✅ อนุมัติสิทธิ์สำเร็จแล้ว!");
@@ -1271,11 +1340,65 @@ font-size: 12px; border-radius: 8px;}
                 }
             }
             
-            // ล้าง URL กลับเป็นปกติ 
             window.history.replaceState({}, document.title, window.location.pathname);
             loadRequests(); 
         }
     }
+  </script>
+
+  <script>
+    function initAccordion() {
+      const adminBoxes = document.querySelectorAll('.admin-box');
+      
+      // รายชื่อหัวข้อที่ไม่ต้องการให้พับ (ให้แสดงผลแบบเต็มตลอด)
+      const excludeText = [
+        "จัดการป้ายโฆษณา",
+        "การอนุมัติสิทธิ์การเข้าถึงทันที",
+        "การจัดการรายการ (File Explorer)"
+      ];
+
+      adminBoxes.forEach(box => {
+        const header = box.querySelector('h2');
+        if (!header) return;
+        
+        const titleText = header.innerText.trim();
+        const isFormBox = box.id === "formBox"; // ล็อกกล่องฟอร์มเพิ่ม/แก้ไขรายการ
+        const shouldExclude = isFormBox || excludeText.some(t => titleText.includes(t));
+        
+        // ถ้าไม่อยู่ในกลุ่มที่ล็อกไว้ ให้เพิ่มระบบพับเก็บ
+        if (!shouldExclude && !header.querySelector('.toggle-arrow')) {
+          box.classList.add('collapsible-box');
+          
+          // สร้างไอคอนลูกศรแบบ SVG เพื่อความสวยงาม
+          const arrow = document.createElement('span');
+          arrow.className = 'toggle-arrow';
+          arrow.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>'; 
+          header.appendChild(arrow);
+          
+          // ห่อหุ้มเนื้อหาด้านในทั้งหมด (ยกเว้น h2) ด้วย Wrapper สำหรับทำ Animation สไลด์แบบ Smooth
+          const contentWrapper = document.createElement('div');
+          contentWrapper.className = 'accordion-content';
+          const innerWrapper = document.createElement('div');
+          innerWrapper.className = 'accordion-inner';
+          
+          while (header.nextSibling) {
+              innerWrapper.appendChild(header.nextSibling);
+          }
+          contentWrapper.appendChild(innerWrapper);
+          box.appendChild(contentWrapper);
+
+          // ค่าเริ่มต้น: พับเก็บไว้
+          box.classList.add('collapsed');
+
+          // คลิกที่ h2 เพื่อสลับสถานะ
+          header.addEventListener('click', () => {
+            box.classList.toggle('collapsed');
+          });
+        }
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', initAccordion);
   </script>
 </body>
 </html>
