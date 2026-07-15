@@ -5,165 +5,87 @@
   <title>ระบบผู้ดูแล - จัดการสิทธิ์แบบรวมศูนย์</title>
   <style>
     body { font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-background: #f5f5f7; display: flex; flex-direction: column; align-items: center; margin: 0;
-min-height: 100vh;}
+      background: #f5f5f7; display: flex; flex-direction: column; align-items: center; margin: 0; min-height: 100vh;}
     
-    #adminLoginWrapper { position: fixed; top: 0; left: 0; width: 100%;
-height: 100%; background: #f5f5f7; display: flex; justify-content: center; align-items: center; z-index: 9999; }
-    .login-card { background: white;
-padding: 40px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); width: 100%; max-width: 400px; text-align: center; box-sizing: border-box;
-}
-    .login-card h2 { margin-top: 0; color: #1d1d1f;
-justify-content: center;}
+    #adminLoginWrapper { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #f5f5f7; display: flex; justify-content: center; align-items: center; z-index: 9999; }
+    .login-card { background: white; padding: 40px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); width: 100%; max-width: 400px; text-align: center; box-sizing: border-box; }
+    .login-card h2 { margin-top: 0; color: #1d1d1f; justify-content: center;}
     
-    #mainAdminContent { width: 100%; display: none; flex-direction: column; align-items: center;
-padding: 30px 20px; box-sizing: border-box; }
+    #mainAdminContent { width: 100%; display: none; flex-direction: column; align-items: center; padding: 30px 20px; box-sizing: border-box; }
 
-    .admin-box { background: white; padding: 30px; border-radius: 16px; width: 100%;
-max-width: 850px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); margin-bottom: 25px; box-sizing: border-box; position: relative;
-}
-    h2 { margin-top: 0; display: flex; justify-content: space-between; align-items: center; color: #1d1d1f; font-size: 22px;
-}
-    label { font-weight: 600; margin-top: 15px; display: block; font-size: 14px; color: #1d1d1f;
-}
-    input, select, textarea, button { width: 100%; padding: 14px; margin-top: 8px; box-sizing: border-box;
-border: 1px solid #d2d2d7; border-radius: 12px; font-family: inherit; font-size: 15px;
-transition: 0.2s;}
-    input:focus, select:focus, textarea:focus { outline: none; border-color: #0071e3; box-shadow: 0 0 0 3px rgba(0,113,227,0.1);
-}
+    .admin-box { background: white; padding: 30px; border-radius: 16px; width: 100%; max-width: 850px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); margin-bottom: 25px; box-sizing: border-box; position: relative; }
+    h2 { margin-top: 0; display: flex; justify-content: space-between; align-items: center; color: #1d1d1f; font-size: 22px; }
+    label { font-weight: 600; margin-top: 15px; display: block; font-size: 14px; color: #1d1d1f; }
+    input, select, textarea, button { width: 100%; padding: 14px; margin-top: 8px; box-sizing: border-box; border: 1px solid #d2d2d7; border-radius: 12px; font-family: inherit; font-size: 15px; transition: 0.2s;}
+    input:focus, select:focus, textarea:focus { outline: none; border-color: #0071e3; box-shadow: 0 0 0 3px rgba(0,113,227,0.1); }
     textarea { height: 120px; resize: vertical; }
-    button { color: white; border: none;
-cursor: pointer; font-weight: 600; margin-top: 15px; transition: 0.2s; }
-    button:hover { opacity: 0.85; transform: scale(0.98);
-}
+    button { color: white; border: none; cursor: pointer; font-weight: 600; margin-top: 15px; transition: 0.2s; }
+    button:hover { opacity: 0.85; transform: scale(0.98); }
     button:active { transform: scale(0.95); }
     
-    .btn-blue { background: #0071e3;
-}
+    .btn-blue { background: #0071e3; }
     .btn-green { background: #34c759; }
-    .btn-yellow { background: #ffcc00; color: #1d1d1f;
-}
+    .btn-yellow { background: #ffcc00; color: #1d1d1f; }
     .btn-red { background: #ff3b30; }
-    .btn-gray { background: #86868b; display: none;
-}
+    .btn-gray { background: #86868b; display: none; }
     
-    .nav-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; padding-bottom: 15px;
-border-bottom: 1px solid #d2d2d7; }
-    .back-btn { background: transparent; color: #0071e3; padding: 8px 12px; width: auto;
-margin: 0; font-size: 15px; }
-    .back-btn:hover { background: rgba(0, 113, 227, 0.1); transform: none;
-}
-    .path-title { font-size: 17px; font-weight: 600; flex-grow: 1; text-align: center; color: #1d1d1f; white-space: nowrap; overflow: hidden;
-text-overflow: ellipsis; margin: 0 10px; }
+    .nav-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #d2d2d7; }
+    .back-btn { background: transparent; color: #0071e3; padding: 8px 12px; width: auto; margin: 0; font-size: 15px; }
+    .back-btn:hover { background: rgba(0, 113, 227, 0.1); transform: none; }
+    .path-title { font-size: 17px; font-weight: 600; flex-grow: 1; text-align: center; color: #1d1d1f; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin: 0 10px; }
     
-    .explorer-zone { border: 2px dashed transparent;
-border-radius: 14px; padding: 15px; transition: all 0.3s ease; }
-    .explorer-zone.dragover-active { border-color: #0071e3;
-background-color: rgba(0, 113, 227, 0.04); }
+    .explorer-zone { border: 2px dashed transparent; border-radius: 14px; padding: 15px; transition: all 0.3s ease; }
+    .explorer-zone.dragover-active { border-color: #0071e3; background-color: rgba(0, 113, 227, 0.04); }
 
-    .item-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px 15px;
-margin-top: 15px; align-items: start; }
+    .item-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px 15px; margin-top: 15px; align-items: start; }
     
-    .grid-item { display: flex; flex-direction: column; align-items: center;
-padding: 10px; border-radius: 12px; transition: background-color 0.2s, transform 0.2s; user-select: none; height: auto; min-height: 190px; justify-content: flex-start;
-}
+    .grid-item { display: flex; flex-direction: column; align-items: center; padding: 10px; border-radius: 12px; transition: background-color 0.2s, transform 0.2s; user-select: none; height: auto; min-height: 190px; justify-content: flex-start; }
     .grid-item:hover { background-color: #f5f5f7; }
-    .grid-item.folder-target.dragover-active { background-color: rgba(0, 71, 227, 0.15) !important;
-transform: scale(1.05); box-shadow: 0 0 0 2px #0071e3; }
-    .grid-item.dragging-item { opacity: 0.4;
-}
+    .grid-item.folder-target.dragover-active { background-color: rgba(0, 71, 227, 0.15) !important; transform: scale(1.05); box-shadow: 0 0 0 2px #0071e3; }
+    .grid-item.dragging-item { opacity: 0.4; }
 
-    .grid-icon { margin-bottom: 10px; display: flex; justify-content: center; align-items: center; cursor: pointer; transition: transform 0.2s;
-height: 65px; width: 100%; position: relative; }
-    .grid-icon:hover { transform: scale(0.95);
-}
+    .grid-icon { margin-bottom: 10px; display: flex; justify-content: center; align-items: center; cursor: pointer; transition: transform 0.2s; height: 65px; width: 100%; position: relative; }
+    .grid-icon:hover { transform: scale(0.95); }
     .grid-icon svg.icon-folder { width: 70px; height: auto; }
-    .grid-icon svg.icon-file { width: 48px;
-height: auto; }
-    .grid-icon svg.icon-wide { width: 62px; height: auto;
-}
+    .grid-icon svg.icon-file { width: 48px; height: auto; }
+    .grid-icon svg.icon-wide { width: 62px; height: auto; }
 
-    .grid-name { font-size: 13px; font-weight: 500; color: #1d1d1f; text-align: center; line-height: 1.4; word-break: break-word; width: 100%;
-cursor: pointer;}
-    .grid-lock { font-size: 12px; margin-top: 6px; color: #1d1d1f; text-align: center;
-}
-    .grid-time { font-size: 11px; color: #86868b; margin-top: 6px; text-align: center; line-height: 1.3;
-}
+    .grid-name { font-size: 13px; font-weight: 500; color: #1d1d1f; text-align: center; line-height: 1.4; word-break: break-word; width: 100%; cursor: pointer;}
+    .grid-lock { font-size: 12px; margin-top: 6px; color: #1d1d1f; text-align: center; display: flex; align-items: center; justify-content: center; gap:4px; }
+    .grid-time { font-size: 11px; color: #86868b; margin-top: 6px; text-align: center; line-height: 1.3; }
 
-    .admin-actions { display: flex; gap: 5px; margin-top: 15px; width: 100%; justify-content: center;
-}
-    .admin-actions button { padding: 6px 10px; font-size: 11px; margin: 0; width: auto; border-radius: 8px;
-}
+    .admin-actions { display: flex; gap: 5px; margin-top: 15px; width: 100%; justify-content: center; }
+    .admin-actions button { padding: 6px 10px; font-size: 11px; margin: 0; width: auto; border-radius: 8px; }
 
-    .color-circle { width: 28px; height: 28px; border-radius: 50%; cursor: pointer; border: 3px solid transparent; box-sizing: border-box;
-transition: 0.1s; }
-    .color-circle:hover { transform: scale(1.1);
-}
+    .color-circle { width: 28px; height: 28px; border-radius: 50%; cursor: pointer; border: 3px solid transparent; box-sizing: border-box; transition: 0.1s; }
+    .color-circle:hover { transform: scale(1.1); }
 
-    @media (max-width: 600px) { .item-grid { grid-template-columns: repeat(3, 1fr); gap: 15px 10px;
-} }
-    @media (max-width: 450px) { .item-grid { grid-template-columns: repeat(2, 1fr);
-} }
+    @media (max-width: 600px) { .item-grid { grid-template-columns: repeat(3, 1fr); gap: 15px 10px; } }
+    @media (max-width: 450px) { .item-grid { grid-template-columns: repeat(2, 1fr); } }
 
-    table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 15px;
-}
-    th, td { border: 1px solid #d2d2d7; padding: 12px 10px; text-align: left; vertical-align: middle;
-}
+    table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 15px; }
+    th, td { border: 1px solid #d2d2d7; padding: 12px 10px; text-align: left; vertical-align: middle; }
     th { background-color: #f5f5f7; text-align: center; font-weight: 600; }
-    .action-btns { display: flex;
-gap: 5px; justify-content: center; flex-wrap: wrap; }
-    .action-btns button { width: auto; padding: 6px 12px; margin: 0;
-font-size: 12px; border-radius: 8px;}
+    .action-btns { display: flex; gap: 5px; justify-content: center; flex-wrap: wrap; }
+    .action-btns button { width: auto; padding: 6px 12px; margin: 0; font-size: 12px; border-radius: 8px;}
 
     /* =========================================
-       ระบบพับเก็บข้อมูล (Accordion) สำหรับ Admin Box - แบบทันสมัย
+       ระบบพับเก็บข้อมูล (Accordion)
        ========================================= */
     .admin-box.collapsible-box h2 {
-        cursor: pointer;
-        user-select: none;
-        transition: all 0.3s ease;
-        padding: 12px 15px;
-        margin: -12px -15px 15px -15px; /* Offset to make hover full width */
-        border-radius: 12px;
-        background: transparent;
+        cursor: pointer; user-select: none; transition: all 0.3s ease; padding: 12px 15px; margin: -12px -15px 15px -15px; border-radius: 12px; background: transparent;
     }
-    .admin-box.collapsible-box h2:hover {
-        background-color: #f5f5f7;
-    }
+    .admin-box.collapsible-box h2:hover { background-color: #f5f5f7; }
     .toggle-arrow {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 32px;
-        height: 32px;
-        border-radius: 50%;
-        background-color: #e5e5ea;
-        color: #1d1d1f;
-        transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.2s;
-        margin-left: auto;
+        display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 50%; background-color: #e5e5ea; color: #1d1d1f; transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.2s; margin-left: auto;
     }
-    .admin-box.collapsible-box h2:hover .toggle-arrow {
-        background-color: #d2d2d7;
-    }
-    .admin-box.collapsed .toggle-arrow {
-        transform: rotate(180deg);
-    }
-    
-    /* Smooth Transition using CSS Grid */
+    .admin-box.collapsible-box h2:hover .toggle-arrow { background-color: #d2d2d7; }
+    .admin-box.collapsed .toggle-arrow { transform: rotate(180deg); }
     .accordion-content {
-        display: grid;
-        grid-template-rows: 1fr;
-        transition: grid-template-rows 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease, margin 0.4s ease;
-        opacity: 1;
+        display: grid; grid-template-rows: 1fr; transition: grid-template-rows 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease, margin 0.4s ease; opacity: 1;
     }
-    .accordion-content > .accordion-inner {
-        overflow: hidden;
-    }
-    .admin-box.collapsed .accordion-content {
-        grid-template-rows: 0fr;
-        opacity: 0;
-        margin-top: -10px;
-    }
+    .accordion-content > .accordion-inner { overflow: hidden; }
+    .admin-box.collapsed .accordion-content { grid-template-rows: 0fr; opacity: 0; margin-top: -10px; }
 
     /* Notification Bell Animation */
     @keyframes bell-ring {
@@ -171,18 +93,35 @@ font-size: 12px; border-radius: 8px;}
       10%, 30%, 50% { transform: rotate(15deg); }
       20%, 40% { transform: rotate(-15deg); }
     }
-    .bell-icon.ringing {
-        display: inline-block;
-        animation: bell-ring 1.5s ease-in-out infinite;
-        transform-origin: top center;
-    }
+    .bell-icon.ringing { display: inline-block; animation: bell-ring 1.5s ease-in-out infinite; transform-origin: top center; }
   </style>
 </head>
 <body oncontextmenu="return false;">
 
+  <div id="timePickerModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:10000; justify-content:center; align-items:center;">
+    <div style="background:white; padding:25px; border-radius:16px; width:90%; max-width:350px; text-align:center; box-shadow: 0 15px 40px rgba(0,0,0,0.15);">
+        <h3 style="margin-top:0; color:#1d1d1f; font-weight:600;">กำหนดเวลาการเข้าถึง</h3>
+        <div style="text-align:left; background:#f5f5f7; padding:15px; border-radius:14px; margin-bottom:20px;">
+            <label style="margin-top:0; display:flex; align-items:center; gap:8px; cursor:pointer;">
+                <input type="radio" name="timeType" value="unlimited" checked onchange="toggleTimePicker()" style="width:auto; margin:0;">
+                <span>ไม่จำกัดเวลา (ถาวร)</span>
+            </label>
+            <hr style="border:none; border-top:1px solid #d2d2d7; margin:15px 0;">
+            <label style="margin-top:0; display:flex; align-items:center; gap:8px; cursor:pointer;">
+                <input type="radio" name="timeType" value="custom" onchange="toggleTimePicker()" style="width:auto; margin:0;">
+                <span>กำหนดเวลาหมดอายุ:</span>
+            </label>
+            <input type="datetime-local" id="customExpireDate" style="display:none; margin-top:10px; width:100%; box-sizing:border-box;">
+        </div>
+        <div style="display:flex; gap:10px;">
+            <button class="btn-gray" onclick="closeTimePicker()" style="display:block; background:#e5e5ea; color:#1d1d1f; margin-top:0; box-shadow:none;">ยกเลิก</button>
+            <button class="btn-blue" onclick="confirmTimePicker()" style="margin-top:0; box-shadow:none;">ยืนยัน</button>
+        </div>
+    </div>
+  </div>
+
   <div id="folderSettingsModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:10000; justify-content:center; align-items:center;">
     <div style="background:#ffffff; width:90%; max-width:320px; border-radius:24px; padding:25px; box-sizing:border-box; text-align:center; box-shadow: 0 15px 40px rgba(0,0,0,0.15);">
-        
         <div id="folderPreviewIcon" style="width:90px; height:90px; margin:0 auto 15px; display:flex; justify-content:center; align-items:center;"></div>
         
         <input type="hidden" id="editFolderPath">
@@ -237,11 +176,11 @@ font-size: 12px; border-radius: 8px;}
     <div class="admin-box" style="border: 2px solid #0071e3;">
       <h2>จัดการป้ายโฆษณา (Banners)</h2>
       <p style="color:#86868b; font-size:13px; margin-top:-5px; margin-bottom:15px;">
-        💡 ระบบจะแสดงป้ายโฆษณาที่ด้านบนของหน้าเว็บผู้ใช้ และจะเลื่อนอัตโนมัติทุกๆ 1 นาที (ขนาดแนะนำ 1200 x 600 px)
+        💡 ระบบจะแสดงป้ายโฆษณาที่ด้านบนของหน้าเว็บผู้ใช้ และจะเลื่อนอัตโนมัติ (ขนาดแนะนำ 1200 x 600 px)<br>
+        <strong style="color:#0071e3;">เคล็ดลับ: สามารถคลิกค้างแล้วลาก (Drag & Drop) ที่ตารางเพื่อสลับตำแหน่งแสดงผลป้ายโฆษณาได้ทันที</strong>
       </p>
       
       <input type="hidden" id="editBannerId">
-      
       <label>1. ลิงก์รูปภาพ (Image URL):</label>
       <input type="text" id="bannerImageUrl" placeholder="ระบุ URL รูปภาพโฆษณา..." required>
       
@@ -258,10 +197,11 @@ font-size: 12px; border-radius: 8px;}
 
     <div class="admin-box" style="border: 2px solid #34c759;">
       <h2>การอนุมัติสิทธิ์การเข้าถึงทันที (ไม่ต้องรอยื่นคำขอ)</h2>
-      <label>1. เลือกระบบงาน / เอกสาร:</label>
+      <label>1. เลือกระบบงาน หรือ โฟลเดอร์ (ให้สิทธิ์ทั้งโฟลเดอร์):</label>
       <select id="directJobSelect"><option value="">-- กำลังโหลดข้อมูลระบบงาน... --</option></select>
-      <label>2. รหัสผู้รับสิทธิ์:</label>
-      <input type="text" id="directStudentId" placeholder="ระบุรหัสประจำตัวผู้รับสิทธิ์..." required>
+      <label>2. รหัสผู้รับสิทธิ์ (สามารถใส่หลายผู้ใช้ได้ คั่นด้วยลูกน้ำ (,) หรือขึ้นบรรทัดใหม่):</label>
+      <textarea id="directStudentId" placeholder="ตัวอย่าง: 6810210178, 6810210220" style="height: 80px;"></textarea>
+ 
       <button class="btn-green" onclick="grantDirectDownload()">ยืนยันการให้สิทธิ์การดาวน์โหลด</button>
     </div>
 
@@ -363,6 +303,45 @@ font-size: 12px; border-radius: 8px;}
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     const auth = getAuth(app);
+    
+    // Global Promise Resolver for TimePicker
+    let timePickerResolve = null;
+
+    window.toggleTimePicker = function() {
+        let type = document.querySelector('input[name="timeType"]:checked').value;
+        if (type === 'custom') {
+            document.getElementById('customExpireDate').style.display = 'block';
+        } else {
+            document.getElementById('customExpireDate').style.display = 'none';
+        }
+    }
+
+    window.requestTimeSelection = function() {
+        return new Promise((resolve) => {
+            timePickerResolve = resolve;
+            document.getElementById('timePickerModal').style.display = 'flex';
+            document.querySelector('input[name="timeType"][value="unlimited"]').checked = true;
+            document.getElementById('customExpireDate').style.display = 'none';
+            document.getElementById('customExpireDate').value = '';
+        });
+    }
+
+    window.closeTimePicker = function() {
+        document.getElementById('timePickerModal').style.display = 'none';
+        if(timePickerResolve) timePickerResolve(null);
+    }
+
+    window.confirmTimePicker = function() {
+        let type = document.querySelector('input[name="timeType"]:checked').value;
+        let result = { unlimited: type === 'unlimited', date: null };
+        if (type === 'custom') {
+            let val = document.getElementById('customExpireDate').value;
+            if (!val) { alert('กรุณาระบุวันและเวลา'); return; }
+            result.date = new Date(val);
+        }
+        document.getElementById('timePickerModal').style.display = 'none';
+        if(timePickerResolve) timePickerResolve(result);
+    }
 
     const appleColors = {
         blue: ['#89C4FA', '#74B5F6', '#0071e3'],
@@ -373,14 +352,13 @@ font-size: 12px; border-radius: 8px;}
         purple: ['#d1a3ff', '#b870ff', '#af52de'],
         gray: ['#c2c2c2', '#a8a8a8', '#8e8e93']
     };
-
     const icons = {
       pdf: `<svg class="icon-file" viewBox="0 0 64 80" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="4" y="4" width="56" height="72" rx="6" fill="#F9F9FB" stroke="#D2D2D7" stroke-width="2"/><path d="M40 4L60 24V10C60 6.68629 57.3137 4 54 4H40Z" fill="#E5E5EA"/><path d="M40 4V18C40 21.3137 42.6863 24 46 24H60" stroke="#D2D2D7" stroke-width="2" stroke-linejoin="round"/><rect x="16" y="32" width="32" height="4" rx="2" fill="#FF3B30"/><rect x="16" y="44" width="24" height="4" rx="2" fill="#D2D2D7"/><rect x="16" y="56" width="28" height="4" rx="2" fill="#D2D2D7"/></svg>`,
       image: `<svg class="icon-wide" viewBox="0 0 80 64" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="4" y="4" width="72" height="56" rx="8" fill="#F9F9FB" stroke="#D2D2D7" stroke-width="2"/><circle cx="24" cy="24" r="6" fill="#FFCC00"/><path d="M4 48L28 28L52 48L64 38L76 48V52C76 56.4183 72.4183 60 68 60H12C7.58172 60 4 56.4183 4 52V48Z" fill="#34C759"/></svg>`,
       youtube: `<svg class="icon-wide" viewBox="0 0 80 56" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="4" y="4" width="72" height="48" rx="12" fill="#FF3B30"/><path d="M34 18L52 28L34 38V18Z" fill="white"/></svg>`,
-      link: `<svg class="icon-file" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="40" cy="40" r="36" fill="#F9F9FB" stroke="#D2D2D7" stroke-width="2"/><path d="M40 10C28 10 20 25 20 40C20 55 28 70 40 70C52 70 60 55 60 40C60 25 52 10 40 10Z" stroke="#0071E3" stroke-width="2"/><path d="M10 40H70" stroke="#0071E3" stroke-width="2"/><path d="M20 25H60" stroke="#0071E3" stroke-width="2"/><path d="M20 55H60" stroke="#0071E3" stroke-width="2"/></svg>`
+      link: `<svg class="icon-file" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="40" cy="40" r="36" fill="#F9F9FB" stroke="#D2D2D7" stroke-width="2"/><path d="M40 10C28 10 20 25 20 40C20 55 28 70 40 70C52 70 60 55 60 40C60 25 52 10 40 10Z" stroke="#0071E3" stroke-width="2"/><path d="M10 40H70" stroke="#0071E3" stroke-width="2"/><path d="M20 25H60" stroke="#0071E3" stroke-width="2"/><path d="M20 55H60" stroke="#0071E3" stroke-width="2"/></svg>`,
+      lock: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle;"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>`
     };
-
     function getFolderIcon(color, emoji) {
         let c = appleColors[color] || appleColors.blue;
         let svg = `<svg class="icon-folder" viewBox="0 0 100 80" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -408,6 +386,7 @@ font-size: 12px; border-radius: 8px;}
     let currentAdminPath = "";
     let currentEmptyFolderMarkerId = null;
     let folderMeta = {};
+    let adminBanners = []; // เก็บ State Banner สำหรับ Drag & Drop
 
     window.loginAdmin = function() {
       const email = document.getElementById("adminEmail").value;
@@ -452,29 +431,32 @@ font-size: 12px; border-radius: 8px;}
         document.getElementById("mainAdminContent").style.display = "none";
       }
     });
-
+    
     document.getElementById("adminPassword").addEventListener("keypress", function(e) {
       if (e.key === "Enter") loginAdmin();
     });
-
+    
     window.loadBanners = async function() {
       const div = document.getElementById("bannersTable");
       div.innerHTML = "<p style='text-align:center;'>กำลังโหลดข้อมูลโฆษณา...</p>";
       try {
         const snap = await getDocs(collection(db, "banners"));
-        if(snap.empty) { div.innerHTML = "<p style='text-align:center; color:#86868b;'>ไม่มีป้ายโฆษณาในระบบ</p>"; return; }
+        adminBanners = [];
+        snap.forEach(doc => adminBanners.push({id: doc.id, ...doc.data()}));
+        adminBanners.sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0));
+
+        if(adminBanners.length === 0) { div.innerHTML = "<p style='text-align:center; color:#86868b;'>ไม่มีป้ายโฆษณาในระบบ</p>"; return; }
         
         let html = `<table><tr><th width="40%">รูปภาพ (Image)</th><th width="40%">ลิงก์ปลายทาง (Target URL)</th><th width="20%">จัดการ</th></tr>`;
-        snap.forEach(docSnap => {
-           const data = docSnap.data();
-           const safeData = encodeURIComponent(JSON.stringify({id: docSnap.id, ...data}));
-           html += `<tr>
+        adminBanners.forEach(data => {
+           const safeData = encodeURIComponent(JSON.stringify(data));
+           html += `<tr draggable="true" data-banner-id="${data.id}" ondragstart="bannerDragStart(event)" ondragover="bannerDragOver(event)" ondragenter="bannerDragEnter(event)" ondragleave="bannerDragLeave(event)" ondrop="bannerDrop(event, '${data.id}')" style="cursor: grab;">
              <td style="text-align:center;"><img src="${data.imageUrl}" style="max-width:150px; border-radius:8px; border:1px solid #d2d2d7;"></td>
              <td style="word-break: break-all;">${data.link || '-'}</td>
              <td style="text-align:center;">
                 <div class="action-btns">
                     <button class="btn-yellow" onclick="editBanner('${safeData}')">แก้ไข</button>
-                    <button class="btn-red" onclick="deleteBanner('${docSnap.id}')">ลบ</button>
+                    <button class="btn-red" onclick="deleteBanner('${data.id}')">ลบ</button>
                 </div>
              </td>
            </tr>`;
@@ -484,6 +466,37 @@ font-size: 12px; border-radius: 8px;}
       } catch (e) {
         div.innerHTML = "<p style='color:red; text-align:center;'>การเรียกข้อมูลโฆษณาล้มเหลว</p>";
       }
+    }
+
+    // Drag and Drop Banners Logic
+    window.bannerDragStart = function(e) {
+        e.dataTransfer.setData("text/plain", e.currentTarget.getAttribute("data-banner-id"));
+        e.currentTarget.style.opacity = "0.5";
+    }
+    window.bannerDragOver = function(e) { e.preventDefault(); }
+    window.bannerDragEnter = function(e) { e.currentTarget.style.background = "#e5e5ea"; }
+    window.bannerDragLeave = function(e) { e.currentTarget.style.background = ""; }
+    window.bannerDrop = async function(e, targetId) {
+        e.preventDefault();
+        e.currentTarget.style.background = "";
+        let sourceId = e.dataTransfer.getData("text/plain");
+        if(sourceId === targetId) return;
+
+        let sourceIdx = adminBanners.findIndex(b => b.id === sourceId);
+        let targetIdx = adminBanners.findIndex(b => b.id === targetId);
+        let [movedItem] = adminBanners.splice(sourceIdx, 1);
+        adminBanners.splice(targetIdx, 0, movedItem);
+        
+        // Batch update sort order
+        const batch = writeBatch(db);
+        adminBanners.forEach((b, index) => {
+            batch.update(doc(db, "banners", b.id), { sortOrder: index });
+        });
+        
+        try {
+            await batch.commit();
+            loadBanners(); // Reload UI
+        } catch(err) { alert("เกิดข้อผิดพลาดในการจัดเรียงป้ายโฆษณา"); }
     }
 
     window.saveBanner = async function() {
@@ -496,7 +509,9 @@ font-size: 12px; border-radius: 8px;}
         if(editId) {
             await updateDoc(doc(db, "banners", editId), { imageUrl: imageUrl, link: linkUrl, updatedAt: serverTimestamp() });
         } else {
-            await addDoc(collection(db, "banners"), { imageUrl: imageUrl, link: linkUrl, createdAt: serverTimestamp() });
+            // New banner gets placed at the end
+            let nextOrder = adminBanners.length;
+            await addDoc(collection(db, "banners"), { imageUrl: imageUrl, link: linkUrl, sortOrder: nextOrder, createdAt: serverTimestamp() });
         }
         cancelEditBanner();
         loadBanners();
@@ -527,7 +542,8 @@ font-size: 12px; border-radius: 8px;}
       try {
         await deleteDoc(doc(db, "banners", id));
         loadBanners();
-      } catch(e) { alert("ลบป้ายโฆษณาล้มเหลว"); }
+      } catch(e) { alert("ลบป้ายโฆษณาล้มเหลว");
+      }
     }
 
     function cleanUrl(type, url) {
@@ -545,7 +561,8 @@ font-size: 12px; border-radius: 8px;}
         const querySnapshot = await getDocs(collection(db, "jobs"));
         allJobsAdmin = [];
         folderMeta = {};
-        let jobOptionsHtml = '<option value="">-- กรุณาเลือกระบบงาน --</option>';
+        
+        let jobOptionsHtml = '<option value="">-- กรุณาเลือกระบบงาน หรือ โฟลเดอร์ --</option>';
         let tableHtml = `<table>
                           <tr>
                             <th width="30%">ชื่อรายการ / เส้นทางโฟลเดอร์</th>
@@ -569,36 +586,45 @@ font-size: 12px; border-radius: 8px;}
           }
           
           allJobsAdmin.push({ id: docSnap.id, normalizedPath: path, ...data });
-          
-          if (data.type !== "system_folder") {
-              jobOptionsHtml += `<option value="${docSnap.id}">${data.title}</option>`;
-          }
+        });
 
-          const displayFolder = data.folder ? `📁 ${data.folder}` : "หน้าหลัก (ไม่ระบุโฟลเดอร์)";
-          if (data.type === "system_folder") {
-              let lockTxt = data.password ? " 🔒" : "";
+        // จัดเตรียมตัวเลือก (Dropdown) เพื่อให้เลือกได้ทั้งไฟล์ และ โฟลเดอร์
+        Object.keys(folderMeta).forEach(path => {
+            jobOptionsHtml += `<option value="FOLDER::${path}">📁 ให้สิทธิ์ทั้งโฟลเดอร์: ${path || 'หน้าหลัก'}</option>`;
+        });
+        allJobsAdmin.forEach(job => {
+            if (job.type !== "system_folder") {
+                jobOptionsHtml += `<option value="FILE::${job.id}">📄 ให้สิทธิ์ไฟล์เดียว: ${job.title}</option>`;
+            }
+        });
+
+        // สร้างตาราง
+        allJobsAdmin.forEach((job) => {
+          const displayFolder = job.folder ? `📁 ${job.folder}` : "หน้าหลัก (ไม่ระบุโฟลเดอร์)";
+          let lockTxt = job.password ? ` ${icons.lock}` : "";
+          
+          if (job.type === "system_folder") {
               tableHtml += `<tr>
                         <td><b>${displayFolder}</b>${lockTxt}<br><small style="color:gray;">(แฟ้มข้อมูล / กำหนดสี)</small></td>
                         <td style="text-align:center;">โฟลเดอร์</td>
                         <td style="text-align:center; color:gray;">-</td>
                         <td>
                           <div class="action-btns">
-                            <button class="btn-red" onclick="deleteJob('${docSnap.id}')">ลบโฟลเดอร์</button>
+                            <button class="btn-red" onclick="deleteJob('${job.id}')">ลบโฟลเดอร์</button>
                           </div>
                         </td>
                        </tr>`;
           } else {
-              const userCount = data.allowedUsers ? data.allowedUsers.length : 0;
-              const safeData = encodeURIComponent(JSON.stringify({id: docSnap.id, ...data}));
-              let lockTxt = data.password ? " 🔒" : "";
+              const userCount = job.allowedUsers ? job.allowedUsers.length : 0;
+              const safeData = encodeURIComponent(JSON.stringify({id: job.id, ...job}));
               tableHtml += `<tr>
-                        <td><b>${data.title}</b>${lockTxt}<br><small style="color:gray;">${displayFolder}</small></td>
-                        <td style="text-align:center;">${data.type}</td>
+                        <td><b>${job.title}</b>${lockTxt}<br><small style="color:gray;">${displayFolder}</small></td>
+                        <td style="text-align:center;">${job.type}</td>
                         <td style="text-align:center; color:#34c759; font-weight:bold;">${userCount} บัญชี</td>
                         <td>
                           <div class="action-btns">
                             <button class="btn-yellow" onclick="editJob('${safeData}')">แก้ไข</button>
-                            <button class="btn-red" onclick="deleteJob('${docSnap.id}')">ลบ</button>
+                            <button class="btn-red" onclick="deleteJob('${job.id}')">ลบ</button>
                           </div>
                         </td>
                        </tr>`;
@@ -770,7 +796,6 @@ font-size: 12px; border-radius: 8px;}
                 }
             }
         });
-        
         const btnDeleteEmpty = document.getElementById("btnDeleteEmptyFolder");
         if (currentAdminPath !== "" && filesInCurrentPath.length === 0 && foldersInCurrentPath.size === 0 && currentEmptyFolderMarkerId) {
             btnDeleteEmpty.style.display = "inline-block";
@@ -779,13 +804,12 @@ font-size: 12px; border-radius: 8px;}
         }
 
         let html = `<div class="item-grid">`;
-        
         Array.from(foldersInCurrentPath).sort().forEach(folderName => {
             const safeFolderName = encodeURIComponent(folderName);
             let targetPath = currentAdminPath ? currentAdminPath + "/" + folderName : folderName;
             const safeTarget = encodeURIComponent(targetPath);
             let meta = folderMeta[targetPath] || { color: 'blue', emoji: '', password: '', updatedAt: null };
-            let lockHtml = meta.password ? `<div class="grid-lock">🔒</div>` : "";
+            let lockHtml = meta.password ? `<div class="grid-lock">${icons.lock} ติดรหัสผ่าน</div>` : "";
             let timeStr = formatTime(meta.updatedAt);
             
             html += `
@@ -825,7 +849,7 @@ font-size: 12px; border-radius: 8px;}
             else if (file.type === "image") iconSvg = icons.image;
             else if (file.type === "link") iconSvg = icons.link;
 
-            let lockHtml = file.password ? `<div class="grid-lock">🔒</div>` : "";
+            let lockHtml = file.password ? `<div class="grid-lock">${icons.lock} ติดรหัสผ่าน</div>` : "";
             let fileTimeStr = file.updatedAt ? formatTime(file.updatedAt) : (file.createdAt ? formatTime(file.createdAt) : "");
 
             html += `
@@ -847,7 +871,6 @@ font-size: 12px; border-radius: 8px;}
         });
         
         html += `</div>`;
-        
         if (foldersInCurrentPath.size === 0 && filesInCurrentPath.length === 0) {
             html = "<p style='text-align:center; color:#86868b; margin-top:30px; margin-bottom: 20px;'>โฟลเดอร์ว่างเปล่า</p>";
         }
@@ -983,16 +1006,7 @@ font-size: 12px; border-radius: 8px;}
     window.openAdminFolder = function(encodedFolderName) {
       const folderName = decodeURIComponent(encodedFolderName);
       let targetPath = currentAdminPath === "" ? folderName : currentAdminPath + "/" + folderName;
-      let meta = folderMeta[targetPath];
-      
-      if (meta && meta.password) {
-          let pwd = prompt("โฟลเดอร์นี้ถูกล็อก \nกรุณาใส่รหัสผ่าน:");
-          if (pwd !== meta.password) {
-              alert("รหัสผ่านไม่ถูกต้อง");
-              return;
-          }
-      }
-      
+      // แอดมินสามารถเปิดดูไฟล์/โฟลเดอร์ที่ล็อกได้เลย ไม่ต้องกรอกรหัสผ่าน
       currentAdminPath = targetPath;
       renderAdminExplorer();
     }
@@ -1108,7 +1122,6 @@ font-size: 12px; border-radius: 8px;}
       } catch (e) { alert("การลบข้อมูลล้มเหลว"); }
     }
 
-    // ฟังก์ชันอัปเดตกระดิ่งแจ้งเตือนคำขอ
     window.updateRequestBadge = function(count) {
         const badge = document.getElementById("requestBadge");
         const countEl = document.getElementById("requestBadgeCount");
@@ -1169,16 +1182,15 @@ font-size: 12px; border-radius: 8px;}
                       <div class="action-btns">
                         ${data.status !== 'approved' 
                            ? `<button class="btn-green" onclick="updateRequestStatus('${id}', 'approved')">อนุมัติ</button>` 
-                           : `<button class="btn-yellow" onclick="editExpirationTime('${id}')">กำหนดเวลา</button>`}
+                           : `<button class="btn-yellow" onclick="editExpirationTime('${id}')">แก้เวลา</button>`}
                         ${data.status !== 'rejected' 
                           ? `<button class="btn-blue" onclick="updateRequestStatus('${id}', 'rejected')">ปฏิเสธ</button>` 
                           : ''}
                         <button class="btn-red" onclick="deleteRequest('${id}')">ลบ</button>
                       </div>
                     </td>
-                 </tr>`;
+                  </tr>`;
         });
-        
         html += "</table>";
         tableDiv.innerHTML = html;
         window.updateRequestBadge(pendingCount);
@@ -1190,25 +1202,18 @@ font-size: 12px; border-radius: 8px;}
       try {
         await deleteDoc(doc(db, "download_requests", reqId));
         loadRequests();
-      } catch (e) {
-        alert("การลบข้อมูลล้มเหลว");
-      }
+      } catch (e) { alert("การลบข้อมูลล้มเหลว"); }
     }
 
     window.updateRequestStatus = async function(reqId, newStatus) {
       try {
         let updateData = { status: newStatus, updatedAt: serverTimestamp() };
         if (newStatus === 'approved') {
-          const hours = prompt("กำหนดเวลาการเข้าถึง (ระบุเป็นชั่วโมง)\\n(ตัวอย่าง: 24 = 1 วัน, 72 = 3 วัน, หรือ 0 = เข้าถึงได้ถาวร)", "72");
-          if (hours === null) return; 
-          const duration = parseInt(hours);
-          if (isNaN(duration) || duration < 0) { alert("กรุณาระบุตัวเลขที่ถูกต้อง"); return; }
+          const timeSelection = await requestTimeSelection();
+          if (!timeSelection) return; 
           
-          if (duration > 0) {
-            const expireDate = new Date();
-            expireDate.setHours(expireDate.getHours() + duration);
-            updateData.expiresAt = expireDate;
-          } else { updateData.expiresAt = null; }
+          if (!timeSelection.unlimited) updateData.expiresAt = timeSelection.date;
+          else updateData.expiresAt = null;
         }
         await updateDoc(doc(db, "download_requests", reqId), updateData);
         loadRequests();
@@ -1216,18 +1221,14 @@ font-size: 12px; border-radius: 8px;}
     }
 
     window.editExpirationTime = async function(reqId) {
-      const hours = prompt("กำหนดเวลาการเข้าถึงใหม่ (ระบุเป็นชั่วโมงนับจากปัจจุบัน)\\n(ตัวอย่าง: 24 = 1 วัน, 72 = 3 วัน, หรือ 0 = เข้าถึงได้ถาวร)", "72");
-      if (hours === null) return; 
-      const duration = parseInt(hours);
-      if (isNaN(duration) || duration < 0) { alert("กรุณาระบุตัวเลขที่ถูกต้อง"); return; }
+      const timeSelection = await requestTimeSelection();
+      if (!timeSelection) return; 
       
       try {
         let updateData = { updatedAt: serverTimestamp() };
-        if (duration > 0) {
-          const expireDate = new Date();
-          expireDate.setHours(expireDate.getHours() + duration);
-          updateData.expiresAt = expireDate;
-        } else { updateData.expiresAt = null; }
+        if (!timeSelection.unlimited) updateData.expiresAt = timeSelection.date;
+        else updateData.expiresAt = null;
+        
         await updateDoc(doc(db, "download_requests", reqId), updateData);
         alert("ปรับปรุงข้อมูลเวลาสำเร็จ");
         loadRequests();
@@ -1236,29 +1237,58 @@ font-size: 12px; border-radius: 8px;}
 
     window.grantDirectDownload = async function() {
       const select = document.getElementById("directJobSelect");
-      const jobId = select.value;
-      const jobTitle = select.options[select.selectedIndex]?.text;
-      const studentId = document.getElementById("directStudentId").value.trim();
+      const selectedVal = select.value;
+      const studentIdsText = document.getElementById("directStudentId").value.trim();
       
-      if (!jobId || !studentId) { alert("กรุณาระบุข้อมูลรายการและรหัสผู้รับสิทธิ์ให้ครบถ้วน"); return; }
-      const hours = prompt("กำหนดเวลาการเข้าถึง (ระบุเป็นชั่วโมง)\\n(ตัวอย่าง: 24 = 1 วัน, 72 = 3 วัน, หรือ 0 = เข้าถึงได้ถาวร)", "72");
-      if (hours === null) return;
-      const duration = parseInt(hours);
-      if (isNaN(duration) || duration < 0) { alert("กรุณาระบุตัวเลขที่ถูกต้อง"); return; }
+      if (!selectedVal || !studentIdsText) { alert("กรุณาระบุข้อมูลรายการและรหัสผู้รับสิทธิ์ให้ครบถ้วน"); return; }
+      
+      const timeSelection = await requestTimeSelection();
+      if(!timeSelection) return;
+      
+      // ดึงรหัสผ่านผู้ใช้งานโดยการตัดด้วยลูกน้ำ หรือการขึ้นบรรทัดใหม่
+      const students = studentIdsText.split(/[\n,]+/).map(s => s.trim()).filter(s => s);
+      let jobsToGrant = [];
+      
+      if (selectedVal.startsWith("FOLDER::")) {
+          const folderPath = selectedVal.split("FOLDER::")[1];
+          allJobsAdmin.forEach(job => {
+              if (job.type !== "system_folder") {
+                  // เช็คว่าไฟล์นี้อยู่ในโฟลเดอร์นี้ หรือซับโฟลเดอร์ของโฟลเดอร์นี้หรือไม่
+                  if (folderPath === "" || job.normalizedPath === folderPath || job.normalizedPath.startsWith(folderPath + "/")) {
+                      jobsToGrant.push(job);
+                  }
+              }
+          });
+      } else if (selectedVal.startsWith("FILE::")) {
+          const fileId = selectedVal.split("FILE::")[1];
+          const job = allJobsAdmin.find(j => j.id === fileId);
+          if(job) jobsToGrant.push(job);
+      }
+
+      if (jobsToGrant.length === 0) {
+          alert("ไม่พบไฟล์ในโฟลเดอร์ที่เลือก หรือไม่พบข้อมูล");
+          return;
+      }
 
       try {
-        let updateData = { jobId: jobId, jobTitle: jobTitle, studentId: studentId, status: "approved", updatedAt: serverTimestamp() };
-        if (duration > 0) {
-          const expireDate = new Date();
-          expireDate.setHours(expireDate.getHours() + duration);
-          updateData.expiresAt = expireDate;
-        } else { updateData.expiresAt = null; }
-        const reqId = `${jobId}_${studentId}`;
-        await setDoc(doc(db, "download_requests", reqId), updateData);
-        alert(`ดำเนินการอนุมัติสิทธิ์ให้บัญชี ${studentId} สำเร็จ`);
+        const batch = writeBatch(db);
+        jobsToGrant.forEach(job => {
+            students.forEach(studentId => {
+                const reqId = `${job.id}_${studentId}`;
+                let updateData = { jobId: job.id, jobTitle: job.title, studentId: studentId, status: "approved", updatedAt: serverTimestamp() };
+                
+                if (!timeSelection.unlimited) updateData.expiresAt = timeSelection.date;
+                else updateData.expiresAt = null;
+                
+                batch.set(doc(db, "download_requests", reqId), updateData);
+            });
+        });
+        
+        await batch.commit();
+        alert(`ดำเนินการอนุมัติสิทธิ์สำเร็จ ให้กับ ${students.length} ผู้ใช้ และจำนวน ${jobsToGrant.length} ไฟล์แล้ว!\n(สามารถลบหรือแก้เวลาทีละไฟล์/บัญชี ได้ในตารางด้านล่าง)`);
         document.getElementById("directStudentId").value = ""; 
         loadRequests();
-      } catch (e) { alert("เกิดข้อผิดพลาดในการประมวลผล"); }
+      } catch (e) { alert("เกิดข้อผิดพลาดในการประมวลผลการให้สิทธิ์"); }
     }
 
     window.loadHistory = async function() {
@@ -1278,7 +1308,6 @@ font-size: 12px; border-radius: 8px;}
             const timeB = b.downloadedAt ? b.downloadedAt.toMillis() : 0;
             return timeB - timeA;
         });
-        
         let html = `<table><tr><th width="20%">รหัสบัญชี</th><th width="40%">ข้อมูลรายการที่เข้าถึง</th><th width="40%">วัน / เวลาทำการ</th></tr>`;
         histories.forEach(data => {
           let dateStr = "-";
@@ -1287,7 +1316,8 @@ font-size: 12px; border-radius: 8px;}
         });
         html += "</table>";
         tableDiv.innerHTML = html;
-      } catch (error) { tableDiv.innerHTML = "<p style='color:red; text-align:center;'>การเรียกข้อมูลประวัติล้มเหลว</p>"; }
+      } catch (error) { tableDiv.innerHTML = "<p style='color:red; text-align:center;'>การเรียกข้อมูลประวัติล้มเหลว</p>";
+      }
     }
 
     window.processDiscordActions = async function() {
@@ -1295,16 +1325,15 @@ font-size: 12px; border-radius: 8px;}
         const action = urlParams.get('action');
         const reqId = urlParams.get('reqId');
         const durationParam = urlParams.get('duration');
-        
         if (action && reqId) {
             if (action === 'approve') {
                 let duration = 72;
-                
                 if (durationParam === 'custom') {
                     const hours = prompt("ระบุเวลาการเข้าถึง (ชั่วโมง)\n(เช่น: 24 = 1 วัน, 72 = 3 วัน, 0 = ไม่จำกัดเวลา):", "24");
                     if (hours === null) return; 
                     duration = parseInt(hours);
-                    if (isNaN(duration) || duration < 0) { alert("กรุณาระบุตัวเลขที่ถูกต้อง"); return; }
+                    if (isNaN(duration) || duration < 0) { alert("กรุณาระบุตัวเลขที่ถูกต้อง"); return;
+                    }
                 } else if (durationParam !== null) {
                     duration = parseInt(durationParam);
                 }
@@ -1336,7 +1365,8 @@ font-size: 12px; border-radius: 8px;}
                      try {
                         await deleteDoc(doc(db, "download_requests", reqId));
                         alert("🗑️ ลบคำขอออกจากระบบแล้ว!");
-                     } catch(e) { alert("เกิดข้อผิดพลาดในการลบ"); }
+                     } catch(e) { alert("เกิดข้อผิดพลาดในการลบ");
+                     }
                 }
             }
             
@@ -1349,48 +1379,36 @@ font-size: 12px; border-radius: 8px;}
   <script>
     function initAccordion() {
       const adminBoxes = document.querySelectorAll('.admin-box');
-      
-      // รายชื่อหัวข้อที่ไม่ต้องการให้พับ (ให้แสดงผลแบบเต็มตลอด)
       const excludeText = [
         "จัดการป้ายโฆษณา",
         "การอนุมัติสิทธิ์การเข้าถึงทันที",
         "การจัดการรายการ (File Explorer)"
       ];
-
       adminBoxes.forEach(box => {
         const header = box.querySelector('h2');
         if (!header) return;
         
         const titleText = header.innerText.trim();
-        const isFormBox = box.id === "formBox"; // ล็อกกล่องฟอร์มเพิ่ม/แก้ไขรายการ
+        const isFormBox = box.id === "formBox"; 
         const shouldExclude = isFormBox || excludeText.some(t => titleText.includes(t));
         
-        // ถ้าไม่อยู่ในกลุ่มที่ล็อกไว้ ให้เพิ่มระบบพับเก็บ
         if (!shouldExclude && !header.querySelector('.toggle-arrow')) {
           box.classList.add('collapsible-box');
-          
-          // สร้างไอคอนลูกศรแบบ SVG เพื่อความสวยงาม
           const arrow = document.createElement('span');
           arrow.className = 'toggle-arrow';
           arrow.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>'; 
-          header.appendChild(arrow);
           
-          // ห่อหุ้มเนื้อหาด้านในทั้งหมด (ยกเว้น h2) ด้วย Wrapper สำหรับทำ Animation สไลด์แบบ Smooth
+          header.appendChild(arrow);
           const contentWrapper = document.createElement('div');
           contentWrapper.className = 'accordion-content';
           const innerWrapper = document.createElement('div');
           innerWrapper.className = 'accordion-inner';
-          
           while (header.nextSibling) {
               innerWrapper.appendChild(header.nextSibling);
           }
           contentWrapper.appendChild(innerWrapper);
           box.appendChild(contentWrapper);
-
-          // ค่าเริ่มต้น: พับเก็บไว้
           box.classList.add('collapsed');
-
-          // คลิกที่ h2 เพื่อสลับสถานะ
           header.addEventListener('click', () => {
             box.classList.toggle('collapsed');
           });
