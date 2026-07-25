@@ -69,9 +69,6 @@
     .action-btns { display: flex; gap: 5px; justify-content: center; flex-wrap: wrap; }
     .action-btns button { width: auto; padding: 6px 12px; margin: 0; font-size: 12px; border-radius: 8px;}
 
-    /* =========================================
-       ระบบพับเก็บข้อมูล (Accordion)
-       ========================================= */
     .admin-box.collapsible-box h2 {
         cursor: pointer; user-select: none; transition: all 0.3s ease; padding: 12px 15px; margin: -12px -15px 15px -15px; border-radius: 12px; background: transparent;
     }
@@ -87,7 +84,6 @@
     .accordion-content > .accordion-inner { overflow: hidden; }
     .admin-box.collapsed .accordion-content { grid-template-rows: 0fr; opacity: 0; margin-top: -10px; }
 
-    /* Notification Bell Animation */
     @keyframes bell-ring {
       0%, 100% { transform: rotate(0); }
       10%, 30%, 50% { transform: rotate(15deg); }
@@ -193,6 +189,89 @@
       </div>
 
       <div id="bannersTable" style="margin-top: 25px;"></div>
+    </div>
+
+    <!-- 2. แจ้งเตือนความจำ (Reminders) -->
+    <div class="admin-box" style="border: 2px solid #ff9500;">
+      <h2>จัดการแจ้งเตือนความจำ (Reminders)</h2>
+      <p style="color:#86868b; font-size:13px; margin-top:-5px; margin-bottom:15px;">สร้างการแจ้งเตือนบนปฏิทินให้ผู้ใช้งานเป้าหมาย</p>
+      
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+         <input type="text" id="searchReminder" placeholder="ค้นหาแจ้งเตือน (ชื่อ, รายละเอียด)..." oninput="loadReminders()" style="width: 60%; margin: 0;">
+         <button class="btn-yellow" id="btnUndoReminder" onclick="undoReminder()" style="width: auto; margin: 0; display: none;">ย้อนกลับ (Undo)</button>
+      </div>
+
+      <input type="hidden" id="editReminderId">
+      <label>1. ชื่องาน / หัวข้อ:</label>
+      <input type="text" id="remTitle" placeholder="เช่น: ส่งเอกสารภาษี" required>
+      
+      <div style="display:flex; gap:10px;">
+          <div style="flex:1;">
+             <label>2. วันที่เริ่ม:</label>
+             <input type="date" id="remStartDate">
+          </div>
+          <div style="flex:1;">
+             <label>3. วันที่สิ้นสุด (ถ้ามี):</label>
+             <input type="date" id="remEndDate">
+          </div>
+      </div>
+      <div style="display:flex; gap:10px;">
+          <div style="flex:1;">
+             <label>4. เวลาเริ่ม (ถ้ามี):</label>
+             <input type="time" id="remStartTime">
+          </div>
+          <div style="flex:1;">
+             <label>5. เวลาสิ้นสุด (ถ้ามี):</label>
+             <input type="time" id="remEndTime">
+          </div>
+      </div>
+      
+      <label>6. ตั้งค่าการทำซ้ำ:</label>
+      <select id="remRecurring">
+         <option value="ไม่ทำประจำ">ไม่ทำประจำ</option>
+         <option value="ทุกวัน">ทุกวัน</option>
+         <option value="ทุกสัปดาห์">ทุกสัปดาห์</option>
+      </select>
+
+      <label>7. สถานที่ / URL / โน้ตเพิ่มเติม:</label>
+      <input type="text" id="remLocation" placeholder="สถานที่">
+      <input type="text" id="remUrl" placeholder="URL ลิงก์แนบ">
+      <textarea id="remDetails" placeholder="รายละเอียดงาน..." style="height: 60px;"></textarea>
+
+      <label>8. รหัสผู้ใช้เป้าหมาย (คั่นด้วยลูกน้ำ หรือ ขึ้นบรรทัดใหม่):</label>
+      <textarea id="remAllowedUsers" placeholder="เช่น: 6810210178, 6810210220" style="height: 60px;"></textarea>
+      
+      <label>9. สถานะ:</label>
+      <select id="remStatus">
+         <option value="Pending">รอการดำเนินการ (Pending)</option>
+         <option value="Complete">เสร็จสิ้นแล้ว (Complete)</option>
+      </select>
+
+      <div style="display: flex; gap: 10px;">
+        <button class="btn-blue" id="btnSaveReminder" onclick="saveReminder()">สร้างการแจ้งเตือน</button>
+        <button class="btn-gray" id="btnCancelReminder" onclick="cancelEditReminder()">ยกเลิกการแก้ไข</button>
+      </div>
+
+      <div id="remindersTable" style="margin-top: 25px;"></div>
+    </div>
+
+    <!-- 3. ตารางเรียน (Class Schedule) -->
+    <div class="admin-box" style="border: 2px solid #af52de;">
+      <h2>จัดการตารางเรียน (Class Schedules)</h2>
+      
+      <input type="hidden" id="editScheduleId">
+      <label>1. ลิงก์รูปภาพตารางเรียน (URL):</label>
+      <input type="text" id="schImageUrl" placeholder="ระบุ URL รูปภาพตารางเรียน..." required>
+      
+      <label>2. รหัสผู้ใช้เป้าหมายที่อนุญาตให้ดูตารางนี้:</label>
+      <textarea id="schAllowedUsers" placeholder="เช่น: 6810210178, 6810210220" style="height: 60px;"></textarea>
+      
+      <div style="display: flex; gap: 10px;">
+        <button class="btn-blue" id="btnSaveSchedule" onclick="saveSchedule()">เพิ่มตารางเรียน</button>
+        <button class="btn-gray" id="btnCancelSchedule" onclick="cancelEditSchedule()">ยกเลิกการแก้ไข</button>
+      </div>
+
+      <div id="schedulesTable" style="margin-top: 25px;"></div>
     </div>
 
     <div class="admin-box" style="border: 2px solid #34c759;">
@@ -386,7 +465,10 @@
     let currentAdminPath = "";
     let currentEmptyFolderMarkerId = null;
     let folderMeta = {};
-    let adminBanners = []; // เก็บ State Banner สำหรับ Drag & Drop
+    let adminBanners = []; 
+    let allReminders = [];
+    let allSchedules = [];
+    let lastReminderAction = null; 
 
     window.loginAdmin = function() {
       const email = document.getElementById("adminEmail").value;
@@ -425,6 +507,8 @@
         loadJobs();
         loadRequests();
         loadHistory();
+        loadReminders();
+        loadSchedules();
         setTimeout(() => processDiscordActions(), 1000);
       } else {
         document.getElementById("adminLoginWrapper").style.display = "flex";
@@ -435,7 +519,228 @@
     document.getElementById("adminPassword").addEventListener("keypress", function(e) {
       if (e.key === "Enter") loginAdmin();
     });
+
+    // ==========================================
+    // ส่วนจัดการระบบแจ้งเตือนความจำ (Reminders)
+    // ==========================================
+    window.loadReminders = async function() {
+      const div = document.getElementById("remindersTable");
+      const searchKeyword = document.getElementById("searchReminder").value.toLowerCase();
+      try {
+        const snap = await getDocs(collection(db, "reminders"));
+        allReminders = [];
+        snap.forEach(doc => allReminders.push({id: doc.id, ...doc.data()}));
+        
+        let filtered = allReminders.filter(r => (r.title || "").toLowerCase().includes(searchKeyword) || (r.details || "").toLowerCase().includes(searchKeyword));
+        // เรียงตาม startDate เป็นหลัก
+        filtered.sort((a,b) => new Date(a.startDate || a.date) - new Date(b.startDate || b.date));
+
+        if(filtered.length === 0) { div.innerHTML = "<p style='text-align:center; color:#86868b;'>ไม่พบการแจ้งเตือน</p>"; return; }
+        
+        let html = `<table><tr><th width="30%">ชื่องาน / วันที่</th><th width="20%">ผู้ใช้เป้าหมาย</th><th width="20%">สถานะ</th><th width="30%">จัดการ</th></tr>`;
+        filtered.forEach(data => {
+           const safeData = encodeURIComponent(JSON.stringify(data));
+           const statusTxt = data.status === 'Complete' ? `<span style="color:#34c759;">สำเร็จแล้ว</span>` : `<span style="color:#ff3b30;">รอทำ</span>`;
+           const targetLen = data.allowedUsers ? data.allowedUsers.length : 0;
+           
+           let dateStr = data.startDate || data.date;
+           if(data.endDate && data.endDate !== dateStr) dateStr += ` ถึง ${data.endDate}`;
+
+           let timeStr = '';
+           if(data.startTime) {
+               timeStr = data.endTime ? `${data.startTime} - ${data.endTime}` : data.startTime;
+           }
+
+           html += `<tr>
+             <td><b>${data.title}</b><br><small>${dateStr} ${timeStr}</small></td>
+             <td style="text-align:center;">${targetLen} บัญชี</td>
+             <td style="text-align:center;">${statusTxt}</td>
+             <td style="text-align:center;">
+                <div class="action-btns">
+                    <button class="btn-yellow" onclick="editReminder('${safeData}')">แก้ไข</button>
+                    <button class="btn-red" onclick="deleteReminder('${data.id}')">ลบ</button>
+                </div>
+             </td>
+           </tr>`;
+        });
+        html += `</table>`; div.innerHTML = html;
+      } catch(e) { div.innerHTML = "<p style='color:red;'>ดึงข้อมูลล้มเหลว</p>"; }
+    }
+
+    window.saveReminder = async function() {
+      const editId = document.getElementById("editReminderId").value;
+      const title = document.getElementById("remTitle").value.trim();
+      const startDate = document.getElementById("remStartDate").value;
+      const endDate = document.getElementById("remEndDate").value || startDate; // ถ้าไม่ใส่วันที่สิ้นสุด ให้ใช้วันเริ่ม
+      const startTime = document.getElementById("remStartTime").value;
+      const endTime = document.getElementById("remEndTime").value;
+      const recurring = document.getElementById("remRecurring").value;
+      const location = document.getElementById("remLocation").value.trim();
+      const url = document.getElementById("remUrl").value.trim();
+      const details = document.getElementById("remDetails").value.trim();
+      const status = document.getElementById("remStatus").value;
+      const rawUsers = document.getElementById("remAllowedUsers").value;
+      const userList = rawUsers.split(/[\n,]+/).map(id => id.trim()).filter(id => id !== "");
+
+      if(!title || !startDate) return alert("กรุณาระบุชื่องานและวันที่เริ่มให้ครบถ้วน");
+
+      const payload = { 
+          title, startDate, endDate, date: startDate, /*เก็บ date ไว้รองรับข้อมูลเก่าเผื่อไว้*/
+          startTime, endTime, recurring, location, url, details, status, 
+          allowedUsers: userList, updatedAt: serverTimestamp() 
+      };
+      
+      try {
+        if(editId) {
+            const oldSnap = await getDoc(doc(db, "reminders", editId));
+            if(oldSnap.exists()) {
+                lastReminderAction = { type: 'modify', collection: 'reminders', id: editId, oldData: oldSnap.data() };
+                document.getElementById('btnUndoReminder').style.display = 'inline-block';
+            }
+            await updateDoc(doc(db, "reminders", editId), payload);
+        } else {
+            payload.createdAt = serverTimestamp();
+            await addDoc(collection(db, "reminders"), payload);
+        }
+        cancelEditReminder(); loadReminders();
+      } catch(e) { alert("บันทึกล้มเหลว"); }
+    }
+
+    window.editReminder = function(encodedData) {
+      const data = JSON.parse(decodeURIComponent(encodedData));
+      document.getElementById("editReminderId").value = data.id;
+      document.getElementById("remTitle").value = data.title;
+      document.getElementById("remStartDate").value = data.startDate || data.date;
+      document.getElementById("remEndDate").value = data.endDate || data.date || "";
+      document.getElementById("remStartTime").value = data.startTime || "";
+      document.getElementById("remEndTime").value = data.endTime || "";
+      document.getElementById("remRecurring").value = data.recurring || "ไม่ทำประจำ";
+      document.getElementById("remLocation").value = data.location || "";
+      document.getElementById("remUrl").value = data.url || "";
+      document.getElementById("remDetails").value = data.details || "";
+      document.getElementById("remStatus").value = data.status || "Pending";
+      document.getElementById("remAllowedUsers").value = (data.allowedUsers || []).join(",\n");
+      
+      document.getElementById("btnSaveReminder").innerText = "บันทึกการแก้ไข";
+      document.getElementById("btnCancelReminder").style.display = "block";
+    }
+
+    window.cancelEditReminder = function() {
+      document.getElementById("editReminderId").value = "";
+      document.getElementById("remTitle").value = "";
+      document.getElementById("remStartDate").value = "";
+      document.getElementById("remEndDate").value = "";
+      document.getElementById("remStartTime").value = "";
+      document.getElementById("remEndTime").value = "";
+      document.getElementById("remLocation").value = "";
+      document.getElementById("remUrl").value = "";
+      document.getElementById("remDetails").value = "";
+      document.getElementById("remAllowedUsers").value = "";
+      document.getElementById("remStatus").value = "Pending";
+      document.getElementById("btnSaveReminder").innerText = "สร้างการแจ้งเตือน";
+      document.getElementById("btnCancelReminder").style.display = "none";
+    }
+
+    window.deleteReminder = async function(id) {
+      if(!confirm("ยืนยันการลบการแจ้งเตือน?")) return;
+      try {
+        const oldSnap = await getDoc(doc(db, "reminders", id));
+        if(oldSnap.exists()) {
+            lastReminderAction = { type: 'delete', collection: 'reminders', id: id, oldData: oldSnap.data() };
+            document.getElementById('btnUndoReminder').style.display = 'inline-block';
+        }
+        await deleteDoc(doc(db, "reminders", id));
+        loadReminders();
+      } catch(e) { alert("ลบการแจ้งเตือนล้มเหลว"); }
+    }
+
+    window.undoReminder = async function() {
+       if(!lastReminderAction) return;
+       try {
+           if(lastReminderAction.type === 'delete') {
+               await setDoc(doc(db, "reminders", lastReminderAction.id), lastReminderAction.oldData);
+           } else if(lastReminderAction.type === 'modify') {
+               await setDoc(doc(db, "reminders", lastReminderAction.id), lastReminderAction.oldData);
+           }
+           lastReminderAction = null;
+           document.getElementById('btnUndoReminder').style.display = 'none';
+           loadReminders();
+           alert("เรียกคืนการกระทำสำเร็จแล้ว");
+       } catch(e) { alert("ย้อนกลับล้มเหลว"); }
+    }
+
+    // ==========================================
+    // ส่วนจัดการระบบตารางเรียน (Class Schedule)
+    // ==========================================
+    window.loadSchedules = async function() {
+      const div = document.getElementById("schedulesTable");
+      try {
+        const snap = await getDocs(collection(db, "schedules"));
+        allSchedules = [];
+        snap.forEach(doc => allSchedules.push({id: doc.id, ...doc.data()}));
+
+        if(allSchedules.length === 0) { div.innerHTML = "<p style='text-align:center; color:#86868b;'>ไม่มีข้อมูลตารางเรียน</p>"; return; }
+        
+        let html = `<table><tr><th width="40%">รูปภาพตารางเรียน</th><th width="40%">กลุ่มผู้ใช้เป้าหมาย</th><th width="20%">จัดการ</th></tr>`;
+        allSchedules.forEach(data => {
+           const safeData = encodeURIComponent(JSON.stringify(data));
+           const users = data.allowedUsers ? data.allowedUsers.join(", ") : "-";
+           html += `<tr>
+             <td style="text-align:center;"><img src="${data.imageUrl}" style="max-width:150px; border-radius:8px; border:1px solid #d2d2d7;"></td>
+             <td style="word-break: break-all;">${users}</td>
+             <td style="text-align:center;">
+                <div class="action-btns">
+                    <button class="btn-yellow" onclick="editSchedule('${safeData}')">แก้ไข</button>
+                    <button class="btn-red" onclick="deleteSchedule('${data.id}')">ลบ</button>
+                </div>
+             </td>
+           </tr>`;
+        });
+        html += `</table>`; div.innerHTML = html;
+      } catch(e) { div.innerHTML = "<p style='color:red;'>ดึงข้อมูลล้มเหลว</p>"; }
+    }
+
+    window.saveSchedule = async function() {
+      const editId = document.getElementById("editScheduleId").value;
+      const imageUrl = document.getElementById("schImageUrl").value.trim();
+      const rawUsers = document.getElementById("schAllowedUsers").value;
+      const userList = rawUsers.split(/[\n,]+/).map(id => id.trim()).filter(id => id !== "");
+
+      if(!imageUrl) return alert("กรุณาระบุ URL รูปภาพตารางเรียน");
+
+      const payload = { imageUrl, allowedUsers: userList, updatedAt: serverTimestamp() };
+      try {
+        if(editId) { await updateDoc(doc(db, "schedules", editId), payload); } 
+        else { payload.createdAt = serverTimestamp(); await addDoc(collection(db, "schedules"), payload); }
+        cancelEditSchedule(); loadSchedules();
+      } catch(e) { alert("บันทึกล้มเหลว"); }
+    }
+
+    window.editSchedule = function(encodedData) {
+      const data = JSON.parse(decodeURIComponent(encodedData));
+      document.getElementById("editScheduleId").value = data.id;
+      document.getElementById("schImageUrl").value = data.imageUrl;
+      document.getElementById("schAllowedUsers").value = (data.allowedUsers || []).join(",\n");
+      document.getElementById("btnSaveSchedule").innerText = "บันทึกการแก้ไข";
+      document.getElementById("btnCancelSchedule").style.display = "block";
+    }
+
+    window.cancelEditSchedule = function() {
+      document.getElementById("editScheduleId").value = "";
+      document.getElementById("schImageUrl").value = "";
+      document.getElementById("schAllowedUsers").value = "";
+      document.getElementById("btnSaveSchedule").innerText = "เพิ่มตารางเรียน";
+      document.getElementById("btnCancelSchedule").style.display = "none";
+    }
+
+    window.deleteSchedule = async function(id) {
+      if(!confirm("ยืนยันการลบตารางเรียน?")) return;
+      try { await deleteDoc(doc(db, "schedules", id)); loadSchedules(); } catch(e) { alert("ลบตารางเรียนล้มเหลว"); }
+    }
     
+    // ==========================================
+    // ส่วนดั้งเดิม (ป้ายโฆษณา, ไฟล์เอกสาร, โฟลเดอร์, คำขอ ฯลฯ)
+    // ==========================================
     window.loadBanners = async function() {
       const div = document.getElementById("bannersTable");
       div.innerHTML = "<p style='text-align:center;'>กำลังโหลดข้อมูลโฆษณา...</p>";
@@ -468,7 +773,6 @@
       }
     }
 
-    // Drag and Drop Banners Logic
     window.bannerDragStart = function(e) {
         e.dataTransfer.setData("text/plain", e.currentTarget.getAttribute("data-banner-id"));
         e.currentTarget.style.opacity = "0.5";
@@ -487,7 +791,6 @@
         let [movedItem] = adminBanners.splice(sourceIdx, 1);
         adminBanners.splice(targetIdx, 0, movedItem);
         
-        // Batch update sort order
         const batch = writeBatch(db);
         adminBanners.forEach((b, index) => {
             batch.update(doc(db, "banners", b.id), { sortOrder: index });
@@ -495,7 +798,7 @@
         
         try {
             await batch.commit();
-            loadBanners(); // Reload UI
+            loadBanners(); 
         } catch(err) { alert("เกิดข้อผิดพลาดในการจัดเรียงป้ายโฆษณา"); }
     }
 
@@ -509,7 +812,6 @@
         if(editId) {
             await updateDoc(doc(db, "banners", editId), { imageUrl: imageUrl, link: linkUrl, updatedAt: serverTimestamp() });
         } else {
-            // New banner gets placed at the end
             let nextOrder = adminBanners.length;
             await addDoc(collection(db, "banners"), { imageUrl: imageUrl, link: linkUrl, sortOrder: nextOrder, createdAt: serverTimestamp() });
         }
@@ -542,8 +844,7 @@
       try {
         await deleteDoc(doc(db, "banners", id));
         loadBanners();
-      } catch(e) { alert("ลบป้ายโฆษณาล้มเหลว");
-      }
+      } catch(e) { alert("ลบป้ายโฆษณาล้มเหลว"); }
     }
 
     function cleanUrl(type, url) {
@@ -588,7 +889,6 @@
           allJobsAdmin.push({ id: docSnap.id, normalizedPath: path, ...data });
         });
 
-        // จัดเตรียมตัวเลือก (Dropdown) เพื่อให้เลือกได้ทั้งไฟล์ และ โฟลเดอร์
         Object.keys(folderMeta).forEach(path => {
             jobOptionsHtml += `<option value="FOLDER::${path}">📁 ให้สิทธิ์ทั้งโฟลเดอร์: ${path || 'หน้าหลัก'}</option>`;
         });
@@ -598,7 +898,6 @@
             }
         });
 
-        // สร้างตาราง
         allJobsAdmin.forEach((job) => {
           const displayFolder = job.folder ? `📁 ${job.folder}` : "หน้าหลัก (ไม่ระบุโฟลเดอร์)";
           let lockTxt = job.password ? ` ${icons.lock}` : "";
@@ -1006,7 +1305,6 @@
     window.openAdminFolder = function(encodedFolderName) {
       const folderName = decodeURIComponent(encodedFolderName);
       let targetPath = currentAdminPath === "" ? folderName : currentAdminPath + "/" + folderName;
-      // แอดมินสามารถเปิดดูไฟล์/โฟลเดอร์ที่ล็อกได้เลย ไม่ต้องกรอกรหัสผ่าน
       currentAdminPath = targetPath;
       renderAdminExplorer();
     }
@@ -1245,7 +1543,6 @@
       const timeSelection = await requestTimeSelection();
       if(!timeSelection) return;
       
-      // ดึงรหัสผ่านผู้ใช้งานโดยการตัดด้วยลูกน้ำ หรือการขึ้นบรรทัดใหม่
       const students = studentIdsText.split(/[\n,]+/).map(s => s.trim()).filter(s => s);
       let jobsToGrant = [];
       
@@ -1253,7 +1550,6 @@
           const folderPath = selectedVal.split("FOLDER::")[1];
           allJobsAdmin.forEach(job => {
               if (job.type !== "system_folder") {
-                  // เช็คว่าไฟล์นี้อยู่ในโฟลเดอร์นี้ หรือซับโฟลเดอร์ของโฟลเดอร์นี้หรือไม่
                   if (folderPath === "" || job.normalizedPath === folderPath || job.normalizedPath.startsWith(folderPath + "/")) {
                       jobsToGrant.push(job);
                   }
