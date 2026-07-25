@@ -260,10 +260,14 @@
       <h2>จัดการตารางเรียน (Class Schedules)</h2>
       
       <input type="hidden" id="editScheduleId">
-      <label>1. ลิงก์รูปภาพตารางเรียน (URL):</label>
+      
+      <label>1. ชื่อตารางเรียน:</label>
+      <input type="text" id="schTitle" placeholder="เช่น: ตารางเรียน ภาคการศึกษา 1/2569" required>
+
+      <label>2. ลิงก์รูปภาพตารางเรียน (URL):</label>
       <input type="text" id="schImageUrl" placeholder="ระบุ URL รูปภาพตารางเรียน..." required>
       
-      <label>2. รหัสผู้ใช้เป้าหมายที่อนุญาตให้ดูตารางนี้:</label>
+      <label>3. รหัสผู้ใช้เป้าหมายที่อนุญาตให้ดูตารางนี้:</label>
       <textarea id="schAllowedUsers" placeholder="เช่น: 6810210178, 6810210220" style="height: 60px;"></textarea>
       
       <div style="display: flex; gap: 10px;">
@@ -681,11 +685,13 @@
 
         if(allSchedules.length === 0) { div.innerHTML = "<p style='text-align:center; color:#86868b;'>ไม่มีข้อมูลตารางเรียน</p>"; return; }
         
-        let html = `<table><tr><th width="40%">รูปภาพตารางเรียน</th><th width="40%">กลุ่มผู้ใช้เป้าหมาย</th><th width="20%">จัดการ</th></tr>`;
+        let html = `<table><tr><th width="20%">ชื่อตารางเรียน</th><th width="30%">รูปภาพ</th><th width="30%">กลุ่มผู้ใช้เป้าหมาย</th><th width="20%">จัดการ</th></tr>`;
         allSchedules.forEach(data => {
            const safeData = encodeURIComponent(JSON.stringify(data));
            const users = data.allowedUsers ? data.allowedUsers.join(", ") : "-";
+           const title = data.title || data.name || "-";
            html += `<tr>
+             <td><b>${title}</b></td>
              <td style="text-align:center;"><img src="${data.imageUrl}" style="max-width:150px; border-radius:8px; border:1px solid #d2d2d7;"></td>
              <td style="word-break: break-all;">${users}</td>
              <td style="text-align:center;">
@@ -702,13 +708,14 @@
 
     window.saveSchedule = async function() {
       const editId = document.getElementById("editScheduleId").value;
+      const title = document.getElementById("schTitle").value.trim();
       const imageUrl = document.getElementById("schImageUrl").value.trim();
       const rawUsers = document.getElementById("schAllowedUsers").value;
       const userList = rawUsers.split(/[\n,]+/).map(id => id.trim()).filter(id => id !== "");
 
-      if(!imageUrl) return alert("กรุณาระบุ URL รูปภาพตารางเรียน");
+      if(!title || !imageUrl) return alert("กรุณาระบุชื่อและ URL รูปภาพตารางเรียน");
 
-      const payload = { imageUrl, allowedUsers: userList, updatedAt: serverTimestamp() };
+      const payload = { title, imageUrl, allowedUsers: userList, updatedAt: serverTimestamp() };
       try {
         if(editId) { await updateDoc(doc(db, "schedules", editId), payload); } 
         else { payload.createdAt = serverTimestamp(); await addDoc(collection(db, "schedules"), payload); }
@@ -719,6 +726,7 @@
     window.editSchedule = function(encodedData) {
       const data = JSON.parse(decodeURIComponent(encodedData));
       document.getElementById("editScheduleId").value = data.id;
+      document.getElementById("schTitle").value = data.title || data.name || "";
       document.getElementById("schImageUrl").value = data.imageUrl;
       document.getElementById("schAllowedUsers").value = (data.allowedUsers || []).join(",\n");
       document.getElementById("btnSaveSchedule").innerText = "บันทึกการแก้ไข";
@@ -727,6 +735,7 @@
 
     window.cancelEditSchedule = function() {
       document.getElementById("editScheduleId").value = "";
+      document.getElementById("schTitle").value = "";
       document.getElementById("schImageUrl").value = "";
       document.getElementById("schAllowedUsers").value = "";
       document.getElementById("btnSaveSchedule").innerText = "เพิ่มตารางเรียน";
