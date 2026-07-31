@@ -90,6 +90,80 @@
       20%, 40% { transform: rotate(-15deg); }
     }
     .bell-icon.ringing { display: inline-block; animation: bell-ring 1.5s ease-in-out infinite; transform-origin: top center; }
+
+    /* Switch Toggle Style */
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 50px;
+      height: 28px;
+    }
+    .switch input { 
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      transition: .4s;
+      border-radius: 34px;
+    }
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 20px;
+      width: 20px;
+      left: 4px;
+      bottom: 4px;
+      background-color: white;
+      transition: .4s;
+      border-radius: 50%;
+    }
+    input:checked + .slider {
+      background-color: var(--apple-blue);
+    }
+    input:checked + .slider:before {
+      transform: translateX(22px);
+    }
+
+    /* Loader Style (Zzz) */
+    .loader-wrapper {
+        position: relative;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 65px; 
+        width: 100%;
+        margin-bottom: 10px;
+    }
+    .z {
+        position: absolute;
+        font-size: 24px; 
+        font-weight: bold;
+        color: var(--apple-blue);
+        opacity: 0;
+    }
+    .z-1 { animation: swayUpToRight 2s ease-out infinite; }
+    .z-2 { animation: swayUpToRight 2s ease-out 0.5s infinite; }
+    .z-3 { animation: swayUpToRight 2s ease-out 1s infinite; }
+    .z-4 { animation: swayUpToRight 2s ease-out 1.5s infinite; }
+
+    @keyframes swayUpToRight {
+        0% {
+            transform: translate(0, 0) rotate(0deg);
+            opacity: 1;
+        }
+        100% {
+            transform: translate(30px, -40px) rotate(30deg);
+            opacity: 0;
+        }
+    }
   </style>
 </head>
 <body oncontextmenu="return false;">
@@ -123,6 +197,18 @@
         <input type="hidden" id="editFolderPath">
         <input type="text" id="editFolderName" placeholder="ชื่อโฟลเดอร์" style="font-size:18px; font-weight:600; text-align:center; padding:10px 5px; margin-bottom:20px; width:100%; border:none; border-bottom:2px solid #e5e5ea; border-radius:0; background:transparent;">
         
+        <!-- Toggle Switch สำหรับโหมดพัก -->
+        <div style="display: flex; justify-content: space-between; align-items: center; background:#f5f5f7; padding:12px 15px; border-radius:14px; margin-bottom: 15px;">
+            <label style="font-size:14px; color:#1d1d1f; margin:0; font-weight:600; text-align:left;">
+                โหมดกำลังพัก<br>
+                <span style="font-size: 11px; font-weight: normal; color: var(--apple-text-muted);">ซ่อนการแสดงผลชั่วคราว</span>
+            </label>
+            <label class="switch">
+              <input type="checkbox" id="editFolderIsPaused">
+              <span class="slider"></span>
+            </label>
+        </div>
+
         <div style="text-align:left; margin-bottom:15px; background:#f5f5f7; padding:12px 15px; border-radius:14px;">
             <label style="font-size:14px; color:#1d1d1f; margin:0 0 8px 0; font-weight:600; display:block;">รหัสผ่านโฟลเดอร์</label>
             <input type="text" id="editFolderPassword" placeholder="เว้นว่างหากไม่ล็อก..." style="width:100%; border:1px solid #d2d2d7; border-radius:10px; padding:10px; box-sizing:border-box; font-size:14px; font-family:inherit; margin:0;">
@@ -293,8 +379,20 @@
       <input type="hidden" id="editJobId"> 
       <label>1. ชื่อรายการ / เอกสาร:</label>
       <input type="text" id="jobTitle" placeholder="ตัวอย่าง: เอกสารประกอบการเรียน" required>
-      <label>2. โฟลเดอร์ (จัดหมวดหมู่):</label>
-      <input type="text" id="jobFolder" placeholder="ระบุชื่อโฟลเดอร์ (ใช้ / เพื่อซ้อนโฟลเดอร์ เช่น คณิตศาสตร์/ม.1)">
+      
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px;">
+        <label style="margin-top: 0;">2. โฟลเดอร์ (จัดหมวดหมู่):</label>
+        <!-- เพิ่ม Switch ในส่วนของฟอร์มไฟล์ด้วย -->
+        <div style="display: flex; align-items: center; gap: 8px;">
+            <label style="margin-top: 0; font-size: 13px; color: var(--apple-text-muted);">กำลังพัก</label>
+            <label class="switch">
+              <input type="checkbox" id="jobIsPaused">
+              <span class="slider"></span>
+            </label>
+        </div>
+      </div>
+      <input type="text" id="jobFolder" placeholder="ระบุชื่อโฟลเดอร์ (ใช้ / เพื่อซ้อนโฟลเดอร์ เช่น คณิตศาสตร์/ม.1)" style="margin-top: 8px;">
+      
       <label>3. ประเภทของไฟล์:</label>
       <select id="fileType">
         <option value="youtube">วิดีโอ (ลิงก์ YouTube)</option>
@@ -891,6 +989,7 @@
                   color: data.color || 'blue', 
                   emoji: data.emoji || '', 
                   password: data.password || '',
+                  isPaused: data.isPaused || false, // เก็บสถานะโหมดพัก
                   updatedAt: data.updatedAt || data.createdAt || null
               };
           }
@@ -910,10 +1009,11 @@
         allJobsAdmin.forEach((job) => {
           const displayFolder = job.folder ? `📁 ${job.folder}` : "หน้าหลัก (ไม่ระบุโฟลเดอร์)";
           let lockTxt = job.password ? ` ${icons.lock}` : "";
+          let pauseTxt = job.isPaused ? ` <span style="color:var(--apple-text-muted); font-size:12px;">(กำลังพัก)</span>` : "";
           
           if (job.type === "system_folder") {
               tableHtml += `<tr>
-                        <td><b>${displayFolder}</b>${lockTxt}<br><small style="color:gray;">(แฟ้มข้อมูล / กำหนดสี)</small></td>
+                        <td><b>${displayFolder}</b>${lockTxt}${pauseTxt}<br><small style="color:gray;">(แฟ้มข้อมูล / กำหนดสี)</small></td>
                         <td style="text-align:center;">โฟลเดอร์</td>
                         <td style="text-align:center; color:gray;">-</td>
                         <td>
@@ -926,7 +1026,7 @@
               const userCount = job.allowedUsers ? job.allowedUsers.length : 0;
               const safeData = encodeURIComponent(JSON.stringify({id: job.id, ...job}));
               tableHtml += `<tr>
-                        <td><b>${job.title}</b>${lockTxt}<br><small style="color:gray;">${displayFolder}</small></td>
+                        <td><b>${job.title}</b>${lockTxt}${pauseTxt}<br><small style="color:gray;">${displayFolder}</small></td>
                         <td style="text-align:center;">${job.type}</td>
                         <td style="text-align:center; color:#34c759; font-weight:bold;">${userCount} บัญชี</td>
                         <td>
@@ -987,12 +1087,13 @@
 
     window.openFolderSettings = function(path) {
        let folderName = path.split('/').pop();
-       let meta = folderMeta[path] || { color: 'blue', emoji: '', password: '' };
+       let meta = folderMeta[path] || { color: 'blue', emoji: '', password: '', isPaused: false };
        
        document.getElementById("editFolderPath").value = path;
        document.getElementById("editFolderName").value = folderName;
        document.getElementById("editFolderEmoji").value = meta.emoji;
        document.getElementById("editFolderPassword").value = meta.password || "";
+       document.getElementById("editFolderIsPaused").checked = meta.isPaused || false;
        
        selectFolderColor(meta.color);
        document.getElementById("folderSettingsModal").style.display = "flex";
@@ -1026,6 +1127,7 @@
         let newColor = window.selectedFolderColor || 'blue';
         let newEmoji = document.getElementById("editFolderEmoji").value.trim();
         let newPassword = document.getElementById("editFolderPassword").value.trim();
+        let isPaused = document.getElementById("editFolderIsPaused").checked;
         
         if (!newName) { alert("กรุณาระบุชื่อโฟลเดอร์"); return; }
         if (newName.includes("/")) { alert("ไม่อนุญาตให้ใช้เครื่องหมาย / ในชื่อโฟลเดอร์"); return; }
@@ -1055,6 +1157,7 @@
                 color: newColor,
                 emoji: newEmoji,
                 password: newPassword,
+                isPaused: isPaused,
                 updatedAt: serverTimestamp()
             });
         } else {
@@ -1066,6 +1169,7 @@
                 color: newColor,
                 emoji: newEmoji,
                 password: newPassword,
+                isPaused: isPaused,
                 allowedUsers: [],
                 searchableUsers: [],
                 createdAt: serverTimestamp(),
@@ -1116,9 +1220,18 @@
             const safeFolderName = encodeURIComponent(folderName);
             let targetPath = currentAdminPath ? currentAdminPath + "/" + folderName : folderName;
             const safeTarget = encodeURIComponent(targetPath);
-            let meta = folderMeta[targetPath] || { color: 'blue', emoji: '', password: '', updatedAt: null };
+            let meta = folderMeta[targetPath] || { color: 'blue', emoji: '', password: '', isPaused: false, updatedAt: null };
             let lockHtml = meta.password ? `<div class="grid-lock">${icons.lock} ติดรหัสผ่าน</div>` : "";
             let timeStr = formatTime(meta.updatedAt);
+
+            // หากเปิดโหมดกำลังพัก ให้แสดง Loader แทนที่ไอคอนในหน้าระบบแอดมิน เพื่อให้แอดมินทราบ
+            let iconDisplay = meta.isPaused ? `
+                <div class="loader-wrapper">
+                    <div class="z z-1">Z</div>
+                    <div class="z z-2">Z</div>
+                    <div class="z z-3">Z</div>
+                    <div class="z z-4">Z</div>
+                </div>` : getFolderIcon(meta.color, meta.emoji);
             
             html += `
               <div class="grid-item folder-target" 
@@ -1134,7 +1247,7 @@
                      onmouseleave="cancelFolderPress()"
                      oncontextmenu="handleFolderContextMenu(event, '${safeTarget}')"
                      onclick="handleFolderClick(event, '${safeFolderName}')">
-                     ${getFolderIcon(meta.color, meta.emoji)}
+                     ${iconDisplay}
                 </div>
                 <div class="grid-name" 
                      ontouchstart="startFolderPress(event, '${safeTarget}')"
@@ -1160,13 +1273,22 @@
             let lockHtml = file.password ? `<div class="grid-lock">${icons.lock} ติดรหัสผ่าน</div>` : "";
             let fileTimeStr = file.updatedAt ? formatTime(file.updatedAt) : (file.createdAt ? formatTime(file.createdAt) : "");
 
+            // หากไฟล์เปิดโหมดกำลังพัก ให้แสดง Loader แทนที่ไอคอนในหน้าระบบแอดมิน เพื่อให้แอดมินทราบ
+            let iconDisplay = file.isPaused ? `
+                <div class="loader-wrapper">
+                    <div class="z z-1">Z</div>
+                    <div class="z z-2">Z</div>
+                    <div class="z z-3">Z</div>
+                    <div class="z z-4">Z</div>
+                </div>` : iconSvg;
+
             html += `
               <div class="grid-item structural-file" 
                    draggable="true" 
                    data-file-id="${file.id}"
                    ondragstart="handleFileDragStart(event)" 
                    ondragend="handleFileDragEnd(event)">
-                <div class="grid-icon" onclick="editJob('${safeData}')">${iconSvg}</div>
+                <div class="grid-icon" onclick="editJob('${safeData}')">${iconDisplay}</div>
                 <div class="grid-name" onclick="editJob('${safeData}')">${file.title}</div>
                 <div class="grid-time">${fileTimeStr}</div>
                 ${lockHtml}
@@ -1219,6 +1341,7 @@
                 color: "blue",
                 emoji: "",
                 password: "",
+                isPaused: false,
                 url: "-",
                 allowedUsers: [], 
                 searchableUsers: [],
@@ -1341,6 +1464,7 @@
       const rawUsers = document.getElementById("allowedUsers").value;
       const showWatermark = document.getElementById("showWatermark").value === "true";
       const password = document.getElementById("jobPassword").value.trim();
+      const isPaused = document.getElementById("jobIsPaused").checked;
       const statusText = document.getElementById("status");
       
       if (!title || !url) {
@@ -1367,6 +1491,7 @@
           searchableUsers: searchList,
           showWatermark: showWatermark,
           password: password,
+          isPaused: isPaused,
           updatedAt: serverTimestamp()
         };
 
@@ -1399,6 +1524,7 @@
       document.getElementById("allowedUsers").value = (data.allowedUsers || []).join(",\n");
       document.getElementById("showWatermark").value = data.showWatermark !== false ? "true" : "false";
       document.getElementById("jobPassword").value = data.password || "";
+      document.getElementById("jobIsPaused").checked = data.isPaused || false;
       document.getElementById("btnSave").innerText = "บันทึกการแก้ไข";
       document.getElementById("btnSave").classList.replace("btn-blue", "btn-yellow");
       document.getElementById("btnCancel").style.display = "block";
@@ -1415,6 +1541,7 @@
       document.getElementById("allowedUsers").value = "";
       document.getElementById("showWatermark").value = "true";
       document.getElementById("jobPassword").value = "";
+      document.getElementById("jobIsPaused").checked = false;
       document.getElementById("btnSave").innerText = "บันทึกข้อมูลระบบงาน";
       document.getElementById("btnSave").classList.replace("btn-yellow", "btn-blue");
       document.getElementById("btnCancel").style.display = "none";
