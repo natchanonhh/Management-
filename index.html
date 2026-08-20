@@ -2,46 +2,86 @@
 <html lang="th">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ระบบผู้ดูแล - จัดการสิทธิ์แบบรวมศูนย์</title>
+  
+  <!-- โหลดฟอนต์ Sarabun แบบเดียวกับหน้าแรก -->
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
   <style>
-    body { font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      background: #f5f5f7; display: flex; flex-direction: column; align-items: center; margin: 0; min-height: 100vh;}
-    
-    #adminLoginWrapper { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #f5f5f7; display: flex; justify-content: center; align-items: center; z-index: 9999; }
-    .login-card { background: white; padding: 40px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); width: 100%; max-width: 400px; text-align: center; box-sizing: border-box; }
-    .login-card h2 { margin-top: 0; color: #1d1d1f; justify-content: center;}
-    
-    #mainAdminContent { width: 100%; display: none; flex-direction: column; align-items: center; padding: 30px 20px; box-sizing: border-box; }
+    /* ==========================================
+       CSS ระบบหลังบ้าน (ดึงสไตล์มาเพื่อให้หน้าตาเหมือนระบบหลัก)
+       ========================================== */
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Sarabun', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
 
-    .admin-box { background: white; padding: 30px; border-radius: 16px; width: 100%; max-width: 850px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); margin-bottom: 25px; box-sizing: border-box; position: relative; }
-    h2 { margin-top: 0; display: flex; justify-content: space-between; align-items: center; color: #1d1d1f; font-size: 22px; }
+    :root {
+        --pink-primary: #9d5b78;
+        --apple-blue: #0071e3;
+        --apple-blue-hover: #0077ed;
+        --apple-green: #34c759;
+        --apple-red: #ff3b30;
+        --apple-bg: #f5f5f7;
+        --apple-card-bg: #ffffff;
+        --apple-text-main: #1d1d1f;
+        --apple-text-muted: #86868b;
+        --apple-border: #d2d2d7;
+    }
+
+    body {
+        background: linear-gradient(180deg, #fcedf0 0%, #ffffff 500px);
+        background-attachment: fixed;
+        color: #333;
+        line-height: 1.6;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    /* --- Header (เหมือนหน้าบ้าน) --- */
+    header {
+        display: flex; justify-content: center; align-items: center;
+        padding: 15px 5%; background-color: transparent; border-bottom: 1px solid rgba(0,0,0,0.05); width: 100%;
+        margin-bottom: 20px;
+    }
+    .logo-container { display: flex; align-items: center; gap: 15px; }
+    .logo-img { height: 65px; width: auto; max-width: 250px; border: none; object-fit: contain; background: transparent; }
+
+    #adminLoginWrapper { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: transparent; display: flex; justify-content: center; align-items: center; z-index: 9999; }
+    .login-card { background: white; padding: 40px; border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.06); width: 100%; max-width: 400px; text-align: center; box-sizing: border-box; border: 1px solid rgba(0,0,0,0.05);}
+    .login-card h2 { margin-top: 0; color: #1d1d1f; justify-content: center; font-weight: 600;}
+    
+    #mainAdminContent { width: 100%; display: none; flex-direction: column; align-items: center; padding: 0 20px 30px; box-sizing: border-box; }
+
+    .admin-box { background: white; padding: 30px; border-radius: 16px; width: 100%; max-width: 850px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); margin-bottom: 25px; box-sizing: border-box; position: relative; border: 1px solid rgba(0,0,0,0.03);}
+    h2 { margin-top: 0; display: flex; justify-content: space-between; align-items: center; color: #1d1d1f; font-size: 22px; font-weight: 600;}
     label { font-weight: 600; margin-top: 15px; display: block; font-size: 14px; color: #1d1d1f; }
     input, select, textarea, button { width: 100%; padding: 14px; margin-top: 8px; box-sizing: border-box; border: 1px solid #d2d2d7; border-radius: 12px; font-family: inherit; font-size: 15px; transition: 0.2s;}
-    input:focus, select:focus, textarea:focus { outline: none; border-color: #0071e3; box-shadow: 0 0 0 3px rgba(0,113,227,0.1); }
+    input:focus, select:focus, textarea:focus { outline: none; border-color: var(--pink-primary); box-shadow: 0 0 0 3px rgba(157,91,120,0.1); }
     textarea { height: 120px; resize: vertical; }
     button { color: white; border: none; cursor: pointer; font-weight: 600; margin-top: 15px; transition: 0.2s; }
     button:hover { opacity: 0.85; transform: scale(0.98); }
     button:active { transform: scale(0.95); }
     
-    .btn-blue { background: #0071e3; }
+    .btn-blue { background: var(--pink-primary); } /* เปลี่ยนปุ่มหลักเป็นสีธีมจุฬาฯ */
     .btn-green { background: #34c759; }
     .btn-yellow { background: #ffcc00; color: #1d1d1f; }
     .btn-red { background: #ff3b30; }
     .btn-gray { background: #86868b; display: none; }
     
     .nav-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #d2d2d7; }
-    .back-btn { background: transparent; color: #0071e3; padding: 8px 12px; width: auto; margin: 0; font-size: 15px; }
-    .back-btn:hover { background: rgba(0, 113, 227, 0.1); transform: none; }
+    .back-btn { background: transparent; color: var(--pink-primary); padding: 8px 12px; width: auto; margin: 0; font-size: 15px; }
+    .back-btn:hover { background: rgba(157,91,120, 0.1); transform: none; }
     .path-title { font-size: 17px; font-weight: 600; flex-grow: 1; text-align: center; color: #1d1d1f; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin: 0 10px; }
     
     .explorer-zone { border: 2px dashed transparent; border-radius: 14px; padding: 15px; transition: all 0.3s ease; }
-    .explorer-zone.dragover-active { border-color: #0071e3; background-color: rgba(0, 113, 227, 0.04); }
+    .explorer-zone.dragover-active { border-color: var(--pink-primary); background-color: rgba(157,91,120, 0.04); }
 
     .item-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px 15px; margin-top: 15px; align-items: start; }
     
     .grid-item { display: flex; flex-direction: column; align-items: center; padding: 10px; border-radius: 12px; transition: background-color 0.2s, transform 0.2s; user-select: none; height: auto; min-height: 190px; justify-content: flex-start; }
     .grid-item:hover { background-color: #f5f5f7; }
-    .grid-item.folder-target.dragover-active { background-color: rgba(0, 71, 227, 0.15) !important; transform: scale(1.05); box-shadow: 0 0 0 2px #0071e3; }
+    .grid-item.folder-target.dragover-active { background-color: rgba(157,91,120, 0.15) !important; transform: scale(1.05); box-shadow: 0 0 0 2px var(--pink-primary); }
     .grid-item.dragging-item { opacity: 0.4; }
 
     .grid-icon { margin-bottom: 10px; display: flex; justify-content: center; align-items: center; cursor: pointer; transition: transform 0.2s; height: 65px; width: 100%; position: relative; }
@@ -50,7 +90,7 @@
     .grid-icon svg.icon-file { width: 48px; height: auto; }
     .grid-icon svg.icon-wide { width: 62px; height: auto; }
 
-    .grid-name { font-size: 13px; font-weight: 500; color: #1d1d1f; text-align: center; line-height: 1.4; word-break: break-word; width: 100%; cursor: pointer;}
+    .grid-name { font-size: 13px; font-weight: 500; color: #1d1d1f; text-align: center; line-height: 1.4; word-break: break-word; white-space: normal; width: 100%; cursor: pointer;}
     .grid-lock { font-size: 12px; margin-top: 6px; color: #1d1d1f; text-align: center; display: flex; align-items: center; justify-content: center; gap:4px; }
     .grid-time { font-size: 11px; color: #86868b; margin-top: 6px; text-align: center; line-height: 1.3; }
 
@@ -60,7 +100,9 @@
     .color-circle { width: 28px; height: 28px; border-radius: 50%; cursor: pointer; border: 3px solid transparent; box-sizing: border-box; transition: 0.1s; }
     .color-circle:hover { transform: scale(1.1); }
 
-    @media (max-width: 600px) { .item-grid { grid-template-columns: repeat(3, 1fr); gap: 15px 10px; } }
+    @media (max-width: 600px) { 
+        .item-grid { grid-template-columns: repeat(3, 1fr); gap: 15px 10px; } 
+    }
     @media (max-width: 450px) { .item-grid { grid-template-columns: repeat(2, 1fr); } }
 
     table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 15px; }
@@ -92,81 +134,35 @@
     .bell-icon.ringing { display: inline-block; animation: bell-ring 1.5s ease-in-out infinite; transform-origin: top center; }
 
     /* Switch Toggle Style */
-    .switch {
-      position: relative;
-      display: inline-block;
-      width: 50px;
-      height: 28px;
-    }
-    .switch input { 
-      opacity: 0;
-      width: 0;
-      height: 0;
-    }
-    .slider {
-      position: absolute;
-      cursor: pointer;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background-color: #ccc;
-      transition: .4s;
-      border-radius: 34px;
-    }
-    .slider:before {
-      position: absolute;
-      content: "";
-      height: 20px;
-      width: 20px;
-      left: 4px;
-      bottom: 4px;
-      background-color: white;
-      transition: .4s;
-      border-radius: 50%;
-    }
-    input:checked + .slider {
-      background-color: var(--apple-blue);
-    }
-    input:checked + .slider:before {
-      transform: translateX(22px);
-    }
+    .switch { position: relative; display: inline-block; width: 50px; height: 28px; }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 34px; }
+    .slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
+    input:checked + .slider { background-color: var(--pink-primary); }
+    input:checked + .slider:before { transform: translateX(22px); }
 
-    /* Loader Style (Zzz) */
-    .loader-wrapper {
-        position: relative;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 65px; 
-        width: 100%;
-        margin-bottom: 10px;
-    }
-    .z {
-        position: absolute;
-        font-size: 24px; 
-        font-weight: bold;
-        color: var(--apple-blue);
-        opacity: 0;
-    }
+    .loader-wrapper { position: relative; display: flex; justify-content: center; align-items: center; height: 65px; width: 100%; margin-bottom: 10px; }
+    .z { position: absolute; font-size: 24px; font-weight: bold; color: var(--pink-primary); opacity: 0; }
     .z-1 { animation: swayUpToRight 2s ease-out infinite; }
     .z-2 { animation: swayUpToRight 2s ease-out 0.5s infinite; }
     .z-3 { animation: swayUpToRight 2s ease-out 1s infinite; }
     .z-4 { animation: swayUpToRight 2s ease-out 1.5s infinite; }
 
     @keyframes swayUpToRight {
-        0% {
-            transform: translate(0, 0) rotate(0deg);
-            opacity: 1;
-        }
-        100% {
-            transform: translate(30px, -40px) rotate(30deg);
-            opacity: 0;
-        }
+        0% { transform: translate(0, 0) rotate(0deg); opacity: 1; }
+        100% { transform: translate(30px, -40px) rotate(30deg); opacity: 0; }
     }
+    
+    .lang-label { font-size: 13px; color: #86868b; margin-top: 10px; margin-bottom: -5px; display: block; font-weight: 500;}
   </style>
 </head>
 <body oncontextmenu="return false;">
+
+  <header>
+      <div class="logo-container">
+          <img src="https://i.postimg.cc/hvWpwkgG/Docum.png" alt="Logo" class="logo-img">
+      </div>
+  </header>
 
   <div id="timePickerModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:10000; justify-content:center; align-items:center;">
     <div style="background:white; padding:25px; border-radius:16px; width:90%; max-width:350px; text-align:center; box-shadow: 0 15px 40px rgba(0,0,0,0.15);">
@@ -191,13 +187,22 @@
   </div>
 
   <div id="folderSettingsModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:10000; justify-content:center; align-items:center;">
-    <div style="background:#ffffff; width:90%; max-width:320px; border-radius:24px; padding:25px; box-sizing:border-box; text-align:center; box-shadow: 0 15px 40px rgba(0,0,0,0.15);">
+    <div style="background:#ffffff; width:90%; max-width:320px; border-radius:24px; padding:25px; box-sizing:border-box; text-align:center; box-shadow: 0 15px 40px rgba(0,0,0,0.15); max-height: 90vh; overflow-y: auto;">
         <div id="folderPreviewIcon" style="width:90px; height:90px; margin:0 auto 15px; display:flex; justify-content:center; align-items:center;"></div>
         
         <input type="hidden" id="editFolderPath">
-        <input type="text" id="editFolderName" placeholder="ชื่อโฟลเดอร์" style="font-size:18px; font-weight:600; text-align:center; padding:10px 5px; margin-bottom:20px; width:100%; border:none; border-bottom:2px solid #e5e5ea; border-radius:0; background:transparent;">
         
-        <!-- Toggle Switch สำหรับโหมดพัก -->
+        <div style="text-align: left; margin-bottom: 15px;">
+            <label style="margin-top: 0; font-size: 13px; color: var(--pink-primary);">ชื่อโฟลเดอร์ (ภาษาไทย - บังคับ/ตัวหลัก)</label>
+            <input type="text" id="editFolderName" placeholder="ชื่อโฟลเดอร์" style="font-size:16px; font-weight:600; text-align:center; padding:10px 5px; width:100%; border:none; border-bottom:2px solid #e5e5ea; border-radius:0; background:transparent;">
+            
+            <label style="margin-top: 10px; font-size: 13px; color: #86868b;">Folder Name (English - Optional)</label>
+            <input type="text" id="editFolderNameEN" placeholder="Optional English Name" style="font-size:14px; text-align:center; padding:8px 5px; width:100%; border:none; border-bottom:1px solid #e5e5ea; border-radius:0; background:transparent;">
+            
+            <label style="margin-top: 10px; font-size: 13px; color: #86868b;">文件夹名称 (中文 - 可选)</label>
+            <input type="text" id="editFolderNameCN" placeholder="可选中文名称" style="font-size:14px; text-align:center; padding:8px 5px; width:100%; border:none; border-bottom:1px solid #e5e5ea; border-radius:0; background:transparent;">
+        </div>
+        
         <div style="display: flex; justify-content: space-between; align-items: center; background:#f5f5f7; padding:12px 15px; border-radius:14px; margin-bottom: 15px;">
             <label style="font-size:14px; color:#1d1d1f; margin:0; font-weight:600; text-align:left;">
                 โหมดกำลังพัก<br>
@@ -255,11 +260,11 @@
        <button class="btn-red" style="width: auto; padding: 10px 20px; margin: 0; border-radius: 12px;" onclick="logoutAdmin()">ออกจากระบบผู้ดูแล</button>
     </div>
     
-    <div class="admin-box" style="border: 2px solid #0071e3;">
+    <div class="admin-box" style="border: 2px solid var(--pink-primary);">
       <h2>จัดการป้ายโฆษณา (Banners)</h2>
       <p style="color:#86868b; font-size:13px; margin-top:-5px; margin-bottom:15px;">
         💡 ระบบจะแสดงป้ายโฆษณาที่ด้านบนของหน้าเว็บผู้ใช้ และจะเลื่อนอัตโนมัติ (ขนาดแนะนำ 1200 x 600 px)<br>
-        <strong style="color:#0071e3;">เคล็ดลับ: สามารถคลิกค้างแล้วลาก (Drag & Drop) ที่ตารางเพื่อสลับตำแหน่งแสดงผลป้ายโฆษณาได้ทันที</strong>
+        <strong style="color:var(--pink-primary);">เคล็ดลับ: สามารถคลิกค้างแล้วลาก (Drag & Drop) ที่ตารางเพื่อสลับตำแหน่งแสดงผลป้ายโฆษณาได้ทันที</strong>
       </p>
       
       <input type="hidden" id="editBannerId">
@@ -374,15 +379,22 @@
       <button class="btn-green" onclick="grantDirectDownload()">ยืนยันการให้สิทธิ์การดาวน์โหลด</button>
     </div>
 
+    <!-- ฟอร์มเพิ่มเอกสารที่มีระบบ 3 ภาษา -->
     <div class="admin-box" id="formBox">
       <h2 id="formTitle">เพิ่มรายการเข้าสู่ระบบ</h2>
       <input type="hidden" id="editJobId"> 
-      <label>1. ชื่อรายการ / เอกสาร:</label>
+      
+      <label>1. ชื่อรายการ / เอกสาร (ภาษาไทย - บังคับ):</label>
       <input type="text" id="jobTitle" placeholder="ตัวอย่าง: เอกสารประกอบการเรียน" required>
+      
+      <span class="lang-label">1.1 ชื่อรายการ (English - ไม่บังคับ):</span>
+      <input type="text" id="jobTitleEN" placeholder="Example: Study Materials">
+      
+      <span class="lang-label">1.2 ชื่อรายการ (中文 - ไม่บังคับ):</span>
+      <input type="text" id="jobTitleCN" placeholder="例如: 学习资料">
       
       <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px;">
         <label style="margin-top: 0;">2. โฟลเดอร์ (จัดหมวดหมู่):</label>
-        <!-- เพิ่ม Switch ในส่วนของฟอร์มไฟล์ด้วย -->
         <div style="display: flex; align-items: center; gap: 8px;">
             <label style="margin-top: 0; font-size: 13px; color: var(--apple-text-muted);">กำลังพัก</label>
             <label class="switch">
@@ -423,7 +435,7 @@
 
     <div class="admin-box">
       <h2>การจัดการรายการ (File Explorer)</h2>
-      <p style="color:#86868b; font-size:13px; margin-top:-5px; margin-bottom:15px;">💡 กดค้างที่โฟลเดอร์เพื่อตั้งค่าสี, อีโมจิ หรือใส่รหัสผ่านโฟลเดอร์</p>
+      <p style="color:#86868b; font-size:13px; margin-top:-5px; margin-bottom:15px;">💡 กดค้างที่โฟลเดอร์เพื่อตั้งค่าสี, อีโมจิ, ใส่รหัสผ่าน หรือเปลี่ยนชื่อภาษาอื่นๆ</p>
      
       <div class="nav-header" id="adminNavHeader" style="display: none;">
          <button class="back-btn" onclick="navigateAdminUp()">< ย้อนกลับ</button>
@@ -432,8 +444,8 @@
       </div>
       
       <div style="display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap; justify-content: center;">
-         <button class="btn-blue" style="background: #e8e8ed; color: #0071e3; box-shadow: none; margin: 0; width: auto; font-size: 14px;" onclick="addNewJobHere()">+ สร้างเอกสารในหน้านี้</button>
-         <button class="btn-blue" style="background: #e8e8ed; color: #0071e3; box-shadow: none; margin: 0; width: auto; font-size: 14px;" onclick="createNewFolder()">+ สร้างโฟลเดอร์ว่าง</button>
+         <button class="btn-blue" style="background: #e8e8ed; color: var(--pink-primary); box-shadow: none; margin: 0; width: auto; font-size: 14px;" onclick="addNewJobHere()">+ สร้างเอกสารในหน้านี้</button>
+         <button class="btn-blue" style="background: #e8e8ed; color: var(--pink-primary); box-shadow: none; margin: 0; width: auto; font-size: 14px;" onclick="createNewFolder()">+ สร้างโฟลเดอร์ว่าง</button>
          <button class="btn-red" id="btnDeleteEmptyFolder" style="display: none; margin: 0; width: auto; font-size: 14px;" onclick="deleteCurrentEmptyFolder()">🗑️ ลบโฟลเดอร์นี้ (ว่าง)</button>
       </div>
       
@@ -485,7 +497,6 @@
     const db = getFirestore(app);
     const auth = getAuth(app);
     
-    // Global Promise Resolver for TimePicker
     let timePickerResolve = null;
 
     window.toggleTimePicker = function() {
@@ -562,6 +573,20 @@
             }) + " น.";
         } catch(e) { return ""; }
     }
+    
+    function getLocalizedName(defaultName, metaObj) {
+        const lang = localStorage.getItem('docSystem_lang') || 'TH';
+        if (!metaObj) return defaultName;
+        if (lang === 'EN' && metaObj.titleEN) return metaObj.titleEN;
+        if (lang === 'CN' && metaObj.titleCN) return metaObj.titleCN;
+        return defaultName;
+    }
+    function getLocalizedFileTitle(file) {
+        const lang = localStorage.getItem('docSystem_lang') || 'TH';
+        if (lang === 'EN' && file.titleEN) return file.titleEN;
+        if (lang === 'CN' && file.titleCN) return file.titleCN;
+        return file.title || '-';
+    }
 
     let allJobsAdmin = [];
     let currentAdminPath = "";
@@ -572,6 +597,7 @@
     let allSchedules = [];
     let lastReminderAction = null; 
 
+    // ป้องกันปัญหา "Can't find variable" โดยการประกาศให้อยู่ระดับ Window (Global) ทันที
     window.loginAdmin = function() {
       const email = document.getElementById("adminEmail").value;
       const pwd = document.getElementById("adminPassword").value;
@@ -634,7 +660,6 @@
         snap.forEach(doc => allReminders.push({id: doc.id, ...doc.data()}));
         
         let filtered = allReminders.filter(r => (r.title || "").toLowerCase().includes(searchKeyword) || (r.details || "").toLowerCase().includes(searchKeyword));
-        // เรียงตาม startDate เป็นหลัก
         filtered.sort((a,b) => new Date(a.startDate || a.date) - new Date(b.startDate || b.date));
 
         if(filtered.length === 0) { div.innerHTML = "<p style='text-align:center; color:#86868b;'>ไม่พบการแจ้งเตือน</p>"; return; }
@@ -673,7 +698,7 @@
       const editId = document.getElementById("editReminderId").value;
       const title = document.getElementById("remTitle").value.trim();
       const startDate = document.getElementById("remStartDate").value;
-      const endDate = document.getElementById("remEndDate").value || startDate; // ถ้าไม่ใส่วันที่สิ้นสุด ให้ใช้วันเริ่ม
+      const endDate = document.getElementById("remEndDate").value || startDate; 
       const startTime = document.getElementById("remStartTime").value;
       const endTime = document.getElementById("remEndTime").value;
       const recurring = document.getElementById("remRecurring").value;
@@ -687,7 +712,7 @@
       if(!title || !startDate) return alert("กรุณาระบุชื่องานและวันที่เริ่มให้ครบถ้วน");
 
       const payload = { 
-          title, startDate, endDate, date: startDate, /*เก็บ date ไว้รองรับข้อมูลเก่าเผื่อไว้*/
+          title, startDate, endDate, date: startDate, 
           startTime, endTime, recurring, location, url, details, status, 
           allowedUsers: userList, updatedAt: serverTimestamp() 
       };
@@ -989,7 +1014,9 @@
                   color: data.color || 'blue', 
                   emoji: data.emoji || '', 
                   password: data.password || '',
-                  isPaused: data.isPaused || false, // เก็บสถานะโหมดพัก
+                  isPaused: data.isPaused || false,
+                  titleEN: data.titleEN || '',
+                  titleCN: data.titleCN || '',
                   updatedAt: data.updatedAt || data.createdAt || null
               };
           }
@@ -1012,8 +1039,9 @@
           let pauseTxt = job.isPaused ? ` <span style="color:var(--apple-text-muted); font-size:12px;">(กำลังพัก)</span>` : "";
           
           if (job.type === "system_folder") {
+              const displayName = getLocalizedName(job.title, folderMeta[job.normalizedPath]);
               tableHtml += `<tr>
-                        <td><b>${displayFolder}</b>${lockTxt}${pauseTxt}<br><small style="color:gray;">(แฟ้มข้อมูล / กำหนดสี)</small></td>
+                        <td><b>${displayName}</b>${lockTxt}${pauseTxt}<br><small style="color:gray;">(แฟ้มข้อมูล / กำหนดสี)</small></td>
                         <td style="text-align:center;">โฟลเดอร์</td>
                         <td style="text-align:center; color:gray;">-</td>
                         <td>
@@ -1025,8 +1053,9 @@
           } else {
               const userCount = job.allowedUsers ? job.allowedUsers.length : 0;
               const safeData = encodeURIComponent(JSON.stringify({id: job.id, ...job}));
+              const displayName = getLocalizedFileTitle(job);
               tableHtml += `<tr>
-                        <td><b>${job.title}</b>${lockTxt}${pauseTxt}<br><small style="color:gray;">${displayFolder}</small></td>
+                        <td><b>${displayName}</b>${lockTxt}${pauseTxt}<br><small style="color:gray;">${displayFolder}</small></td>
                         <td style="text-align:center;">${job.type}</td>
                         <td style="text-align:center; color:#34c759; font-weight:bold;">${userCount} บัญชี</td>
                         <td>
@@ -1087,10 +1116,12 @@
 
     window.openFolderSettings = function(path) {
        let folderName = path.split('/').pop();
-       let meta = folderMeta[path] || { color: 'blue', emoji: '', password: '', isPaused: false };
+       let meta = folderMeta[path] || { color: 'blue', emoji: '', password: '', isPaused: false, titleEN: '', titleCN: '' };
        
        document.getElementById("editFolderPath").value = path;
        document.getElementById("editFolderName").value = folderName;
+       document.getElementById("editFolderNameEN").value = meta.titleEN || "";
+       document.getElementById("editFolderNameCN").value = meta.titleCN || "";
        document.getElementById("editFolderEmoji").value = meta.emoji;
        document.getElementById("editFolderPassword").value = meta.password || "";
        document.getElementById("editFolderIsPaused").checked = meta.isPaused || false;
@@ -1124,12 +1155,14 @@
     window.saveFolderSettings = async function() {
         let oldPath = document.getElementById("editFolderPath").value;
         let newName = document.getElementById("editFolderName").value.trim();
+        let newNameEN = document.getElementById("editFolderNameEN").value.trim();
+        let newNameCN = document.getElementById("editFolderNameCN").value.trim();
         let newColor = window.selectedFolderColor || 'blue';
         let newEmoji = document.getElementById("editFolderEmoji").value.trim();
         let newPassword = document.getElementById("editFolderPassword").value.trim();
         let isPaused = document.getElementById("editFolderIsPaused").checked;
         
-        if (!newName) { alert("กรุณาระบุชื่อโฟลเดอร์"); return; }
+        if (!newName) { alert("กรุณาระบุชื่อโฟลเดอร์ภาษาไทย (ใช้เป็นระบบหลัก)"); return; }
         if (newName.includes("/")) { alert("ไม่อนุญาตให้ใช้เครื่องหมาย / ในชื่อโฟลเดอร์"); return; }
 
         let pathParts = oldPath.split('/');
@@ -1153,6 +1186,8 @@
         if (meta && meta.id) {
             batch.update(doc(db, "jobs", meta.id), {
                 title: `[Folder] ${newName}`,
+                titleEN: newNameEN,
+                titleCN: newNameCN,
                 folder: newPath,
                 color: newColor,
                 emoji: newEmoji,
@@ -1164,6 +1199,8 @@
             let newFolderRef = doc(collection(db, "jobs"));
             batch.set(newFolderRef, {
                 title: `[Folder] ${newName}`,
+                titleEN: newNameEN,
+                titleCN: newNameCN,
                 folder: newPath,
                 type: "system_folder",
                 color: newColor,
@@ -1224,7 +1261,6 @@
             let lockHtml = meta.password ? `<div class="grid-lock">${icons.lock} ติดรหัสผ่าน</div>` : "";
             let timeStr = formatTime(meta.updatedAt);
 
-            // หากเปิดโหมดกำลังพัก ให้แสดง Loader แทนที่ไอคอนในหน้าระบบแอดมิน เพื่อให้แอดมินทราบ
             let iconDisplay = meta.isPaused ? `
                 <div class="loader-wrapper">
                     <div class="z z-1">Z</div>
@@ -1273,7 +1309,6 @@
             let lockHtml = file.password ? `<div class="grid-lock">${icons.lock} ติดรหัสผ่าน</div>` : "";
             let fileTimeStr = file.updatedAt ? formatTime(file.updatedAt) : (file.createdAt ? formatTime(file.createdAt) : "");
 
-            // หากไฟล์เปิดโหมดกำลังพัก ให้แสดง Loader แทนที่ไอคอนในหน้าระบบแอดมิน เพื่อให้แอดมินทราบ
             let iconDisplay = file.isPaused ? `
                 <div class="loader-wrapper">
                     <div class="z z-1">Z</div>
@@ -1336,6 +1371,8 @@
         try {
             const jobData = {
                 title: `[Folder] ${folderName}`,
+                titleEN: "",
+                titleCN: "",
                 folder: newPath,
                 type: "system_folder",
                 color: "blue",
@@ -1458,6 +1495,8 @@
     window.saveJob = async function() {
       const editId = document.getElementById("editJobId").value;
       const title = document.getElementById("jobTitle").value.trim();
+      const titleEN = document.getElementById("jobTitleEN").value.trim();
+      const titleCN = document.getElementById("jobTitleCN").value.trim();
       const folder = document.getElementById("jobFolder").value.trim() || "";
       const type = document.getElementById("fileType").value;
       let url = document.getElementById("fileUrl").value.trim();
@@ -1468,7 +1507,7 @@
       const statusText = document.getElementById("status");
       
       if (!title || !url) {
-        statusText.innerText = "กรุณาระบุข้อมูลให้ครบถ้วน";
+        statusText.innerText = "กรุณาระบุข้อมูลไฟล์และลิงก์ให้ครบถ้วน";
         statusText.style.color = "red";
         return;
       }
@@ -1484,6 +1523,8 @@
       try {
         const jobData = {
           title: title,
+          titleEN: titleEN,
+          titleCN: titleCN,
           folder: folder,
           type: type,
           url: url,
@@ -1518,6 +1559,8 @@
       document.getElementById("formTitle").innerText = "แก้ไขข้อมูลและสิทธิ์ระบบงาน";
       document.getElementById("editJobId").value = data.id;
       document.getElementById("jobTitle").value = data.title;
+      document.getElementById("jobTitleEN").value = data.titleEN || "";
+      document.getElementById("jobTitleCN").value = data.titleCN || "";
       document.getElementById("jobFolder").value = data.folder || "";
       document.getElementById("fileType").value = data.type;
       document.getElementById("fileUrl").value = data.url;
@@ -1536,6 +1579,8 @@
       document.getElementById("formTitle").innerText = "เพิ่มรายการเข้าสู่ระบบ";
       document.getElementById("editJobId").value = "";
       document.getElementById("jobTitle").value = "";
+      document.getElementById("jobTitleEN").value = "";
+      document.getElementById("jobTitleCN").value = "";
       document.getElementById("jobFolder").value = "";
       document.getElementById("fileUrl").value = "";
       document.getElementById("allowedUsers").value = "";
