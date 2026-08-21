@@ -8,6 +8,9 @@
   <!-- โหลดฟอนต์ Sarabun แบบเดียวกับหน้าแรก -->
   <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   
+  <!-- โหลดไลบรารี Chart.js สำหรับวาดกราฟสถิติ -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  
   <style>
     /* ==========================================
        CSS ระบบหลังบ้าน (ดึงสไตล์มาเพื่อให้หน้าตาเหมือนระบบหลัก)
@@ -63,7 +66,7 @@
     button:hover { opacity: 0.85; transform: scale(0.98); }
     button:active { transform: scale(0.95); }
     
-    .btn-blue { background: var(--pink-primary); } /* เปลี่ยนปุ่มหลักเป็นสีธีมจุฬาฯ */
+    .btn-blue { background: var(--pink-primary); } 
     .btn-green { background: #34c759; }
     .btn-yellow { background: #ffcc00; color: #1d1d1f; }
     .btn-red { background: #ff3b30; }
@@ -106,7 +109,6 @@
     }
     @media (max-width: 450px) { .item-grid { grid-template-columns: repeat(2, 1fr); } }
 
-    /* ปรับแต่งตารางให้สามารถเลื่อนซ้าย-ขวาได้เมื่อหน้าจอแคบ */
     .table-responsive { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
     table { width: 100%; min-width: 750px; border-collapse: collapse; font-size: 13px; margin-top: 15px; }
     th, td { border: 1px solid #d2d2d7; padding: 12px 10px; text-align: left; vertical-align: middle; }
@@ -136,7 +138,6 @@
     }
     .bell-icon.ringing { display: inline-block; animation: bell-ring 1.5s ease-in-out infinite; transform-origin: top center; }
 
-    /* Switch Toggle Style */
     .switch { position: relative; display: inline-block; width: 50px; height: 28px; }
     .switch input { opacity: 0; width: 0; height: 0; }
     .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 34px; }
@@ -163,7 +164,6 @@
 
   <header>
       <div class="logo-container">
-          <!-- โลโก้แบบเดียวกับระบบหน้าแรกโปร่งใส -->
           <img src="https://i.postimg.cc/hvWpwkgG/Docum.png" alt="Logo" class="logo-img">
       </div>
   </header>
@@ -246,6 +246,19 @@
             <button class="btn-gray" onclick="closeFolderSettings()" style="display:block; background:#e5e5ea; color:#1d1d1f; margin-top:0; box-shadow:none;">ยกเลิก</button>
             <button class="btn-blue" onclick="saveFolderSettings()" style="margin-top:0; box-shadow:none;">บันทึก</button>
         </div>
+    </div>
+  </div>
+
+  <!-- Modal สำหรับดูประวัติ Access Logs แบบเจาะจงผู้ใช้ -->
+  <div id="userLogsModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:10000; justify-content:center; align-items:center;">
+    <div style="background:white; padding:25px; border-radius:16px; width:90%; max-width:600px; max-height: 80vh; display:flex; flex-direction:column; box-shadow: 0 15px 40px rgba(0,0,0,0.15);">
+       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+           <h3 style="margin:0; color:#1d1d1f; font-weight:600;" id="userLogsModalTitle">ประวัติการเข้าสู่ระบบ</h3>
+           <button class="sys-close-btn" style="background:#f2f2f7; border:none; width:32px; height:32px; border-radius:50%; cursor:pointer; font-weight:bold; font-size:16px; display:flex; align-items:center; justify-content:center; color:#8e8e93;" onclick="closeUserLogsModal()">×</button>
+       </div>
+       <div class="table-responsive" style="flex:1; overflow-y:auto;">
+           <div id="userLogsModalContent"></div>
+       </div>
     </div>
   </div>
 
@@ -493,6 +506,36 @@
         <div id="historyTable"></div>
       </div>
     </div>
+
+    <!-- ส่วนสถิติการเข้าสู่ระบบแบบจัดกลุ่มผู้ใช้ (Group By User) -->
+    <div class="admin-box">
+      <h2>สถิติการเข้าสู่ระบบ (Access Logs)</h2>
+      <div class="table-responsive">
+        <div id="accessLogsTable"></div>
+      </div>
+    </div>
+
+    <!-- ส่วนข้อมูลสถิติและความยินยอมคุกกี้ที่แก้ไขใหม่ ให้กราฟและการรวมข้อมูลถูกต้อง 100% -->
+    <div class="admin-box">
+      <h2>ข้อมูลสถิติและความยินยอมคุกกี้ (Cookies & Analytics)</h2>
+      <p style="color:#86868b; font-size:13px; margin-top:-5px; margin-bottom:15px;">ระบบบันทึกข้อมูลและสถิติการใช้งานของผู้ใช้ตามประเภทความยินยอมของคุกกี้ (นับเฉพาะผู้ใช้ 1 บัญชี/อุปกรณ์ ไม่นับซ้ำ)</p>
+      
+      <div style="background:#f5f5f7; padding:15px; border-radius:12px; margin-bottom:20px; font-size:13px; color:#1d1d1f; line-height:1.6;">
+        <strong style="color:var(--pink-primary);">ประเภทข้อมูลที่บันทึก (อ้างอิงตามสิทธิ์การยินยอม):</strong><br>
+        <b style="color:#0071e3;">1. เพื่อความสะดวกในการใช้งาน (Functional):</b> ช่วยจดจำสถานะการเข้าสู่ระบบ (Log in) จดจำภาษาที่คุณเลือก หรือจดจำสินค้าที่คุณกดใส่ตะกร้าไว้ ทำให้คุณไม่ต้องคอยตั้งค่าใหม่หรือพิมพ์รหัสผ่านใหม่ทุกครั้งที่กลับมาเปิดเว็บเดิม<br>
+        <b style="color:#34c759;">2. เพื่อเก็บสถิติ (Analytics):</b> ช่วยให้เจ้าของเว็บรู้ว่าผู้ใช้งานชอบอ่านเนื้อหาหน้าไหน หรือใช้เวลาอยู่ในเว็บไซต์นานแค่ไหน เพื่อนำข้อมูลไปปรับปรุงเว็บให้ใช้งานง่ายขึ้น<br>
+        <b style="color:#ff9500;">3. เพื่อการโฆษณา (Marketing):</b> คุกกี้ประเภทนี้จะติดตามพฤติกรรมการท่องเว็บของคุณ ว่าคุณสนใจเรื่องอะไร เพื่อนำไปวิเคราะห์และยิงโฆษณา (Ads) สินค้าหรือบริการกลับมาหาคุณได้ตรงใจมากที่สุด
+      </div>
+
+      <!-- กล่องสำหรับแสดงกราฟ -->
+      <div style="width: 100%; max-width: 600px; margin: 0 auto 20px auto; background: #fff; padding: 15px; border-radius: 12px; border: 1px solid #d2d2d7;">
+        <canvas id="cookieChart"></canvas>
+      </div>
+
+      <div class="table-responsive">
+        <div id="cookieStatsTable"></div>
+      </div>
+    </div>
   </div>
 
   <script type="module">
@@ -613,6 +656,10 @@
     let allReminders = [];
     let allSchedules = [];
     let lastReminderAction = null; 
+    let cookieChartInstance = null;
+    
+    // ตัวแปรเก็บ log สำหรับการจัดกลุ่มผู้ใช้
+    window.groupedLogs = {}; 
 
     window.loginAdmin = function() {
       const email = document.getElementById("adminEmail").value;
@@ -651,6 +698,8 @@
         loadJobs();
         loadRequests();
         loadHistory();
+        loadAccessLogs();
+        loadCookieStats();
         loadReminders();
         loadSchedules();
         setTimeout(() => processDiscordActions(), 1000);
@@ -676,7 +725,7 @@
         snap.forEach(doc => allReminders.push({id: doc.id, ...doc.data()}));
         
         let filtered = allReminders.filter(r => (r.title || "").toLowerCase().includes(searchKeyword) || (r.details || "").toLowerCase().includes(searchKeyword));
-        // เรียงตาม startDate เป็นหลัก
+        
         filtered.sort((a,b) => new Date(a.startDate || a.date) - new Date(b.startDate || b.date));
 
         if(filtered.length === 0) { div.innerHTML = "<p style='text-align:center; color:#86868b;'>ไม่พบการแจ้งเตือน</p>"; return; }
@@ -715,7 +764,7 @@
       const editId = document.getElementById("editReminderId").value;
       const title = document.getElementById("remTitle").value.trim();
       const startDate = document.getElementById("remStartDate").value;
-      const endDate = document.getElementById("remEndDate").value || startDate; // ถ้าไม่ใส่วันที่สิ้นสุด ให้ใช้วันเริ่ม
+      const endDate = document.getElementById("remEndDate").value || startDate; 
       const startTime = document.getElementById("remStartTime").value;
       const endTime = document.getElementById("remEndTime").value;
       const recurring = document.getElementById("remRecurring").value;
@@ -729,7 +778,7 @@
       if(!title || !startDate) return alert("กรุณาระบุชื่องานและวันที่เริ่มให้ครบถ้วน");
 
       const payload = { 
-          title, startDate, endDate, date: startDate, /*เก็บ date ไว้รองรับข้อมูลเก่าเผื่อไว้*/
+          title, startDate, endDate, date: startDate, 
           startTime, endTime, recurring, location, url, details, status, 
           allowedUsers: userList, updatedAt: serverTimestamp() 
       };
@@ -1811,6 +1860,194 @@
         html += "</table>";
         tableDiv.innerHTML = html;
       } catch (error) { tableDiv.innerHTML = "<p style='color:red; text-align:center;'>การเรียกข้อมูลประวัติล้มเหลว</p>";
+      }
+    }
+
+    // ฟังก์ชันสำหรับโหลดสถิติการเข้าสู่ระบบแบบใหม่ (จัดกลุ่มผู้ใช้)
+    window.loadAccessLogs = async function() {
+      const tableDiv = document.getElementById("accessLogsTable");
+      tableDiv.innerHTML = "<p style='text-align:center;'>กำลังโหลดข้อมูลสถิติ...</p>";
+
+      try {
+        const querySnapshot = await getDocs(collection(db, "access_logs"));
+        if (querySnapshot.empty) {
+          tableDiv.innerHTML = "<p style='text-align:center; color:#86868b;'>ไม่พบข้อมูลสถิติการเข้าสู่ระบบ</p>";
+          return;
+        }
+        
+        let logs = [];
+        querySnapshot.forEach(doc => { logs.push({ id: doc.id, ...doc.data() }); });
+        
+        // เรียงจากเวลาล่าสุดไปเก่าสุด
+        logs.sort((a, b) => {
+            const timeA = a.loginTime ? a.loginTime.toMillis() : 0;
+            const timeB = b.loginTime ? b.loginTime.toMillis() : 0;
+            return timeB - timeA;
+        });
+        
+        // จัดกลุ่ม (Group by) รหัสบัญชี (studentId)
+        window.groupedLogs = {};
+        logs.forEach(log => {
+            let sId = log.studentId || 'ไม่ระบุ';
+            if(!window.groupedLogs[sId]) window.groupedLogs[sId] = [];
+            window.groupedLogs[sId].push(log);
+        });
+        
+        let html = `<table>
+                      <tr>
+                        <th width="30%">รหัสบัญชี</th>
+                        <th width="20%">จำนวนครั้ง</th>
+                        <th width="30%">เข้าสู่ระบบล่าสุด</th>
+                        <th width="20%">จัดการ</th>
+                      </tr>`;
+        
+        // วนลูปข้อมูลที่จัดกลุ่มแล้วมาสร้างตาราง
+        for (const [sId, userLogs] of Object.entries(window.groupedLogs)) {
+            let lastLoginStr = "-";
+            if (userLogs[0].loginTime) lastLoginStr = userLogs[0].loginTime.toDate().toLocaleString('th-TH');
+            
+            html += `<tr>
+                <td style="text-align:center;"><b>${sId}</b></td>
+                <td style="text-align:center; color:#0071e3; font-weight:bold;">${userLogs.length} ครั้ง</td>
+                <td style="text-align:center;">${lastLoginStr}</td>
+                <td style="text-align:center;">
+                    <button class="btn-blue" style="padding: 6px 12px; font-size: 12px; border-radius: 8px; margin:0;" onclick="viewUserLogs('${sId}')">ดูประวัติ</button>
+                </td>
+            </tr>`;
+        }
+        
+        html += "</table>";
+        tableDiv.innerHTML = html;
+        
+      } catch (error) { 
+        tableDiv.innerHTML = "<p style='color:red; text-align:center;'>การเรียกข้อมูลสถิติล้มเหลว</p>"; 
+      }
+    }
+
+    // ฟังก์ชันเปิด Modal ดูประวัติรายบุคคล
+    window.viewUserLogs = function(sId) {
+        const logs = window.groupedLogs[sId] || [];
+        document.getElementById('userLogsModalTitle').innerText = `ประวัติของ: ${sId}`;
+        
+        let html = `<table><tr><th width="50%">เวลาเข้าสู่ระบบ</th><th width="50%">เวลาออกจากระบบ</th></tr>`;
+        logs.forEach(data => {
+          let loginStr = "-";
+          let logoutStr = "ยังไม่ออกจากระบบ / ปิดเบราว์เซอร์";
+          if (data.loginTime) loginStr = data.loginTime.toDate().toLocaleString('th-TH');
+          if (data.logoutTime) logoutStr = data.logoutTime.toDate().toLocaleString('th-TH');
+          html += `<tr>
+            <td style="text-align:center;">${loginStr}</td>
+            <td style="text-align:center; color: ${data.logoutTime ? '#1d1d1f' : '#ff9500'}">${logoutStr}</td>
+          </tr>`;
+        });
+        html += "</table>";
+        
+        document.getElementById('userLogsModalContent').innerHTML = html;
+        document.getElementById('userLogsModal').style.display = 'flex';
+    }
+
+    // ฟังก์ชันปิด Modal ประวัติรายบุคคล
+    window.closeUserLogsModal = function() {
+        document.getElementById('userLogsModal').style.display = 'none';
+    }
+
+    // ฟังก์ชันที่เพิ่มใหม่สำหรับดึงข้อมูลและสถิติคุกกี้
+    window.loadCookieStats = async function() {
+      const tableDiv = document.getElementById("cookieStatsTable");
+      tableDiv.innerHTML = "<p style='text-align:center;'>กำลังโหลดข้อมูลสถิติจากคุกกี้...</p>";
+
+      try {
+        const querySnapshot = await getDocs(collection(db, "cookie_stats"));
+        if (querySnapshot.empty) {
+          tableDiv.innerHTML = "<p style='text-align:center; color:#86868b;'>ไม่พบข้อมูลสถิติและการยินยอมคุกกี้ในระบบ</p>";
+          return;
+        }
+        
+        // ใช้ Map เพื่อนับผู้ใช้แค่ 1 อัน (ไม่ซ้ำ) โดยให้ความสำคัญกับ userId ก่อน ถ้าไม่มีใช้ deviceId
+        let uniqueUsersMap = new Map();
+        
+        querySnapshot.forEach(doc => { 
+            let data = doc.data();
+            let key = (data.userId && data.userId !== '-') ? data.userId : (data.deviceId || doc.id);
+            uniqueUsersMap.set(key, { id: doc.id, ...data });
+        });
+        
+        let stats = Array.from(uniqueUsersMap.values());
+        
+        // ตัวแปรเก็บจำนวนสำหรับนำไปแสดงกราฟ
+        let countFunctional = 0;
+        let countAnalytics = 0;
+        let countMarketing = 0;
+        
+        let html = `<table>
+          <tr>
+             <th width="20%">รหัสบัญชี / อุปกรณ์ (ไม่ซ้ำ)</th>
+             <th width="25%">Functional (ล็อกอิน/ภาษา)</th>
+             <th width="25%">Analytics (การใช้งานหน้าเว็บ)</th>
+             <th width="30%">Marketing (ความสนใจโฆษณา)</th>
+          </tr>`;
+          
+        stats.forEach(data => {
+          // ตรวจสอบว่าผู้ใช้ยินยอมหรือไม่ (มีข้อมูลหรือไม่ และไม่ใช่ขีด หรือ false)
+          let hasFunctional = data.functionalData === 'ยอมรับ';
+          let hasAnalytics = data.analyticsData === 'ยอมรับ';
+          let hasMarketing = data.marketingData === 'ยอมรับ';
+          
+          if (hasFunctional) countFunctional++;
+          if (hasAnalytics) countAnalytics++;
+          if (hasMarketing) countMarketing++;
+            
+          html += `<tr>
+            <td style="text-align:center;"><b>${data.userId || data.deviceId || '-'}</b></td>
+            <td style="text-align:center; color:#0071e3;">${data.functionalData || '-'}</td>
+            <td style="text-align:center; color:#34c759;">${data.analyticsData || '-'}</td>
+            <td style="text-align:center; color:#ff9500;">${data.marketingData || '-'}</td>
+          </tr>`;
+        });
+        html += "</table>";
+        tableDiv.innerHTML = html;
+        
+        // วาดกราฟแท่ง (Bar Chart) ด้วย Chart.js
+        const ctx = document.getElementById('cookieChart');
+        if (ctx) {
+            if (cookieChartInstance) {
+                cookieChartInstance.destroy(); // ลบกราฟเก่าก่อนวาดใหม่
+            }
+            cookieChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Functional', 'Analytics', 'Marketing'],
+                    datasets: [{
+                        label: 'จำนวนผู้ใช้ที่ยินยอม (คน)',
+                        data: [countFunctional, countAnalytics, countMarketing],
+                        backgroundColor: [
+                            'rgba(0, 113, 227, 0.7)',
+                            'rgba(52, 199, 89, 0.7)',
+                            'rgba(255, 149, 0, 0.7)'
+                        ],
+                        borderColor: ['#0071e3', '#34c759', '#ff9500'],
+                        borderWidth: 1,
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: { beginAtZero: true, ticks: { stepSize: 1 } }
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        title: {
+                            display: true,
+                            text: 'แผนภูมิแท่งแสดงจำนวนความยินยอมแยกตามหมวดหมู่ (คน)',
+                            font: { family: "'Sarabun', sans-serif", size: 15 }
+                        }
+                    }
+                }
+            });
+        }
+      } catch (error) { 
+        tableDiv.innerHTML = "<p style='color:red; text-align:center;'>การเรียกข้อมูลสถิติคุกกี้ล้มเหลว</p>"; 
       }
     }
 
