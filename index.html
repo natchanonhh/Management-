@@ -478,6 +478,15 @@
       </div>
     </div>
 
+    <!-- ส่วนจัดการผู้ใช้งานที่เพิ่มใหม่ -->
+    <div class="admin-box">
+      <h2>ข้อมูลบัญชีผู้ใช้งาน (User Profiles)</h2>
+      <p style="color:#86868b; font-size:13px; margin-top:-5px; margin-bottom:15px;">แสดงข้อมูลโปรไฟล์ รหัสผ่าน และการตั้งชื่อของผู้ใช้งานในระบบ</p>
+      <div class="table-responsive">
+        <div id="usersTable"></div>
+      </div>
+    </div>
+
     <div class="admin-box">
       <h2>จัดการรายการเอกสารทั้งหมด (Table)</h2>
       <div class="table-responsive">
@@ -702,6 +711,7 @@
         loadCookieStats();
         loadReminders();
         loadSchedules();
+        loadUsers(); // โหลดข้อมูลผู้ใช้งาน (ฟังก์ชันใหม่)
         setTimeout(() => processDiscordActions(), 1000);
       } else {
         document.getElementById("adminLoginWrapper").style.display = "flex";
@@ -712,6 +722,67 @@
     document.getElementById("adminPassword").addEventListener("keypress", function(e) {
       if (e.key === "Enter") loginAdmin();
     });
+
+    // ==========================================
+    // ส่วนจัดการผู้ใช้งานในระบบหลังบ้าน (User Profiles)
+    // ==========================================
+    window.loadUsers = async function() {
+      const tableDiv = document.getElementById("usersTable");
+      tableDiv.innerHTML = "<p style='text-align:center;'>กำลังโหลดข้อมูลผู้ใช้งาน...</p>";
+
+      try {
+        const querySnapshot = await getDocs(collection(db, "users"));
+        if (querySnapshot.empty) {
+          tableDiv.innerHTML = "<p style='text-align:center; color:#86868b;'>ไม่พบข้อมูลผู้ใช้งาน</p>";
+          return;
+        }
+
+        let users = [];
+        querySnapshot.forEach(doc => { users.push({ id: doc.id, ...doc.data() }); });
+
+        // เรียงลำดับตามเวลาอัปเดตล่าสุด
+        users.sort((a, b) => {
+            const timeA = a.updatedAt ? a.updatedAt.toMillis() : 0;
+            const timeB = b.updatedAt ? b.updatedAt.toMillis() : 0;
+            return timeB - timeA;
+        });
+
+        let html = `<table>
+                      <tr>
+                        <th width="15%">รูปโปรไฟล์</th>
+                        <th width="20%">รหัสประจำตัว (ID)</th>
+                        <th width="25%">ชื่อแสดงผล</th>
+                        <th width="20%">รหัสผ่านเข้าสู่ระบบ</th>
+                        <th width="20%">เวลาแก้ชื่อล่าสุด</th>
+                      </tr>`;
+
+        users.forEach((data) => {
+          const id = data.id;
+
+          let picHtml = `<svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" stroke-width="1" style="color: var(--apple-text-muted); margin: 0 auto; display: block;"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>`;
+          if (data.profilePic) {
+              picHtml = `<img src="${data.profilePic}" style="width: 45px; height: 45px; border-radius: 50%; object-fit: cover; border: 2px solid #d2d2d7; margin: 0 auto; display: block;">`;
+          }
+
+          let timeStr = "-";
+          if (data.lastNameChangeAt) {
+              timeStr = new Date(data.lastNameChangeAt.toDate()).toLocaleString('th-TH');
+          }
+
+          html += `<tr>
+                    <td style="text-align:center; vertical-align: middle;">${picHtml}</td>
+                    <td style="text-align:center; vertical-align: middle;"><b>${id}</b></td>
+                    <td style="vertical-align: middle;">${data.displayName || '-'}</td>
+                    <td style="text-align:center; vertical-align: middle;">${data.password ? `<span style="color:#ff3b30; font-weight:bold;">${data.password}</span>` : `<span style="color:#86868b;">-</span>`}</td>
+                    <td style="text-align:center; vertical-align: middle;">${timeStr}</td>
+                  </tr>`;
+        });
+        html += "</table>";
+        tableDiv.innerHTML = html;
+      } catch (error) {
+        tableDiv.innerHTML = "<p style='color:red; text-align:center;'>การเรียกข้อมูลผู้ใช้งานล้มเหลว</p>";
+      }
+    }
 
     // ==========================================
     // ส่วนจัดการระบบแจ้งเตือนความจำ (Reminders)
