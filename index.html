@@ -1733,7 +1733,32 @@
     window.deleteJob = async function(id) {
       if (!confirm("ยืนยันการลบรายการนี้? (บัญชีทั้งหมดจะถูกตัดสิทธิ์จากรายการนี้ทันที)")) return;
       try {
+        const job = allJobsAdmin.find(j => j.id === id);
         await deleteDoc(doc(db, "jobs", id));
+
+        // ลบไฟล์ใน Supabase หากไฟล์นั้นมาจากระบบอัปโหลดเร่งด่วน
+        if (job && job.url && job.url.includes("jpejixrqjszqizmwipju.supabase.co")) {
+            try {
+                const SUPABASE_URL = "https://jpejixrqjszqizmwipju.supabase.co";
+                const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpwZWppeHJxanN6cWl6bXdpcGp1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkwNDQwOTAsImV4cCI6MjEwNDYyMDA5MH0.4C4ZIq1J4TO-oaJt9qouFXmqAau1jSzzREFaQNr0q1E";
+                const SUPABASE_BUCKET = "quick_docs";
+                const pathMatch = job.url.split(`/public/${SUPABASE_BUCKET}/`);
+                if(pathMatch && pathMatch[1]) {
+                    const filePath = decodeURIComponent(pathMatch[1]);
+                    const deleteUrl = `${SUPABASE_URL}/storage/v1/object/${SUPABASE_BUCKET}/${encodeURIComponent(filePath)}`;
+                    await fetch(deleteUrl, {
+                        method: 'DELETE',
+                        headers: {
+                            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                            'apikey': SUPABASE_ANON_KEY
+                        }
+                    });
+                }
+            } catch(err) {
+                console.warn("ไม่สามารถลบไฟล์จริงใน Supabase ได้: ", err);
+            }
+        }
+
         loadJobs();
       } catch (e) { alert("การลบข้อมูลล้มเหลว"); }
     }
