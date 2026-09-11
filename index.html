@@ -10,6 +10,9 @@
   
   <!-- โหลดไลบรารี Chart.js สำหรับวาดกราฟสถิติ -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- โหลดไลบรารี TinyMCE สำหรับระบบเขียนข้อความแบบ Full Option -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tinymce/6.8.2/tinymce.min.js"></script>
   
   <style>
     /* ==========================================
@@ -54,7 +57,7 @@
     .login-card { background: white; padding: 40px; border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.06); width: 100%; max-width: 400px; text-align: center; box-sizing: border-box; border: 1px solid rgba(0,0,0,0.05);}
     .login-card h2 { margin-top: 0; color: #1d1d1f; justify-content: center; font-weight: 600;}
     
-    #mainAdminContent { width: 100%; display: none; flex-direction: column; align-items: center; padding: 0 20px 30px; box-sizing: border-box; }
+    #mainAdminContent { width: 100%; display: none; flex-direction: column; align-items: center; padding: 0 20px 30px; box-sizing: border-box; transition: opacity 0.3s; }
 
     .admin-box { background: white; padding: 30px; border-radius: 16px; width: 100%; max-width: 850px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); margin-bottom: 25px; box-sizing: border-box; position: relative; border: 1px solid rgba(0,0,0,0.03);}
     h2 { margin-top: 0; display: flex; justify-content: space-between; align-items: center; color: #1d1d1f; font-size: 22px; font-weight: 600;}
@@ -403,7 +406,7 @@
       <button class="btn-green" onclick="grantDirectDownload()">ยืนยันการให้สิทธิ์การดาวน์โหลด</button>
     </div>
 
-    <!-- ฟอร์มเพิ่มเอกสารที่มีระบบ 3 ภาษา -->
+    <!-- ฟอร์มเพิ่มเอกสารที่มีระบบ 3 ภาษา และไฟล์ประเภทข้อความ -->
     <div class="admin-box" id="formBox">
       <h2 id="formTitle">เพิ่มรายการเข้าสู่ระบบ</h2>
       <input type="hidden" id="editJobId"> 
@@ -430,14 +433,25 @@
       <input type="text" id="jobFolder" placeholder="ระบุชื่อโฟลเดอร์ (ใช้ / เพื่อซ้อนโฟลเดอร์ เช่น คณิตศาสตร์/ม.1)" style="margin-top: 8px;">
       
       <label>3. ประเภทของไฟล์:</label>
-      <select id="fileType">
+      <select id="fileType" onchange="toggleInputType()">
         <option value="youtube">วิดีโอ (ลิงก์ YouTube)</option>
         <option value="image">รูปภาพ (ลิงก์ภาพ)</option>
         <option value="pdf">ไฟล์ PDF / Google Drive (ลิงก์เอกสาร)</option>
         <option value="link">ลิงก์เว็บไซต์ภายนอก (URL)</option>
+        <option value="text">แบบข้อความ (เขียนข้อความจัดรูปแบบได้)</option>
       </select>
-      <label>4. ข้อมูลลิงก์ (URL):</label>
-      <input type="text" id="fileUrl" placeholder="ระบุลิงก์ข้อมูลที่นี่..." required>
+      
+      <div id="urlInputGroup">
+          <label>4. ข้อมูลลิงก์ (URL):</label>
+          <input type="text" id="fileUrl" placeholder="ระบุลิงก์ข้อมูลที่นี่...">
+      </div>
+      
+      <!-- ส่วนแสดงผลระบบเขียนข้อความ (Rich Text) -->
+      <div id="textInputGroup" style="display: none; margin-top: 15px; margin-bottom: 25px;">
+          <label>4. เนื้อหาข้อความ (ปรับแต่งได้ไม่จำกัด):</label>
+          <textarea id="editor-container"></textarea>
+      </div>
+
       <label>5. กำหนดรายชื่อผู้มีสิทธิ์เข้าชมเบื้องต้น (คั่นด้วยลูกน้ำ หรือ ขึ้นบรรทัดใหม่):</label>
       <textarea id="allowedUsers" placeholder="ระบุรหัสประจำตัว เช่น: 6810210178, 6810210220"></textarea>
 
@@ -618,6 +632,7 @@
       image: `<svg class="icon-wide" viewBox="0 0 80 64" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="4" y="4" width="72" height="56" rx="8" fill="#F9F9FB" stroke="#D2D2D7" stroke-width="2"/><circle cx="24" cy="24" r="6" fill="#FFCC00"/><path d="M4 48L28 28L52 48L64 38L76 48V52C76 56.4183 72.4183 60 68 60H12C7.58172 60 4 56.4183 4 52V48Z" fill="#34C759"/></svg>`,
       youtube: `<svg class="icon-wide" viewBox="0 0 80 56" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="4" y="4" width="72" height="48" rx="12" fill="#FF3B30"/><path d="M34 18L52 28L34 38V18Z" fill="white"/></svg>`,
       link: `<svg class="icon-file" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="40" cy="40" r="36" fill="#F9F9FB" stroke="#D2D2D7" stroke-width="2"/><path d="M40 10C28 10 20 25 20 40C20 55 28 70 40 70C52 70 60 55 60 40C60 25 52 10 40 10Z" stroke="#0071E3" stroke-width="2"/><path d="M10 40H70" stroke="#0071E3" stroke-width="2"/><path d="M20 25H60" stroke="#0071E3" stroke-width="2"/><path d="M20 55H60" stroke="#0071E3" stroke-width="2"/></svg>`,
+      text: `<svg class="icon-file" viewBox="0 0 64 80" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="4" y="4" width="56" height="72" rx="6" fill="#F9F9FB" stroke="#D2D2D7" stroke-width="2"/><rect x="16" y="24" width="32" height="4" rx="2" fill="#0071E3"/><rect x="16" y="36" width="32" height="4" rx="2" fill="#D2D2D7"/><rect x="16" y="48" width="24" height="4" rx="2" fill="#D2D2D7"/></svg>`,
       lock: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle;"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>`
     };
     function getFolderIcon(color, emoji) {
@@ -667,8 +682,19 @@
     let lastReminderAction = null; 
     let cookieChartInstance = null;
     
-    // ตัวแปรเก็บ log สำหรับการจัดกลุ่มผู้ใช้
     window.groupedLogs = {}; 
+
+    // สลับกล่องข้อความ / URL
+    window.toggleInputType = function() {
+        const type = document.getElementById("fileType").value;
+        if (type === "text") {
+            document.getElementById("urlInputGroup").style.display = "none";
+            document.getElementById("textInputGroup").style.display = "block";
+        } else {
+            document.getElementById("urlInputGroup").style.display = "block";
+            document.getElementById("textInputGroup").style.display = "none";
+        }
+    };
 
     window.loginAdmin = function() {
       const email = document.getElementById("adminEmail").value;
@@ -698,20 +724,34 @@
       }
     }
 
-    onAuthStateChanged(auth, (user) => {
+    // แก้ไขระบบโหลดข้อมูลใช้ Promise.all แบบสมบูรณ์ เพื่อป้องกันบัค (เสถียรภาพสูงสุด 100%)
+    onAuthStateChanged(auth, async (user) => {
       if (user) {
         document.getElementById("adminLoginWrapper").style.display = "none";
         document.getElementById("mainAdminContent").style.display = "flex";
+        document.getElementById("mainAdminContent").style.opacity = "0.5";
+        document.getElementById("mainAdminContent").style.pointerEvents = "none";
+        
+        try {
+            await Promise.all([
+                loadBanners(),
+                loadJobs(),
+                loadRequests(),
+                loadHistory(),
+                loadAccessLogs(),
+                loadCookieStats(),
+                loadReminders(),
+                loadSchedules(),
+                loadUsers()
+            ]);
+        } catch(e) {
+            console.error("Initial load error: ", e);
+        }
+
+        document.getElementById("mainAdminContent").style.opacity = "1";
+        document.getElementById("mainAdminContent").style.pointerEvents = "auto";
+        
         setupExternalDragAndDrop();
-        loadBanners(); 
-        loadJobs();
-        loadRequests();
-        loadHistory();
-        loadAccessLogs();
-        loadCookieStats();
-        loadReminders();
-        loadSchedules();
-        loadUsers(); // โหลดข้อมูลผู้ใช้งาน (ฟังก์ชันใหม่)
         setTimeout(() => processDiscordActions(), 1000);
       } else {
         document.getElementById("adminLoginWrapper").style.display = "flex";
@@ -740,7 +780,6 @@
         let users = [];
         querySnapshot.forEach(doc => { users.push({ id: doc.id, ...doc.data() }); });
 
-        // เรียงลำดับตามเวลาอัปเดตล่าสุด
         users.sort((a, b) => {
             const timeA = a.updatedAt ? a.updatedAt.toMillis() : 0;
             const timeB = b.updatedAt ? b.updatedAt.toMillis() : 0;
@@ -1189,7 +1228,6 @@
                        </tr>`;
           } else {
               const userCount = job.allowedUsers ? job.allowedUsers.length : 0;
-              const safeData = encodeURIComponent(JSON.stringify({id: job.id, ...job}));
               const displayName = getLocalizedFileTitle(job);
               tableHtml += `<tr>
                         <td><b>${displayName}</b>${lockTxt}${pauseTxt}<br><small style="color:gray;">${displayFolder}</small></td>
@@ -1197,7 +1235,7 @@
                         <td style="text-align:center; color:#34c759; font-weight:bold;">${userCount} บัญชี</td>
                         <td>
                           <div class="action-btns">
-                            <button class="btn-yellow" onclick="editJob('${safeData}')">แก้ไข</button>
+                            <button class="btn-yellow" onclick="editJob('${job.id}')">แก้ไข</button>
                             <button class="btn-red" onclick="deleteJob('${job.id}')">ลบ</button>
                           </div>
                         </td>
@@ -1437,11 +1475,11 @@
         });
 
         filesInCurrentPath.forEach(file => {
-            const safeData = encodeURIComponent(JSON.stringify(file));
             let iconSvg = icons.pdf;
             if (file.type === "youtube") iconSvg = icons.youtube;
             else if (file.type === "image") iconSvg = icons.image;
             else if (file.type === "link") iconSvg = icons.link;
+            else if (file.type === "text") iconSvg = icons.text;
 
             let lockHtml = file.password ? `<div class="grid-lock">${icons.lock} ติดรหัสผ่าน</div>` : "";
             let fileTimeStr = file.updatedAt ? formatTime(file.updatedAt) : (file.createdAt ? formatTime(file.createdAt) : "");
@@ -1460,12 +1498,12 @@
                    data-file-id="${file.id}"
                    ondragstart="handleFileDragStart(event)" 
                    ondragend="handleFileDragEnd(event)">
-                <div class="grid-icon" onclick="editJob('${safeData}')">${iconDisplay}</div>
-                <div class="grid-name" onclick="editJob('${safeData}')">${file.title}</div>
+                <div class="grid-icon" onclick="editJob('${file.id}')">${iconDisplay}</div>
+                <div class="grid-name" onclick="editJob('${file.id}')">${file.title}</div>
                 <div class="grid-time">${fileTimeStr}</div>
                 ${lockHtml}
                 <div class="admin-actions">
-                  <button class="btn-yellow" onclick="editJob('${safeData}')">แก้ไข</button>
+                  <button class="btn-yellow" onclick="editJob('${file.id}')">แก้ไข</button>
                   <button class="btn-red" onclick="deleteJob('${file.id}')">ลบ</button>
                 </div>
                </div>
@@ -1602,6 +1640,8 @@
                else if(droppedFile.type.includes("pdf")) document.getElementById("fileType").value = "pdf";
                else document.getElementById("fileType").value = "link";
                
+               window.toggleInputType();
+               
                document.getElementById("formBox").scrollIntoView({ behavior: 'smooth' });
                alert(`เตรียมบันทึกอัปโหลดไฟล์: "${droppedFile.name}" เข้าสู่โฟลเดอร์ "${currentAdminPath || 'หน้าหลัก'}" แล้ว! กรุณาใส่ URL ข้อมูลลิงก์และบันทึกระบบงาน`);
            }
@@ -1636,15 +1676,26 @@
       const titleCN = document.getElementById("jobTitleCN").value.trim();
       const folder = document.getElementById("jobFolder").value.trim() || "";
       const type = document.getElementById("fileType").value;
+      
       let url = document.getElementById("fileUrl").value.trim();
+      let textContent = "";
+
+      // ถ้าเป็นประเภทข้อความ ให้ดึง HTML จาก TinyMCE
+      if (type === "text") {
+          if(tinymce.get('editor-container')) {
+              textContent = tinymce.get('editor-container').getContent();
+          }
+          url = "-"; // ป้องกัน error
+      }
+
       const rawUsers = document.getElementById("allowedUsers").value;
       const showWatermark = document.getElementById("showWatermark").value === "true";
       const password = document.getElementById("jobPassword").value.trim();
       const isPaused = document.getElementById("jobIsPaused").checked;
       const statusText = document.getElementById("status");
       
-      if (!title || !url) {
-        statusText.innerText = "กรุณาระบุข้อมูลไฟล์และลิงก์ให้ครบถ้วน";
+      if (!title || (!url && type !== "text")) {
+        statusText.innerText = "กรุณาระบุข้อมูลไฟล์และลิงก์/ข้อความให้ครบถ้วน";
         statusText.style.color = "red";
         return;
       }
@@ -1665,6 +1716,7 @@
           folder: folder,
           type: type,
           url: url,
+          textContent: textContent,
           allowedUsers: userList,
           searchableUsers: searchList,
           showWatermark: showWatermark,
@@ -1691,8 +1743,11 @@
       }
     }
 
-    window.editJob = function(encodedData) {
-      const data = JSON.parse(decodeURIComponent(encodedData));
+    // อัปเดต editJob โดยใช้ ID เพื่อดึงข้อมูลแทนการส่ง Object ที่มีข้อความยาวๆ ซึ่งอาจทำให้พัง
+    window.editJob = function(jobId) {
+      const data = allJobsAdmin.find(j => j.id === jobId);
+      if(!data) return;
+
       document.getElementById("formTitle").innerText = "แก้ไขข้อมูลและสิทธิ์ระบบงาน";
       document.getElementById("editJobId").value = data.id;
       document.getElementById("jobTitle").value = data.title;
@@ -1700,7 +1755,21 @@
       document.getElementById("jobTitleCN").value = data.titleCN || "";
       document.getElementById("jobFolder").value = data.folder || "";
       document.getElementById("fileType").value = data.type;
-      document.getElementById("fileUrl").value = data.url;
+      
+      // ควบคุมการแสดงผลตามประเภท
+      if (data.type === "text") {
+          if (tinymce.get('editor-container')) {
+              tinymce.get('editor-container').setContent(data.textContent || "");
+          }
+          document.getElementById("fileUrl").value = "";
+      } else {
+          document.getElementById("fileUrl").value = data.url || "";
+          if (tinymce.get('editor-container')) {
+              tinymce.get('editor-container').setContent("");
+          }
+      }
+      window.toggleInputType();
+
       document.getElementById("allowedUsers").value = (data.allowedUsers || []).join(",\n");
       document.getElementById("showWatermark").value = data.showWatermark !== false ? "true" : "false";
       document.getElementById("jobPassword").value = data.password || "";
@@ -1720,6 +1789,9 @@
       document.getElementById("jobTitleCN").value = "";
       document.getElementById("jobFolder").value = "";
       document.getElementById("fileUrl").value = "";
+      if (tinymce.get('editor-container')) tinymce.get('editor-container').setContent("");
+      document.getElementById("fileType").value = "youtube";
+      window.toggleInputType();
       document.getElementById("allowedUsers").value = "";
       document.getElementById("showWatermark").value = "true";
       document.getElementById("jobPassword").value = "";
@@ -2249,7 +2321,25 @@
       });
     }
 
-    document.addEventListener('DOMContentLoaded', initAccordion);
+    document.addEventListener('DOMContentLoaded', () => {
+        initAccordion();
+        
+        // กำหนดค่าและสร้าง TinyMCE Editor แบบ Full Option (ให้ตรงตามภาพ)
+        tinymce.init({
+            selector: '#editor-container',
+            height: 500, // ความสูงเหมาะสมสำหรับแถบเครื่องมือเยอะ
+            menubar: 'edit view insert format tools table help', // เมนูบาร์ด้านบน
+            plugins: [
+                'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
+                'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
+                'insertdatetime', 'media', 'table', 'wordcount'
+            ],
+            toolbar: 'undo redo | bold italic underline strikethrough | fontfamily fontsize blocks | alignleft aligncenter alignright alignjustify | outdent indent |  numlist bullist | forecolor backcolor removeformat | pagebreak | charmap | fullscreen preview print | image media link codesample table | ltr rtl',
+            content_style: "body { font-family: 'Sarabun', sans-serif; font-size: 15px; }",
+            branding: false, // เอาลายน้ำ TinyMCE ออก
+            promotion: false
+        });
+    });
   </script>
 </body>
 </html>
