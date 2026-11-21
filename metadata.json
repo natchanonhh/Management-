@@ -1,0 +1,6 @@
+{
+  "name": "ระบบผู้ดูแล — จัดการสิทธิ์แบบรวมศูนย์",
+  "description": "Centralized document access, schedule, reminder, and analytics admin console styled as an editorial 3D shelf archive.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
