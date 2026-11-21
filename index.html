@@ -5,8 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ระบบผู้ดูแล - จัดการสิทธิ์แบบรวมศูนย์</title>
   
-  <!-- โหลดฟอนต์ Sarabun แบบเดียวกับหน้าแรก -->
-  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <!-- โหลดฟอนต์ Editorial (Newsreader, Inter Tight) และภาษาไทย (Sarabun) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@500;600&family=Newsreader:ital,opsz,wght@0,6..72,400;1,6..72,400&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   
   <!-- โหลดไลบรารี Chart.js สำหรับวาดกราฟสถิติ -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -16,140 +18,892 @@
   
   <style>
     /* ==========================================
-       CSS ระบบหลังบ้าน (ดึงสไตล์มาเพื่อให้หน้าตาเหมือนระบบหลัก)
+       DESIGN TOKENS: ARCHIVAL PAPER & COBALT INK
        ========================================== */
-    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Sarabun', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-
     :root {
-        --pink-primary: #9d5b78;
-        --apple-blue: #0071e3;
-        --apple-blue-hover: #0077ed;
-        --apple-green: #34c759;
-        --apple-red: #ff3b30;
-        --apple-bg: #f5f5f7;
-        --apple-card-bg: #ffffff;
-        --apple-text-main: #1d1d1f;
-        --apple-text-muted: #86868b;
-        --apple-border: #d2d2d7;
+        --paper: #EDEBE6;
+        --sheet: #F4F2ED;
+        --ink: #141414;
+        --muted: #6D6A63;
+        --cobalt: #1F3FB0;
+        --cobalt-hover: #17318F;
+        --vermilion: #C83E2B;
+        --emerald: #1E7E48;
+        --amber: #B87414;
+        --rule: rgba(20, 20, 20, .9);
+        --rule-soft: rgba(20, 20, 20, .22);
+        --ease: cubic-bezier(.2, .8, .2, 1);
+        --ease-sheet: cubic-bezier(.76, 0, .18, 1);
+        --font-sans: "Inter Tight", "Sarabun", system-ui, -apple-system, sans-serif;
+        --font-serif: "Newsreader", "Sarabun", Georgia, serif;
+
+        /* คงตัวแปรเดิมเผื่อการอ้างอิง */
+        --pink-primary: #1F3FB0;
+        --apple-blue: #1F3FB0;
+        --apple-blue-hover: #17318F;
+        --apple-green: #1E7E48;
+        --apple-red: #C83E2B;
+        --apple-bg: #EDEBE6;
+        --apple-card-bg: #F4F2ED;
+        --apple-text-main: #141414;
+        --apple-text-muted: #6D6A63;
+        --apple-border: rgba(20, 20, 20, .9);
+    }
+
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: var(--font-sans);
     }
 
     body {
-        background: linear-gradient(180deg, #fcedf0 0%, #ffffff 500px);
-        background-attachment: fixed;
-        color: #333;
-        line-height: 1.6;
+        background-color: var(--paper);
+        color: var(--ink);
+        line-height: 1.55;
         min-height: 100vh;
         display: flex;
         flex-direction: column;
         align-items: center;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        overflow-x: hidden;
     }
 
-    /* --- Header (เหมือนหน้าบ้าน) --- */
-    header {
-        display: flex; justify-content: center; align-items: center;
-        padding: 15px 5%; background-color: transparent; border-bottom: 1px solid rgba(0,0,0,0.05); width: 100%;
-        margin-bottom: 20px;
+    @media (pointer: fine) {
+        html, body, button, a, select, input[type="radio"], input[type="checkbox"], .color-circle {
+            cursor: none;
+        }
+        input[type="text"], input[type="email"], input[type="password"], input[type="date"], input[type="time"], input[type="datetime-local"], textarea {
+            cursor: text;
+        }
     }
-    .logo-container { display: flex; align-items: center; gap: 15px; }
-    .logo-img { height: 65px; width: auto; max-width: 250px; border: none; object-fit: contain; background: transparent; }
 
-    #adminLoginWrapper { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: transparent; display: flex; justify-content: center; align-items: center; z-index: 9999; }
-    .login-card { background: white; padding: 40px; border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.06); width: 100%; max-width: 400px; text-align: center; box-sizing: border-box; border: 1px solid rgba(0,0,0,0.05);}
-    .login-card h2 { margin-top: 0; color: #1d1d1f; justify-content: center; font-weight: 600;}
-    
-    #mainAdminContent { width: 100%; display: none; flex-direction: column; align-items: center; padding: 0 20px 30px; box-sizing: border-box; transition: opacity 0.3s; }
-
-    .admin-box { background: white; padding: 30px; border-radius: 16px; width: 100%; max-width: 850px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); margin-bottom: 25px; box-sizing: border-box; position: relative; border: 1px solid rgba(0,0,0,0.03);}
-    h2 { margin-top: 0; display: flex; justify-content: space-between; align-items: center; color: #1d1d1f; font-size: 22px; font-weight: 600;}
-    label { font-weight: 600; margin-top: 15px; display: block; font-size: 14px; color: #1d1d1f; }
-    input, select, textarea, button { width: 100%; padding: 14px; margin-top: 8px; box-sizing: border-box; border: 1px solid #d2d2d7; border-radius: 12px; font-family: inherit; font-size: 15px; transition: 0.2s;}
-    input:focus, select:focus, textarea:focus { outline: none; border-color: var(--pink-primary); box-shadow: 0 0 0 3px rgba(157,91,120,0.1); }
-    textarea { height: 120px; resize: vertical; }
-    button { color: white; border: none; cursor: pointer; font-weight: 600; margin-top: 15px; transition: 0.2s; }
-    button:hover { opacity: 0.85; transform: scale(0.98); }
-    button:active { transform: scale(0.95); }
-    
-    .btn-blue { background: var(--pink-primary); } 
-    .btn-green { background: #34c759; }
-    .btn-yellow { background: #ffcc00; color: #1d1d1f; }
-    .btn-red { background: #ff3b30; }
-    .btn-gray { background: #86868b; display: none; }
-    
-    .nav-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #d2d2d7; }
-    .back-btn { background: transparent; color: var(--pink-primary); padding: 8px 12px; width: auto; margin: 0; font-size: 15px; }
-    .back-btn:hover { background: rgba(157,91,120, 0.1); transform: none; }
-    .path-title { font-size: 17px; font-weight: 600; flex-grow: 1; text-align: center; color: #1d1d1f; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin: 0 10px; }
-    
-    .explorer-zone { border: 2px dashed transparent; border-radius: 14px; padding: 15px; transition: all 0.3s ease; }
-    .explorer-zone.dragover-active { border-color: var(--pink-primary); background-color: rgba(157,91,120, 0.04); }
-
-    .item-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px 15px; margin-top: 15px; align-items: start; }
-    
-    .grid-item { display: flex; flex-direction: column; align-items: center; padding: 10px; border-radius: 12px; transition: background-color 0.2s, transform 0.2s; user-select: none; height: auto; min-height: 190px; justify-content: flex-start; }
-    .grid-item:hover { background-color: #f5f5f7; }
-    .grid-item.folder-target.dragover-active { background-color: rgba(157,91,120, 0.15) !important; transform: scale(1.05); box-shadow: 0 0 0 2px var(--pink-primary); }
-    .grid-item.dragging-item { opacity: 0.4; }
-
-    .grid-icon { margin-bottom: 10px; display: flex; justify-content: center; align-items: center; cursor: pointer; transition: transform 0.2s; height: 65px; width: 100%; position: relative; }
-    .grid-icon:hover { transform: scale(0.95); }
-    .grid-icon svg.icon-folder { width: 70px; height: auto; }
-    .grid-icon svg.icon-file { width: 48px; height: auto; }
-    .grid-icon svg.icon-wide { width: 62px; height: auto; }
-
-    .grid-name { font-size: 13px; font-weight: 500; color: #1d1d1f; text-align: center; line-height: 1.4; word-break: break-word; white-space: normal; width: 100%; cursor: pointer;}
-    .grid-lock { font-size: 12px; margin-top: 6px; color: #1d1d1f; text-align: center; display: flex; align-items: center; justify-content: center; gap:4px; }
-    .grid-time { font-size: 11px; color: #86868b; margin-top: 6px; text-align: center; line-height: 1.3; }
-
-    .admin-actions { display: flex; gap: 5px; margin-top: 15px; width: 100%; justify-content: center; }
-    .admin-actions button { padding: 6px 10px; font-size: 11px; margin: 0; width: auto; border-radius: 8px; }
-
-    .color-circle { width: 28px; height: 28px; border-radius: 50%; cursor: pointer; border: 3px solid transparent; box-sizing: border-box; transition: 0.1s; }
-    .color-circle:hover { transform: scale(1.1); }
-
-    @media (max-width: 600px) { 
-        .item-grid { grid-template-columns: repeat(3, 1fr); gap: 15px 10px; } 
-        header { justify-content: center; margin-bottom: 10px;}
+    /* ==========================================
+       PAPER GRAIN OVERLAY (SVG FRACTAL NOISE)
+       ========================================== */
+    .paper-grain {
+        position: fixed;
+        inset: 0;
+        z-index: 9500;
+        pointer-events: none;
+        mix-blend-mode: multiply;
+        opacity: .55;
+        background-repeat: repeat;
+        background-size: 220px 220px;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0.45 0 0 0 0 0.42 0 0 0 0 0.38 0 0 0 0.22 0'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23n)'/%3E%3C/svg%3E");
     }
-    @media (max-width: 450px) { .item-grid { grid-template-columns: repeat(2, 1fr); } }
 
-    .table-responsive { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
-    table { width: 100%; min-width: 750px; border-collapse: collapse; font-size: 13px; margin-top: 15px; }
-    th, td { border: 1px solid #d2d2d7; padding: 12px 10px; text-align: left; vertical-align: middle; }
-    th { background-color: #f5f5f7; text-align: center; font-weight: 600; }
-    .action-btns { display: flex; gap: 5px; justify-content: center; flex-wrap: wrap; }
-    .action-btns button { width: auto; padding: 6px 12px; margin: 0; font-size: 12px; border-radius: 8px;}
+    /* ==========================================
+       CUSTOM RING CURSOR (DESKTOP FINE POINTER)
+       ========================================== */
+    .custom-cursor {
+        display: none;
+    }
+    @media (pointer: fine) {
+        .custom-cursor {
+            display: block;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 58px;
+            height: 58px;
+            margin-left: -29px;
+            margin-top: -29px;
+            z-index: 10050;
+            pointer-events: none;
+            will-change: transform;
+            transition: opacity .25s var(--ease);
+        }
+        .custom-cursor.hidden-over-editor {
+            opacity: 0;
+        }
+        .custom-cursor .c-ring {
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            border: 1.5px solid var(--ink);
+            background: transparent;
+            transition: transform .5s var(--ease), background-color .4s var(--ease), border-color .4s var(--ease);
+        }
+        .custom-cursor .c-dot {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 6px;
+            height: 6px;
+            margin: -3px 0 0 -3px;
+            border-radius: 50%;
+            background: var(--ink);
+            transition: transform .4s var(--ease);
+        }
+        .custom-cursor.btn .c-ring {
+            transform: scale(.55);
+            border-color: var(--cobalt);
+        }
+        .custom-cursor.btn .c-dot {
+            transform: scale(0);
+        }
+    }
 
-    .admin-box.collapsible-box h2 {
-        cursor: pointer; user-select: none; transition: all 0.3s ease; padding: 12px 15px; margin: -12px -15px 15px -15px; border-radius: 12px; background: transparent;
+    /* ==========================================
+       CATALOGUE LABEL & BOX SYSTEM (.lbl / .box)
+       ========================================== */
+    .lbl {
+        font-family: var(--font-sans);
+        font-weight: 600;
+        font-size: 10.5px;
+        line-height: 1;
+        letter-spacing: .09em;
+        text-transform: uppercase;
     }
-    .admin-box.collapsible-box h2:hover { background-color: #f5f5f7; }
-    .toggle-arrow {
-        display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 50%; background-color: #e5e5ea; color: #1d1d1f; transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.2s; margin-left: auto;
+    .box {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        height: 23px;
+        padding: 0 9px;
+        border: 1px solid var(--rule);
+        background: transparent;
+        color: var(--ink);
+        border-radius: 0;
     }
-    .admin-box.collapsible-box h2:hover .toggle-arrow { background-color: #d2d2d7; }
-    .admin-box.collapsed .toggle-arrow { transform: rotate(180deg); }
-    .accordion-content {
-        display: grid; grid-template-rows: 1fr; transition: grid-template-rows 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease, margin 0.4s ease; opacity: 1;
-    }
-    .accordion-content > .accordion-inner { overflow: hidden; }
-    .admin-box.collapsed .accordion-content { grid-template-rows: 0fr; opacity: 0; margin-top: -10px; }
 
+    /* ==========================================
+       TOP EDITORIAL HEADER BAR (3-COLUMN GRID)
+       ========================================== */
+    header.editorial-header {
+        display: grid;
+        grid-template-columns: 1fr auto 1fr;
+        align-items: center;
+        height: 84px;
+        padding: 0 32px;
+        width: 100%;
+        border-bottom: 1px solid var(--rule);
+        background-color: var(--paper);
+        position: sticky;
+        top: 0;
+        z-index: 500;
+    }
+    .header-left {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 10px;
+    }
+    .logo-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+    }
+    .logo-img {
+        height: 36px;
+        width: auto;
+        max-width: 140px;
+        object-fit: contain;
+        filter: contrast(1.06);
+    }
+    .brand-stack {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
+        color: var(--cobalt);
+        text-align: center;
+    }
+    .brand-stack .brand-main {
+        font-family: var(--font-serif);
+        font-weight: 400;
+        font-size: 22px;
+        line-height: 1;
+        letter-spacing: .02em;
+        color: var(--cobalt);
+    }
+    .brand-stack .brand-sub {
+        font-family: var(--font-sans);
+        font-weight: 600;
+        font-size: 9px;
+        line-height: 1;
+        letter-spacing: .34em;
+        padding-left: .34em;
+        text-transform: uppercase;
+        color: var(--cobalt);
+    }
+    .header-right {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 10px;
+    }
+
+    /* ==========================================
+       LOGIN SCREEN (ARCHIVAL SHEET DIALOG)
+       ========================================== */
+    #adminLoginWrapper {
+        position: fixed;
+        inset: 0;
+        background-color: var(--paper);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 9000;
+        padding: 20px;
+    }
+    .login-card {
+        background: var(--sheet);
+        padding: 42px 36px;
+        border-radius: 2px;
+        border: 1px solid var(--rule);
+        width: 100%;
+        max-width: 420px;
+        text-align: center;
+        position: relative;
+        box-shadow: 0 28px 60px -30px rgba(20, 16, 10, .35);
+    }
+    .login-card .login-tag {
+        margin-bottom: 18px;
+        color: var(--cobalt);
+        border-color: var(--cobalt);
+    }
+    .login-card h2 {
+        margin-top: 0;
+        margin-bottom: 6px;
+        color: var(--ink);
+        justify-content: center;
+        font-family: var(--font-serif);
+        font-size: 30px;
+        font-weight: 400;
+        letter-spacing: -0.015em;
+    }
+    .login-card p.login-sub {
+        color: var(--muted);
+        margin-bottom: 24px;
+        font-size: 13px;
+    }
+
+    /* ==========================================
+       SLIDING COBALT PAGE NAVIGATION BAR
+       ========================================== */
+    #mainAdminContent {
+        width: 100%;
+        display: none;
+        flex-direction: column;
+        align-items: center;
+        padding: 24px 24px 64px;
+        transition: opacity .35s var(--ease);
+    }
+
+    .page-nav-wrapper {
+        width: 100%;
+        max-width: 960px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-bottom: 28px;
+    }
+    .page-nav-caption {
+        color: var(--muted);
+        margin-bottom: 10px;
+    }
+    .page-tabs {
+        position: relative;
+        display: inline-flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-items: center;
+        background: transparent;
+    }
+    .tab-indicator {
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 30px;
+        background-color: var(--cobalt);
+        z-index: 0;
+        pointer-events: none;
+        transition: transform .6s var(--ease), width .6s var(--ease), top .6s var(--ease);
+    }
+    .page-tab-btn {
+        position: relative;
+        z-index: 1;
+        width: auto;
+        height: 30px;
+        padding: 0 14px;
+        margin: 0;
+        margin-left: -1px;
+        border: 1px solid var(--rule);
+        border-radius: 0;
+        background: transparent;
+        color: var(--ink);
+        font-family: var(--font-sans);
+        font-size: 10.5px;
+        font-weight: 600;
+        letter-spacing: .09em;
+        text-transform: uppercase;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        white-space: nowrap;
+        transition: color .45s var(--ease);
+    }
+    .page-tab-btn:first-of-type {
+        margin-left: 0;
+    }
+    .page-tab-btn:hover {
+        opacity: 1;
+        transform: none;
+        color: var(--cobalt);
+    }
+    .page-tab-btn.active {
+        color: #F4F2ED;
+    }
+    .page-tab-btn.active:hover {
+        color: #F4F2ED;
+    }
+    .tab-pill-count {
+        display: none;
+        background: var(--vermilion);
+        color: #F4F2ED;
+        font-size: 9px;
+        padding: 2px 5px;
+        line-height: 1;
+        letter-spacing: .04em;
+    }
+    .page-tab-btn.active .tab-pill-count {
+        background: #F4F2ED;
+        color: var(--cobalt);
+    }
+
+    /* ==========================================
+       SEPARATED ADMIN PAGES (.admin-page)
+       ========================================== */
+    .admin-page {
+        display: none;
+        width: 100%;
+        max-width: 960px;
+        flex-direction: column;
+        align-items: center;
+        animation: pageMaskReveal .55s var(--ease) both;
+    }
+    .admin-page.active {
+        display: flex;
+    }
+    @keyframes pageMaskReveal {
+        from {
+            clip-path: inset(0 0 6% 0);
+            transform: translateY(10px);
+        }
+        to {
+            clip-path: inset(0 0 0 0);
+            transform: translateY(0);
+        }
+    }
+
+    .page-banner-header {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        padding-bottom: 14px;
+        margin-bottom: 22px;
+        border-bottom: 1px solid var(--rule);
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+    .page-banner-header .page-kicker {
+        color: var(--cobalt);
+        display: block;
+        margin-bottom: 6px;
+    }
+    .page-banner-header h1 {
+        font-family: var(--font-serif);
+        font-weight: 400;
+        font-size: clamp(26px, 3.2vw, 36px);
+        line-height: 1.08;
+        letter-spacing: -0.02em;
+        color: var(--ink);
+    }
+
+    /* ==========================================
+       ARCHIVAL SHEET CARDS (.admin-box)
+       ========================================== */
+    .admin-box {
+        background: var(--sheet);
+        padding: 28px 30px;
+        border-radius: 2px;
+        width: 100%;
+        max-width: 960px;
+        border: 1px solid var(--rule);
+        margin-bottom: 24px;
+        position: relative;
+        box-shadow: 0 24px 48px -32px rgba(20, 16, 10, .28);
+    }
+    .admin-box.accent-cobalt {
+        border-top: 4px solid var(--cobalt);
+    }
+    .admin-box.accent-vermilion {
+        border-top: 4px solid var(--vermilion);
+    }
+    .admin-box.accent-emerald {
+        border-top: 4px solid var(--emerald);
+    }
+    .admin-box.accent-ink {
+        border-top: 4px solid var(--ink);
+    }
+
+    .section-head-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        padding-bottom: 12px;
+        margin-bottom: 16px;
+        border-bottom: 1px solid var(--rule-soft);
+        flex-wrap: wrap;
+    }
+
+    h2 {
+        margin-top: 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        color: var(--ink);
+        font-family: var(--font-serif);
+        font-size: 24px;
+        font-weight: 400;
+        letter-spacing: -0.015em;
+        line-height: 1.15;
+    }
+
+    label {
+        font-family: var(--font-sans);
+        font-weight: 600;
+        margin-top: 16px;
+        display: block;
+        font-size: 12px;
+        letter-spacing: .04em;
+        color: var(--ink);
+    }
+    .lang-label {
+        font-size: 11.5px;
+        color: var(--muted);
+        margin-top: 12px;
+        margin-bottom: -2px;
+        display: block;
+        font-weight: 500;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="password"],
+    input[type="date"],
+    input[type="time"],
+    input[type="datetime-local"],
+    select,
+    textarea {
+        width: 100%;
+        padding: 11px 13px;
+        margin-top: 6px;
+        border: 1px solid var(--rule);
+        border-radius: 0;
+        background-color: var(--paper);
+        color: var(--ink);
+        font-family: var(--font-sans);
+        font-size: 14px;
+        transition: border-color .25s var(--ease), background-color .25s var(--ease);
+    }
+    input:focus, select:focus, textarea:focus {
+        outline: none;
+        border-color: var(--cobalt);
+        background-color: #FFFFFF;
+        box-shadow: inset 3px 0 0 var(--cobalt);
+    }
+    textarea {
+        height: 110px;
+        resize: vertical;
+    }
+
+    /* ==========================================
+       EDITORIAL BUTTON SYSTEM
+       ========================================== */
+    button {
+        width: 100%;
+        padding: 12px 18px;
+        margin-top: 16px;
+        border: 1px solid var(--rule);
+        border-radius: 0;
+        font-family: var(--font-sans);
+        font-size: 12px;
+        font-weight: 600;
+        letter-spacing: .08em;
+        text-transform: uppercase;
+        color: #F4F2ED;
+        background-color: var(--ink);
+        transition: background-color .3s var(--ease), color .3s var(--ease), border-color .3s var(--ease), transform .2s var(--ease);
+    }
+    button:hover {
+        opacity: 1;
+        transform: translateY(-1px);
+    }
+    button:active {
+        transform: translateY(0);
+    }
+
+    .btn-blue {
+        background-color: var(--cobalt);
+        border-color: var(--cobalt);
+        color: #F4F2ED;
+    }
+    .btn-blue:hover {
+        background-color: var(--cobalt-hover);
+        border-color: var(--cobalt-hover);
+    }
+    .btn-green {
+        background-color: var(--emerald);
+        border-color: var(--emerald);
+        color: #F4F2ED;
+    }
+    .btn-green:hover {
+        background-color: #176639;
+    }
+    .btn-yellow {
+        background-color: var(--paper);
+        border-color: var(--rule);
+        color: var(--ink);
+    }
+    .btn-yellow:hover {
+        background-color: var(--ink);
+        color: #F4F2ED;
+    }
+    .btn-red {
+        background-color: var(--vermilion);
+        border-color: var(--vermilion);
+        color: #F4F2ED;
+    }
+    .btn-red:hover {
+        background-color: #A63120;
+    }
+    .btn-gray {
+        background-color: transparent;
+        border-color: var(--rule);
+        color: var(--ink);
+        display: none;
+    }
+    .btn-gray:hover {
+        background-color: var(--ink);
+        color: #F4F2ED;
+    }
+
+    .btn-logout-top {
+        width: auto;
+        height: 28px;
+        padding: 0 12px;
+        margin: 0;
+        background: transparent;
+        color: var(--ink);
+        border: 1px solid var(--rule);
+        font-size: 10px;
+        letter-spacing: .09em;
+    }
+    .btn-logout-top:hover {
+        background: var(--vermilion);
+        border-color: var(--vermilion);
+        color: #F4F2ED;
+    }
+
+    /* ==========================================
+       FILE EXPLORER & GRID
+       ========================================== */
+    .nav-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 18px;
+        padding: 10px 14px;
+        border: 1px solid var(--rule);
+        background: var(--paper);
+    }
+    .back-btn {
+        background: transparent;
+        color: var(--cobalt);
+        border: 1px solid var(--cobalt);
+        padding: 6px 12px;
+        width: auto;
+        margin: 0;
+        font-size: 11px;
+    }
+    .back-btn:hover {
+        background: var(--cobalt);
+        color: #F4F2ED;
+        transform: none;
+    }
+    .path-title {
+        font-family: var(--font-serif);
+        font-size: 18px;
+        font-weight: 400;
+        flex-grow: 1;
+        text-align: center;
+        color: var(--ink);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        margin: 0 12px;
+    }
+
+    .explorer-zone {
+        border: 1px dashed var(--rule-soft);
+        border-radius: 0;
+        padding: 18px;
+        background: var(--paper);
+        transition: border-color .3s var(--ease), background-color .3s var(--ease);
+    }
+    .explorer-zone.dragover-active {
+        border-color: var(--cobalt);
+        border-style: solid;
+        background-color: rgba(31, 63, 176, .06);
+    }
+
+    .item-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 16px;
+        margin-top: 8px;
+        align-items: stretch;
+    }
+
+    .grid-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 14px 10px;
+        border: 1px solid var(--rule-soft);
+        background: var(--sheet);
+        transition: border-color .25s var(--ease), transform .25s var(--ease), background-color .25s var(--ease);
+        user-select: none;
+        min-height: 190px;
+        justify-content: flex-start;
+    }
+    .grid-item:hover {
+        border-color: var(--rule);
+        background-color: #FFFFFF;
+        transform: translateY(-2px);
+    }
+    .grid-item.folder-target.dragover-active {
+        background-color: rgba(31, 63, 176, .12) !important;
+        border-color: var(--cobalt) !important;
+        transform: scale(1.03);
+    }
+    .grid-item.dragging-item {
+        opacity: 0.4;
+    }
+
+    .grid-icon {
+        margin-bottom: 10px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+        transition: transform .25s var(--ease);
+        height: 64px;
+        width: 100%;
+        position: relative;
+    }
+    .grid-icon:hover {
+        transform: scale(0.96);
+    }
+    .grid-icon svg.icon-folder { width: 68px; height: auto; }
+    .grid-icon svg.icon-file { width: 46px; height: auto; }
+    .grid-icon svg.icon-wide { width: 60px; height: auto; }
+
+    .grid-name {
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--ink);
+        text-align: center;
+        line-height: 1.35;
+        word-break: break-word;
+        white-space: normal;
+        width: 100%;
+        cursor: pointer;
+    }
+    .grid-lock {
+        font-size: 10px;
+        font-weight: 600;
+        letter-spacing: .06em;
+        text-transform: uppercase;
+        margin-top: 6px;
+        padding: 2px 6px;
+        border: 1px solid var(--vermilion);
+        color: var(--vermilion);
+        text-align: center;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+    }
+    .grid-time {
+        font-size: 11px;
+        color: var(--muted);
+        margin-top: 6px;
+        text-align: center;
+        line-height: 1.3;
+    }
+
+    .admin-actions {
+        display: flex;
+        gap: 6px;
+        margin-top: auto;
+        padding-top: 12px;
+        width: 100%;
+        justify-content: center;
+    }
+    .admin-actions button {
+        padding: 5px 10px;
+        font-size: 10px;
+        margin: 0;
+        width: auto;
+    }
+
+    .color-circle {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        border: 2px solid transparent;
+        transition: transform .2s var(--ease);
+    }
+    .color-circle:hover {
+        transform: scale(1.12);
+    }
+
+    /* ==========================================
+       EDITORIAL TABLES
+       ========================================== */
+    .table-responsive {
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        margin-top: 14px;
+        border: 1px solid var(--rule);
+        background: var(--paper);
+    }
+    table {
+        width: 100%;
+        min-width: 720px;
+        border-collapse: collapse;
+        font-size: 13px;
+        margin-top: 0;
+    }
+    th, td {
+        border-bottom: 1px solid var(--rule-soft);
+        border-right: 1px solid var(--rule-soft);
+        padding: 11px 12px;
+        text-align: left;
+        vertical-align: middle;
+    }
+    th:last-child, td:last-child {
+        border-right: none;
+    }
+    tr:last-child td {
+        border-bottom: none;
+    }
+    th {
+        background-color: var(--ink);
+        color: #F4F2ED;
+        text-align: center;
+        font-family: var(--font-sans);
+        font-size: 10.5px;
+        font-weight: 600;
+        letter-spacing: .09em;
+        text-transform: uppercase;
+        border-bottom: 1px solid var(--rule);
+    }
+    tbody tr:hover td {
+        background-color: rgba(31, 63, 176, .04);
+    }
+    .action-btns {
+        display: flex;
+        gap: 6px;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+    .action-btns button {
+        width: auto;
+        padding: 6px 11px;
+        margin: 0;
+        font-size: 10.5px;
+    }
+
+    /* ==========================================
+       SWITCHES, BELL BADGE & SLEEP LOADER
+       ========================================== */
     @keyframes bell-ring {
       0%, 100% { transform: rotate(0); }
       10%, 30%, 50% { transform: rotate(15deg); }
       20%, 40% { transform: rotate(-15deg); }
     }
-    .bell-icon.ringing { display: inline-block; animation: bell-ring 1.5s ease-in-out infinite; transform-origin: top center; }
+    .bell-icon.ringing {
+        display: inline-block;
+        animation: bell-ring 1.5s ease-in-out infinite;
+        transform-origin: top center;
+    }
 
-    .switch { position: relative; display: inline-block; width: 50px; height: 28px; }
-    .switch input { opacity: 0; width: 0; height: 0; }
-    .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 34px; }
-    .slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
-    input:checked + .slider { background-color: var(--pink-primary); }
-    input:checked + .slider:before { transform: translateX(22px); }
+    .switch {
+        position: relative;
+        display: inline-block;
+        width: 46px;
+        height: 24px;
+        margin: 0;
+    }
+    .switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+    .slider {
+        position: absolute;
+        cursor: pointer;
+        inset: 0;
+        background-color: var(--paper);
+        border: 1px solid var(--rule);
+        transition: .3s var(--ease);
+    }
+    .slider:before {
+        position: absolute;
+        content: "";
+        height: 16px;
+        width: 16px;
+        left: 3px;
+        bottom: 3px;
+        background-color: var(--ink);
+        transition: .3s var(--ease);
+    }
+    input:checked + .slider {
+        background-color: var(--cobalt);
+        border-color: var(--cobalt);
+    }
+    input:checked + .slider:before {
+        background-color: #F4F2ED;
+        transform: translateX(22px);
+    }
 
-    .loader-wrapper { position: relative; display: flex; justify-content: center; align-items: center; height: 65px; width: 100%; margin-bottom: 10px; }
-    .z { position: absolute; font-size: 24px; font-weight: bold; color: var(--pink-primary); opacity: 0; }
+    .loader-wrapper {
+        position: relative;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 64px;
+        width: 100%;
+    }
+    .z {
+        position: absolute;
+        font-family: var(--font-serif);
+        font-size: 22px;
+        font-weight: 400;
+        color: var(--cobalt);
+        opacity: 0;
+    }
     .z-1 { animation: swayUpToRight 2s ease-out infinite; }
     .z-2 { animation: swayUpToRight 2s ease-out 0.5s infinite; }
     .z-3 { animation: swayUpToRight 2s ease-out 1s infinite; }
@@ -157,64 +911,164 @@
 
     @keyframes swayUpToRight {
         0% { transform: translate(0, 0) rotate(0deg); opacity: 1; }
-        100% { transform: translate(30px, -40px) rotate(30deg); opacity: 0; }
+        100% { transform: translate(26px, -36px) rotate(24deg); opacity: 0; }
     }
-    
-    .lang-label { font-size: 13px; color: #86868b; margin-top: 10px; margin-bottom: -5px; display: block; font-weight: 500;}
+
+    /* ==========================================
+       ARCHIVAL MODALS
+       ========================================== */
+    .editorial-modal-backdrop {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(20, 20, 20, .55);
+        z-index: 10000;
+        justify-content: center;
+        align-items: center;
+        padding: 16px;
+    }
+    .editorial-modal-card {
+        background: var(--sheet);
+        border: 1px solid var(--rule);
+        border-radius: 2px;
+        padding: 28px;
+        box-shadow: 0 28px 60px -20px rgba(0, 0, 0, .4);
+        animation: modalSheetOpen .38s var(--ease) both;
+    }
+    @keyframes modalSheetOpen {
+        from {
+            clip-path: inset(12% 12% 12% 12%);
+            transform: rotate(-2deg) scale(.96);
+        }
+        to {
+            clip-path: inset(0 0 0 0);
+            transform: rotate(0deg) scale(1);
+        }
+    }
+
+    /* ==========================================
+       RESPONSIVE (<= 767px)
+       ========================================== */
+    @media (max-width: 767px) {
+        header.editorial-header {
+            height: 68px;
+            padding: 0 16px;
+        }
+        .header-left .archive-tag {
+            display: none;
+        }
+        .brand-stack .brand-main {
+            font-size: 17px;
+        }
+        .brand-stack .brand-sub {
+            font-size: 7.5px;
+        }
+        #mainAdminContent {
+            padding: 18px 14px 48px;
+        }
+        .admin-box {
+            padding: 20px 16px;
+        }
+        .page-tab-btn {
+            height: 28px;
+            padding: 0 9px;
+            font-size: 9px;
+        }
+        .tab-indicator {
+            height: 28px;
+        }
+        .item-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after {
+            animation-duration: 1ms !important;
+            transition-duration: 1ms !important;
+        }
+    }
   </style>
 </head>
 <body oncontextmenu="return false;">
 
-  <header>
-      <div class="logo-container">
-          <img src="https://i.postimg.cc/hvWpwkgG/Docum.png" alt="Logo" class="logo-img">
+  <!-- Paper Grain Layer -->
+  <div class="paper-grain" aria-hidden="true"></div>
+
+  <!-- Custom Ring Cursor -->
+  <div class="custom-cursor" id="customCursor" aria-hidden="true">
+      <div class="c-ring"></div>
+      <div class="c-dot"></div>
+  </div>
+
+  <!-- Top Editorial Bar -->
+  <header class="editorial-header">
+      <div class="header-left">
+          <div class="logo-container">
+              <img src="https://i.postimg.cc/hvWpwkgG/Docum.png" alt="Logo" class="logo-img">
+          </div>
+          <span class="lbl box archive-tag">ADMIN / ผู้ดูแลระบบ</span>
+      </div>
+
+      <div class="brand-stack">
+          <span class="brand-main">จัดการสิทธิ์แบบรวมศูนย์</span>
+          <span class="brand-sub">CENTRALIZED ARCHIVE SYSTEM</span>
+      </div>
+
+      <div class="header-right">
+          <button id="topLogoutBtn" class="btn-logout-top" style="display:none;" onclick="logoutAdmin()">LOGOUT / ออกจากระบบ</button>
       </div>
   </header>
 
-  <div id="timePickerModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:10000; justify-content:center; align-items:center;">
-    <div style="background:white; padding:25px; border-radius:16px; width:90%; max-width:350px; text-align:center; box-shadow: 0 15px 40px rgba(0,0,0,0.15);">
-        <h3 style="margin-top:0; color:#1d1d1f; font-weight:600;">กำหนดเวลาการเข้าถึง</h3>
-        <div style="text-align:left; background:#f5f5f7; padding:15px; border-radius:14px; margin-bottom:20px;">
+  <!-- Modal: กำหนดเวลาการเข้าถึง -->
+  <div id="timePickerModal" class="editorial-modal-backdrop">
+    <div class="editorial-modal-card" style="width:90%; max-width:360px; text-align:center;">
+        <span class="lbl box" style="color:var(--cobalt); border-color:var(--cobalt); margin-bottom:12px;">ACCESS DURATION</span>
+        <h3 style="margin:0 0 16px; color:var(--ink); font-family:var(--font-serif); font-size:24px; font-weight:400;">กำหนดเวลาการเข้าถึง</h3>
+        <div style="text-align:left; background:var(--paper); border:1px solid var(--rule); padding:16px; margin-bottom:20px;">
             <label style="margin-top:0; display:flex; align-items:center; gap:8px; cursor:pointer;">
-                <input type="radio" name="timeType" value="unlimited" checked onchange="toggleTimePicker()" style="width:auto; margin:0;">
+                <input type="radio" name="timeType" value="unlimited" checked onchange="toggleTimePicker()" style="width:auto; margin:0; accent-color:var(--cobalt);">
                 <span>ไม่จำกัดเวลา (ถาวร)</span>
             </label>
-            <hr style="border:none; border-top:1px solid #d2d2d7; margin:15px 0;">
+            <hr style="border:none; border-top:1px solid var(--rule-soft); margin:14px 0;">
             <label style="margin-top:0; display:flex; align-items:center; gap:8px; cursor:pointer;">
-                <input type="radio" name="timeType" value="custom" onchange="toggleTimePicker()" style="width:auto; margin:0;">
+                <input type="radio" name="timeType" value="custom" onchange="toggleTimePicker()" style="width:auto; margin:0; accent-color:var(--cobalt);">
                 <span>กำหนดเวลาหมดอายุ:</span>
             </label>
             <input type="datetime-local" id="customExpireDate" style="display:none; margin-top:10px; width:100%; box-sizing:border-box;">
         </div>
         <div style="display:flex; gap:10px;">
-            <button class="btn-gray" onclick="closeTimePicker()" style="display:block; background:#e5e5ea; color:#1d1d1f; margin-top:0; box-shadow:none;">ยกเลิก</button>
-            <button class="btn-blue" onclick="confirmTimePicker()" style="margin-top:0; box-shadow:none;">ยืนยัน</button>
+            <button class="btn-gray" onclick="closeTimePicker()" style="display:block; margin-top:0;">ยกเลิก</button>
+            <button class="btn-blue" onclick="confirmTimePicker()" style="margin-top:0;">ยืนยัน</button>
         </div>
     </div>
   </div>
 
-  <div id="folderSettingsModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:10000; justify-content:center; align-items:center;">
-    <div style="background:#ffffff; width:90%; max-width:320px; border-radius:24px; padding:25px; box-sizing:border-box; text-align:center; box-shadow: 0 15px 40px rgba(0,0,0,0.15); max-height: 90vh; overflow-y: auto;">
-        <div id="folderPreviewIcon" style="width:90px; height:90px; margin:0 auto 15px; display:flex; justify-content:center; align-items:center;"></div>
+  <!-- Modal: ตั้งค่าโฟลเดอร์ -->
+  <div id="folderSettingsModal" class="editorial-modal-backdrop">
+    <div class="editorial-modal-card" style="width:90%; max-width:350px; text-align:center; max-height: 90vh; overflow-y: auto;">
+        <span class="lbl box" style="color:var(--cobalt); border-color:var(--cobalt); margin-bottom:12px;">FOLDER METADATA</span>
+        <div id="folderPreviewIcon" style="width:84px; height:84px; margin:0 auto 12px; display:flex; justify-content:center; align-items:center;"></div>
         
         <input type="hidden" id="editFolderPath">
         
-        <div style="text-align: left; margin-bottom: 15px;">
-            <label style="margin-top: 0; font-size: 13px; color: var(--pink-primary);">ชื่อโฟลเดอร์ (ภาษาไทย - บังคับ/ตัวหลัก)</label>
-            <input type="text" id="editFolderName" placeholder="ชื่อโฟลเดอร์" style="font-size:16px; font-weight:600; text-align:center; padding:10px 5px; width:100%; border:none; border-bottom:2px solid #e5e5ea; border-radius:0; background:transparent;">
+        <div style="text-align: left; margin-bottom: 16px;">
+            <label style="margin-top: 0; font-size: 12px; color: var(--cobalt);">ชื่อโฟลเดอร์ (ภาษาไทย - บังคับ/ตัวหลัก)</label>
+            <input type="text" id="editFolderName" placeholder="ชื่อโฟลเดอร์" style="font-size:15px; font-weight:600; text-align:center;">
             
-            <label style="margin-top: 10px; font-size: 13px; color: #86868b;">Folder Name (English - Optional)</label>
-            <input type="text" id="editFolderNameEN" placeholder="Optional English Name" style="font-size:14px; text-align:center; padding:8px 5px; width:100%; border:none; border-bottom:1px solid #e5e5ea; border-radius:0; background:transparent;">
+            <label style="margin-top: 10px; font-size: 12px; color: var(--muted);">Folder Name (English - Optional)</label>
+            <input type="text" id="editFolderNameEN" placeholder="Optional English Name" style="font-size:13.5px; text-align:center;">
             
-            <label style="margin-top: 10px; font-size: 13px; color: #86868b;">文件夹名称 (中文 - 可选)</label>
-            <input type="text" id="editFolderNameCN" placeholder="可选中文名称" style="font-size:14px; text-align:center; padding:8px 5px; width:100%; border:none; border-bottom:1px solid #e5e5ea; border-radius:0; background:transparent;">
+            <label style="margin-top: 10px; font-size: 12px; color: var(--muted);">文件夹名称 (中文 - 可选)</label>
+            <input type="text" id="editFolderNameCN" placeholder="可选中文名称" style="font-size:13.5px; text-align:center;">
         </div>
         
         <!-- Toggle Switch สำหรับโหมดพัก -->
-        <div style="display: flex; justify-content: space-between; align-items: center; background:#f5f5f7; padding:12px 15px; border-radius:14px; margin-bottom: 15px;">
-            <label style="font-size:14px; color:#1d1d1f; margin:0; font-weight:600; text-align:left;">
+        <div style="display: flex; justify-content: space-between; align-items: center; background:var(--paper); border:1px solid var(--rule); padding:12px 14px; margin-bottom: 14px;">
+            <label style="font-size:13px; color:var(--ink); margin:0; font-weight:600; text-align:left;">
                 โหมดกำลังพัก<br>
-                <span style="font-size: 11px; font-weight: normal; color: var(--apple-text-muted);">ซ่อนการแสดงผลชั่วคราว</span>
+                <span style="font-size: 11px; font-weight: normal; color: var(--muted);">ซ่อนการแสดงผลชั่วคราว</span>
             </label>
             <label class="switch">
               <input type="checkbox" id="editFolderIsPaused">
@@ -222,345 +1076,482 @@
             </label>
         </div>
 
-        <div style="text-align:left; margin-bottom:15px; background:#f5f5f7; padding:12px 15px; border-radius:14px;">
-            <label style="font-size:14px; color:#1d1d1f; margin:0 0 8px 0; font-weight:600; display:block;">รหัสผ่านโฟลเดอร์</label>
-            <input type="text" id="editFolderPassword" placeholder="เว้นว่างหากไม่ล็อก..." style="width:100%; border:1px solid #d2d2d7; border-radius:10px; padding:10px; box-sizing:border-box; font-size:14px; font-family:inherit; margin:0;">
+        <div style="text-align:left; margin-bottom:14px; background:var(--paper); border:1px solid var(--rule); padding:12px 14px;">
+            <label style="font-size:13px; color:var(--ink); margin:0 0 6px 0; font-weight:600; display:block;">รหัสผ่านโฟลเดอร์</label>
+            <input type="text" id="editFolderPassword" placeholder="เว้นว่างหากไม่ล็อก..." style="margin:0;">
         </div>
 
-        <div style="text-align:left; margin-bottom:15px; background:#f5f5f7; padding:12px 15px; border-radius:14px;">
-            <label style="font-size:13px; color:#86868b; margin-top:0; margin-bottom:10px; display:block; font-weight:600;">สีโฟลเดอร์ (Tags)</label>
-            <div id="colorPicker" style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px;">
-                <div class="color-circle" data-color="red" style="background:#ff3b30;" onclick="selectFolderColor('red')"></div>
-                <div class="color-circle" data-color="orange" style="background:#ff9500;" onclick="selectFolderColor('orange')"></div>
-                <div class="color-circle" data-color="yellow" style="background:#ffcc00;" onclick="selectFolderColor('yellow')"></div>
-                <div class="color-circle" data-color="green" style="background:#34c759;" onclick="selectFolderColor('green')"></div>
-                <div class="color-circle" data-color="blue" style="background:#0071e3;" onclick="selectFolderColor('blue')"></div>
-                <div class="color-circle" data-color="purple" style="background:#af52de;" onclick="selectFolderColor('purple')"></div>
-                <div class="color-circle" data-color="gray" style="background:#8e8e93;" onclick="selectFolderColor('gray')"></div>
+        <div style="text-align:left; margin-bottom:14px; background:var(--paper); border:1px solid var(--rule); padding:12px 14px;">
+            <label style="font-size:12px; color:var(--muted); margin-top:0; margin-bottom:10px; display:block; font-weight:600;">สีโฟลเดอร์ (TAGS)</label>
+            <div id="colorPicker" style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:6px;">
+                <div class="color-circle" data-color="red" style="background:#C83E2B;" onclick="selectFolderColor('red')"></div>
+                <div class="color-circle" data-color="orange" style="background:#D97724;" onclick="selectFolderColor('orange')"></div>
+                <div class="color-circle" data-color="yellow" style="background:#D9A726;" onclick="selectFolderColor('yellow')"></div>
+                <div class="color-circle" data-color="green" style="background:#1E7E48;" onclick="selectFolderColor('green')"></div>
+                <div class="color-circle" data-color="blue" style="background:#1F3FB0;" onclick="selectFolderColor('blue')"></div>
+                <div class="color-circle" data-color="purple" style="background:#6B46C1;" onclick="selectFolderColor('purple')"></div>
+                <div class="color-circle" data-color="gray" style="background:#6D6A63;" onclick="selectFolderColor('gray')"></div>
             </div>
         </div>
         
-        <div style="text-align:left; margin-bottom:25px; background:#f5f5f7; padding:12px 15px; border-radius:14px; display:flex; justify-content:space-between; align-items:center;">
-            <label style="font-size:14px; color:#1d1d1f; margin:0; font-weight:600;">อีโมจิ (Emoji)</label>
-            <input type="text" id="editFolderEmoji" maxlength="2" placeholder="😀" style="font-size:24px; text-align:center; width:50px; height:50px; padding:0; border-radius:12px; border:1px solid #d2d2d7; margin:0; background:white;">
+        <div style="text-align:left; margin-bottom:20px; background:var(--paper); border:1px solid var(--rule); padding:12px 14px; display:flex; justify-content:space-between; align-items:center;">
+            <label style="font-size:13px; color:var(--ink); margin:0; font-weight:600;">อีโมจิ (EMOJI)</label>
+            <input type="text" id="editFolderEmoji" maxlength="2" placeholder="😀" style="font-size:22px; text-align:center; width:50px; height:44px; padding:0; margin:0; background:#FFFFFF;">
         </div>
         
         <div style="display:flex; gap:10px;">
-            <button class="btn-gray" onclick="closeFolderSettings()" style="display:block; background:#e5e5ea; color:#1d1d1f; margin-top:0; box-shadow:none;">ยกเลิก</button>
-            <button class="btn-blue" onclick="saveFolderSettings()" style="margin-top:0; box-shadow:none;">บันทึก</button>
+            <button class="btn-gray" onclick="closeFolderSettings()" style="display:block; margin-top:0;">ยกเลิก</button>
+            <button class="btn-blue" onclick="saveFolderSettings()" style="margin-top:0;">บันทึก</button>
         </div>
     </div>
   </div>
 
-  <!-- Modal สำหรับดูประวัติ Access Logs แบบเจาะจงผู้ใช้ -->
-  <div id="userLogsModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:10000; justify-content:center; align-items:center;">
-    <div style="background:white; padding:25px; border-radius:16px; width:90%; max-width:600px; max-height: 80vh; display:flex; flex-direction:column; box-shadow: 0 15px 40px rgba(0,0,0,0.15);">
-       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-           <h3 style="margin:0; color:#1d1d1f; font-weight:600;" id="userLogsModalTitle">ประวัติการเข้าสู่ระบบ</h3>
-           <button class="sys-close-btn" style="background:#f2f2f7; border:none; width:32px; height:32px; border-radius:50%; cursor:pointer; font-weight:bold; font-size:16px; display:flex; align-items:center; justify-content:center; color:#8e8e93;" onclick="closeUserLogsModal()">×</button>
+  <!-- Modal: ดูประวัติ Access Logs แบบเจาะจงผู้ใช้ -->
+  <div id="userLogsModal" class="editorial-modal-backdrop">
+    <div class="editorial-modal-card" style="width:92%; max-width:620px; max-height: 82vh; display:flex; flex-direction:column;">
+       <div style="display:flex; justify-content:space-between; align-items:center; padding-bottom:12px; border-bottom:1px solid var(--rule); margin-bottom:12px;">
+           <div>
+               <span class="lbl" style="color:var(--cobalt); display:block; margin-bottom:4px;">SESSION HISTORY</span>
+               <h3 style="margin:0; color:var(--ink); font-family:var(--font-serif); font-size:22px; font-weight:400;" id="userLogsModalTitle">ประวัติการเข้าสู่ระบบ</h3>
+           </div>
+           <button class="sys-close-btn btn-gray" style="display:inline-flex; width:auto; height:28px; padding:0 12px; margin:0; font-size:10px;" onclick="closeUserLogsModal()">CLOSE / ปิด</button>
        </div>
-       <div class="table-responsive" style="flex:1; overflow-y:auto;">
+       <div class="table-responsive" style="flex:1; overflow-y:auto; margin-top:0;">
            <div id="userLogsModalContent"></div>
        </div>
     </div>
   </div>
 
+  <!-- Login Screen -->
   <div id="adminLoginWrapper">
      <div class="login-card">
+        <span class="lbl box login-tag">RESTRICTED ARCHIVE / เฉพาะผู้ดูแล</span>
         <h2>ระบบจัดการสำหรับผู้ดูแล</h2>
-        <p style="color:#86868b; margin-bottom: 20px; font-size: 14px;">กรุณาเข้าสู่ระบบด้วยบัญชีแอดมิน</p>
+        <p class="login-sub">กรุณาเข้าสู่ระบบด้วยบัญชีแอดมินเพื่อเข้าถึงหน้าควบคุม</p>
         <input type="email" id="adminEmail" placeholder="อีเมลแอดมิน..." style="text-align:center;" required>
         <input type="password" id="adminPassword" placeholder="รหัสผ่าน..." style="text-align:center;" required>
-        <button class="btn-blue" onclick="loginAdmin()">เข้าสู่ระบบ</button>
-        <p id="loginError" style="color:#ff3b30; display:none; margin-top:15px; font-weight:500; font-size: 14px;">อีเมลหรือรหัสผ่านไม่ถูกต้อง</p>
+        <button class="btn-blue" onclick="loginAdmin()">ENTER CONSOLE / เข้าสู่ระบบ</button>
+        <p id="loginError" style="color:var(--vermilion); display:none; margin-top:15px; font-weight:600; font-size: 13px;">อีเมลหรือรหัสผ่านไม่ถูกต้อง</p>
      </div>
   </div>
 
+  <!-- Main Admin Workspace -->
   <div id="mainAdminContent">
-    <div style="width: 100%; max-width: 850px; display: flex; justify-content: flex-end; margin-bottom: 15px;">
-       <button class="btn-red" style="width: auto; padding: 10px 20px; margin: 0; border-radius: 12px;" onclick="logoutAdmin()">ออกจากระบบผู้ดูแล</button>
-    </div>
-    
-    <div class="admin-box" style="border: 2px solid var(--pink-primary);">
-      <h2>จัดการป้ายโฆษณา (Banners)</h2>
-      <p style="color:#86868b; font-size:13px; margin-top:-5px; margin-bottom:15px;">
-        💡 ระบบจะแสดงป้ายโฆษณาที่ด้านบนของหน้าเว็บผู้ใช้ และจะเลื่อนอัตโนมัติ (ขนาดแนะนำ 1200 x 600 px)<br>
-        <strong style="color:var(--pink-primary);">เคล็ดลับ: สามารถคลิกค้างแล้วลาก (Drag & Drop) ที่ตารางเพื่อสลับตำแหน่งแสดงผลป้ายโฆษณาได้ทันที</strong>
-      </p>
-      
-      <input type="hidden" id="editBannerId">
-      <label>1. ลิงก์รูปภาพ (Image URL):</label>
-      <input type="text" id="bannerImageUrl" placeholder="ระบุ URL รูปภาพโฆษณา..." required>
-      
-      <label>2. ลิงก์ปลายทาง (Target URL - แตะแล้วเปิดลิงก์นี้, ไม่บังคับ):</label>
-      <input type="text" id="bannerLinkUrl" placeholder="ระบุ URL ลิงก์ปลายทาง (ถ้ามี)...">
 
-      <div style="display: flex; gap: 10px;">
-        <button class="btn-blue" id="btnSaveBanner" onclick="saveBanner()">เพิ่มป้ายโฆษณา</button>
-        <button class="btn-gray" id="btnCancelBanner" onclick="cancelEditBanner()">ยกเลิกการแก้ไข</button>
-      </div>
-
-      <div class="table-responsive" style="margin-top: 15px;">
-        <div id="bannersTable"></div>
-      </div>
-    </div>
-
-    <!-- 2. แจ้งเตือนความจำ (Reminders) -->
-    <div class="admin-box" style="border: 2px solid #ff9500;">
-      <h2>จัดการแจ้งเตือนความจำ (Reminders)</h2>
-      <p style="color:#86868b; font-size:13px; margin-top:-5px; margin-bottom:15px;">สร้างการแจ้งเตือนบนปฏิทินให้ผู้ใช้งานเป้าหมาย</p>
-      
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-         <input type="text" id="searchReminder" placeholder="ค้นหาแจ้งเตือน (ชื่อ, รายละเอียด)..." oninput="loadReminders()" style="width: 60%; margin: 0;">
-         <button class="btn-yellow" id="btnUndoReminder" onclick="undoReminder()" style="width: auto; margin: 0; display: none;">ย้อนกลับ (Undo)</button>
-      </div>
-
-      <input type="hidden" id="editReminderId">
-      <label>1. ชื่องาน / หัวข้อ:</label>
-      <input type="text" id="remTitle" placeholder="เช่น: ส่งเอกสารภาษี" required>
-      
-      <div style="display:flex; gap:10px;">
-          <div style="flex:1;">
-             <label>2. วันที่เริ่ม:</label>
-             <input type="date" id="remStartDate">
-          </div>
-          <div style="flex:1;">
-             <label>3. วันที่สิ้นสุด (ถ้ามี):</label>
-             <input type="date" id="remEndDate">
-          </div>
-      </div>
-      <div style="display:flex; gap:10px;">
-          <div style="flex:1;">
-             <label>4. เวลาเริ่ม (ถ้ามี):</label>
-             <input type="time" id="remStartTime">
-          </div>
-          <div style="flex:1;">
-             <label>5. เวลาสิ้นสุด (ถ้ามี):</label>
-             <input type="time" id="remEndTime">
-          </div>
-      </div>
-      
-      <label>6. ตั้งค่าการทำซ้ำ:</label>
-      <select id="remRecurring">
-         <option value="ไม่ทำประจำ">ไม่ทำประจำ</option>
-         <option value="ทุกวัน">ทุกวัน</option>
-         <option value="ทุกสัปดาห์">ทุกสัปดาห์</option>
-      </select>
-
-      <label>7. สถานที่ / URL / โน้ตเพิ่มเติม:</label>
-      <input type="text" id="remLocation" placeholder="สถานที่">
-      <input type="text" id="remUrl" placeholder="URL ลิงก์แนบ">
-      <textarea id="remDetails" placeholder="รายละเอียดงาน..." style="height: 60px;"></textarea>
-
-      <label>8. รหัสผู้ใช้เป้าหมาย (คั่นด้วยลูกน้ำ หรือ ขึ้นบรรทัดใหม่):</label>
-      <textarea id="remAllowedUsers" placeholder="เช่น: 6810210178, 6810210220" style="height: 60px;"></textarea>
-      
-      <label>9. สถานะ:</label>
-      <select id="remStatus">
-         <option value="Pending">รอการดำเนินการ (Pending)</option>
-         <option value="Complete">เสร็จสิ้นแล้ว (Complete)</option>
-      </select>
-
-      <div style="display: flex; gap: 10px;">
-        <button class="btn-blue" id="btnSaveReminder" onclick="saveReminder()">สร้างการแจ้งเตือน</button>
-        <button class="btn-gray" id="btnCancelReminder" onclick="cancelEditReminder()">ยกเลิกการแก้ไข</button>
-      </div>
-
-      <div class="table-responsive" style="margin-top: 15px;">
-        <div id="remindersTable"></div>
-      </div>
-    </div>
-
-    <!-- 3. ตารางเรียน (Class Schedule) -->
-    <div class="admin-box" style="border: 2px solid #af52de;">
-      <h2>จัดการตารางเรียน (Class Schedules)</h2>
-      
-      <input type="hidden" id="editScheduleId">
-      
-      <label>1. ชื่อตารางเรียน:</label>
-      <input type="text" id="schTitle" placeholder="เช่น: ตารางเรียน ภาคการศึกษา 1/2569" required>
-
-      <label>2. ลิงก์รูปภาพตารางเรียน (URL):</label>
-      <input type="text" id="schImageUrl" placeholder="ระบุ URL รูปภาพตารางเรียน..." required>
-      
-      <label>3. รหัสผู้ใช้เป้าหมายที่อนุญาตให้ดูตารางนี้:</label>
-      <textarea id="schAllowedUsers" placeholder="เช่น: 6810210178, 6810210220" style="height: 60px;"></textarea>
-      
-      <div style="display: flex; gap: 10px;">
-        <button class="btn-blue" id="btnSaveSchedule" onclick="saveSchedule()">เพิ่มตารางเรียน</button>
-        <button class="btn-gray" id="btnCancelSchedule" onclick="cancelEditSchedule()">ยกเลิกการแก้ไข</button>
-      </div>
-
-      <div class="table-responsive" style="margin-top: 15px;">
-        <div id="schedulesTable"></div>
-      </div>
-    </div>
-
-    <div class="admin-box" style="border: 2px solid #34c759;">
-      <h2>การอนุมัติสิทธิ์การเข้าถึงทันที (ไม่ต้องรอยื่นคำขอ)</h2>
-      <label>1. เลือกระบบงาน หรือ โฟลเดอร์ (ให้สิทธิ์ทั้งโฟลเดอร์):</label>
-      <select id="directJobSelect"><option value="">-- กำลังโหลดข้อมูลระบบงาน... --</option></select>
-      <label>2. รหัสผู้รับสิทธิ์ (สามารถใส่หลายผู้ใช้ได้ คั่นด้วยลูกน้ำ (,) หรือขึ้นบรรทัดใหม่):</label>
-      <textarea id="directStudentId" placeholder="ตัวอย่าง: 6810210178, 6810210220" style="height: 80px;"></textarea>
- 
-      <button class="btn-green" onclick="grantDirectDownload()">ยืนยันการให้สิทธิ์การดาวน์โหลด</button>
-    </div>
-
-    <!-- ฟอร์มเพิ่มเอกสารที่มีระบบ 3 ภาษา และไฟล์ประเภทข้อความ -->
-    <div class="admin-box" id="formBox">
-      <h2 id="formTitle">เพิ่มรายการเข้าสู่ระบบ</h2>
-      <input type="hidden" id="editJobId"> 
-      
-      <label>1. ชื่อรายการ / เอกสาร (ภาษาไทย - บังคับ):</label>
-      <input type="text" id="jobTitle" placeholder="ตัวอย่าง: เอกสารประกอบการเรียน" required>
-      
-      <span class="lang-label">1.1 ชื่อรายการ (English - ไม่บังคับ):</span>
-      <input type="text" id="jobTitleEN" placeholder="Example: Study Materials">
-      
-      <span class="lang-label">1.2 ชื่อรายการ (中文 - ไม่บังคับ):</span>
-      <input type="text" id="jobTitleCN" placeholder="例如: 学习资料">
-      
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px;">
-        <label style="margin-top: 0;">2. โฟลเดอร์ (จัดหมวดหมู่):</label>
-        <div style="display: flex; align-items: center; gap: 8px;">
-            <label style="margin-top: 0; font-size: 13px; color: var(--apple-text-muted);">กำลังพัก</label>
-            <label class="switch">
-              <input type="checkbox" id="jobIsPaused">
-              <span class="slider"></span>
-            </label>
+    <!-- Sliding Cobalt Navigation Bar (แยกหน้าการทำงานชัดเจน 5 หน้า) -->
+    <nav class="page-nav-wrapper" aria-label="หน้าการทำงานระบบผู้ดูแล">
+        <span class="lbl page-nav-caption">SELECT WORKSPACE SECTION / เลือกหน้าการทำงาน</span>
+        <div class="page-tabs" id="adminPageTabs">
+            <div class="tab-indicator" id="adminTabIndicator"></div>
+            <button type="button" class="page-tab-btn active" data-target="page-docs" onclick="switchAdminPage('page-docs')">
+                01 · เอกสาร & โฟลเดอร์
+            </button>
+            <button type="button" class="page-tab-btn" data-target="page-permissions" onclick="switchAdminPage('page-permissions')">
+                02 · สิทธิ์ & คำขอ
+                <span class="tab-pill-count" id="tabRequestCount">0</span>
+            </button>
+            <button type="button" class="page-tab-btn" data-target="page-media" onclick="switchAdminPage('page-media')">
+                03 · โฆษณา & ตารางเรียน
+            </button>
+            <button type="button" class="page-tab-btn" data-target="page-reminders" onclick="switchAdminPage('page-reminders')">
+                04 · แจ้งเตือนความจำ
+            </button>
+            <button type="button" class="page-tab-btn" data-target="page-analytics" onclick="switchAdminPage('page-analytics')">
+                05 · ผู้ใช้ & สถิติระบบ
+            </button>
         </div>
-      </div>
-      <input type="text" id="jobFolder" placeholder="ระบุชื่อโฟลเดอร์ (ใช้ / เพื่อซ้อนโฟลเดอร์ เช่น คณิตศาสตร์/ม.1)" style="margin-top: 8px;">
-      
-      <label>3. ประเภทของไฟล์:</label>
-      <select id="fileType" onchange="toggleInputType()">
-        <option value="youtube">วิดีโอ (ลิงก์ YouTube)</option>
-        <option value="image">รูปภาพ (ลิงก์ภาพ)</option>
-        <option value="pdf">ไฟล์ PDF / Google Drive (ลิงก์เอกสาร)</option>
-        <option value="link">ลิงก์เว็บไซต์ภายนอก (URL)</option>
-        <option value="text">แบบข้อความ (เขียนข้อความจัดรูปแบบได้)</option>
-      </select>
-      
-      <div id="urlInputGroup">
-          <label>4. ข้อมูลลิงก์ (URL):</label>
-          <input type="text" id="fileUrl" placeholder="ระบุลิงก์ข้อมูลที่นี่...">
-      </div>
-      
-      <!-- ส่วนแสดงผลระบบเขียนข้อความ (Rich Text) -->
-      <div id="textInputGroup" style="display: none; margin-top: 15px; margin-bottom: 25px;">
-          <label>4. เนื้อหาข้อความ (ปรับแต่งได้ไม่จำกัด):</label>
-          <textarea id="editor-container"></textarea>
-      </div>
+    </nav>
 
-      <label>5. กำหนดรายชื่อผู้มีสิทธิ์เข้าชมเบื้องต้น (คั่นด้วยลูกน้ำ หรือ ขึ้นบรรทัดใหม่):</label>
-      <textarea id="allowedUsers" placeholder="ระบุรหัสประจำตัว เช่น: 6810210178, 6810210220"></textarea>
+    <!-- ============================================================
+         หน้า 1: เอกสาร & โฟลเดอร์ (FILE EXPLORER, FORM & JOBS TABLE)
+         ============================================================ -->
+    <section class="admin-page active" id="page-docs">
+        <div class="page-banner-header">
+            <div>
+                <span class="lbl page-kicker">SECTION 01 / ARCHIVE & DOCUMENTS</span>
+                <h1>จัดการเอกสาร โฟลเดอร์ และเนื้อหา</h1>
+            </div>
+            <span class="lbl box">FILE EXPLORER · EDITOR · CATALOG</span>
+        </div>
 
-      <label>6. เปิดใช้งานลายน้ำในเอกสาร (Watermark):</label>
-      <select id="showWatermark">
-        <option value="true">เปิด (แสดงลายน้ำ)</option>
-        <option value="false">ปิด (ซ่อนลายน้ำ)</option>
-      </select>
-      
-      <label>7. รหัสผ่านเอกสาร (เว้นว่างหากไม่ต้องการล็อก):</label>
-      <input type="text" id="jobPassword" placeholder="ตั้งรหัสผ่านสำหรับเอกสารนี้...">
+        <!-- File Explorer -->
+        <div class="admin-box accent-cobalt">
+          <div class="section-head-row">
+              <h2>การจัดการรายการ (File Explorer)</h2>
+              <span class="lbl box" style="color:var(--cobalt); border-color:var(--cobalt);">HOLD FOLDER FOR OPTIONS</span>
+          </div>
+          <p style="color:var(--muted); font-size:13px; margin-bottom:16px;">💡 กดค้างที่โฟลเดอร์เพื่อตั้งค่าสี, อีโมจิ, ใส่รหัสผ่าน หรือเปลี่ยนชื่อภาษาอื่นๆ (สามารถลากไฟล์ย้ายเข้าโฟลเดอร์ได้ทันที)</p>
+         
+          <div class="nav-header" id="adminNavHeader" style="display: none;">
+             <button class="back-btn" onclick="navigateAdminUp()">&lt; ย้อนกลับ</button>
+             <div class="path-title" id="currentAdminPathTitle">หน้าหลัก</div>
+             <div style="width: 70px;"></div>
+          </div>
+          
+          <div style="display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; justify-content: flex-start;">
+             <button class="btn-blue" style="margin: 0; width: auto; font-size: 11px;" onclick="addNewJobHere()">+ สร้างเอกสารในหน้านี้</button>
+             <button class="btn-yellow" style="margin: 0; width: auto; font-size: 11px;" onclick="createNewFolder()">+ สร้างโฟลเดอร์ว่าง</button>
+             <button class="btn-red" id="btnDeleteEmptyFolder" style="display: none; margin: 0; width: auto; font-size: 11px;" onclick="deleteCurrentEmptyFolder()">🗑️ ลบโฟลเดอร์นี้ (ว่าง)</button>
+          </div>
+          
+          <div id="explorerDropZone" class="explorer-zone">
+             <div id="adminFileExplorer"></div>
+          </div>
+        </div>
 
-      <div style="display: flex; gap: 10px;">
-        <button class="btn-blue" id="btnSave" onclick="saveJob()">บันทึกข้อมูลระบบงาน</button>
-        <button class="btn-gray" id="btnCancel" onclick="cancelEdit()">ยกเลิกการแก้ไข</button>
-      </div>
-      <p id="status" style="text-align: center; font-weight: 500; margin-bottom: 0; margin-top: 15px; font-size: 15px;"></p>
-    </div>
+        <!-- ฟอร์มเพิ่ม/แก้ไขเอกสาร 3 ภาษา และไฟล์ข้อความ -->
+        <div class="admin-box accent-ink" id="formBox">
+          <div class="section-head-row">
+              <h2 id="formTitle">เพิ่มรายการเข้าสู่ระบบ</h2>
+              <span class="lbl box">MULTILINGUAL ENTRY</span>
+          </div>
+          <input type="hidden" id="editJobId"> 
+          
+          <label>1. ชื่อรายการ / เอกสาร (ภาษาไทย - บังคับ):</label>
+          <input type="text" id="jobTitle" placeholder="ตัวอย่าง: เอกสารประกอบการเรียน" required>
+          
+          <span class="lang-label">1.1 ชื่อรายการ (English - ไม่บังคับ):</span>
+          <input type="text" id="jobTitleEN" placeholder="Example: Study Materials">
+          
+          <span class="lang-label">1.2 ชื่อรายการ (中文 - ไม่บังคับ):</span>
+          <input type="text" id="jobTitleCN" placeholder="例如: 学习资料">
+          
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 16px; padding: 10px 14px; background: var(--paper); border: 1px solid var(--rule-soft);">
+            <label style="margin-top: 0;">2. โฟลเดอร์ (จัดหมวดหมู่) / สถานะพักการแสดงผล:</label>
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <span class="lbl" style="color: var(--muted);">กำลังพัก (PAUSE)</span>
+                <label class="switch">
+                  <input type="checkbox" id="jobIsPaused">
+                  <span class="slider"></span>
+                </label>
+            </div>
+          </div>
+          <input type="text" id="jobFolder" placeholder="ระบุชื่อโฟลเดอร์ (ใช้ / เพื่อซ้อนโฟลเดอร์ เช่น คณิตศาสตร์/ม.1)" style="margin-top: 8px;">
+          
+          <label>3. ประเภทของไฟล์:</label>
+          <select id="fileType" onchange="toggleInputType()">
+            <option value="youtube">วิดีโอ (ลิงก์ YouTube)</option>
+            <option value="image">รูปภาพ (ลิงก์ภาพ)</option>
+            <option value="pdf">ไฟล์ PDF / Google Drive (ลิงก์เอกสาร)</option>
+            <option value="link">ลิงก์เว็บไซต์ภายนอก (URL)</option>
+            <option value="text">แบบข้อความ (เขียนข้อความจัดรูปแบบได้)</option>
+          </select>
+          
+          <div id="urlInputGroup">
+              <label>4. ข้อมูลลิงก์ (URL):</label>
+              <input type="text" id="fileUrl" placeholder="ระบุลิงก์ข้อมูลที่นี่...">
+          </div>
+          
+          <!-- ส่วนแสดงผลระบบเขียนข้อความ (Rich Text) -->
+          <div id="textInputGroup" style="display: none; margin-top: 16px; margin-bottom: 24px;">
+              <label style="margin-bottom: 8px;">4. เนื้อหาข้อความ (ปรับแต่งได้ไม่จำกัด):</label>
+              <textarea id="editor-container"></textarea>
+          </div>
 
-    <div class="admin-box">
-      <h2>การจัดการรายการ (File Explorer)</h2>
-      <p style="color:#86868b; font-size:13px; margin-top:-5px; margin-bottom:15px;">💡 กดค้างที่โฟลเดอร์เพื่อตั้งค่าสี, อีโมจิ, ใส่รหัสผ่าน หรือเปลี่ยนชื่อภาษาอื่นๆ</p>
+          <label>5. กำหนดรายชื่อผู้มีสิทธิ์เข้าชมเบื้องต้น (คั่นด้วยลูกน้ำ หรือ ขึ้นบรรทัดใหม่):</label>
+          <textarea id="allowedUsers" placeholder="ระบุรหัสประจำตัว เช่น: 6810210178, 6810210220"></textarea>
+
+          <label>6. เปิดใช้งานลายน้ำในเอกสาร (Watermark):</label>
+          <select id="showWatermark">
+            <option value="true">เปิด (แสดงลายน้ำ)</option>
+            <option value="false">ปิด (ซ่อนลายน้ำ)</option>
+          </select>
+          
+          <label>7. รหัสผ่านเอกสาร (เว้นว่างหากไม่ต้องการล็อก):</label>
+          <input type="text" id="jobPassword" placeholder="ตั้งรหัสผ่านสำหรับเอกสารนี้...">
+
+          <div style="display: flex; gap: 10px;">
+            <button class="btn-blue" id="btnSave" onclick="saveJob()">บันทึกข้อมูลระบบงาน</button>
+            <button class="btn-gray" id="btnCancel" onclick="cancelEdit()">ยกเลิกการแก้ไข</button>
+          </div>
+          <p id="status" style="text-align: center; font-weight: 600; margin-bottom: 0; margin-top: 14px; font-size: 14px;"></p>
+        </div>
+
+        <!-- ตารางรายการเอกสารทั้งหมด -->
+        <div class="admin-box">
+          <div class="section-head-row">
+              <h2>จัดการรายการเอกสารทั้งหมด (Table)</h2>
+              <span class="lbl box">MASTER INDEX</span>
+          </div>
+          <div class="table-responsive">
+            <div id="jobsTable"></div>
+          </div>
+        </div>
+    </section>
+
+    <!-- ============================================================
+         หน้า 2: สิทธิ์ & คำขอเข้าถึง (DIRECT GRANT & DOWNLOAD REQUESTS)
+         ============================================================ -->
+    <section class="admin-page" id="page-permissions">
+        <div class="page-banner-header">
+            <div>
+                <span class="lbl page-kicker">SECTION 02 / ACCESS & CLEARANCE</span>
+                <h1>การอนุมัติสิทธิ์และคำขอเข้าถึง</h1>
+            </div>
+            <span class="lbl box">DIRECT GRANT · APPROVAL QUEUE</span>
+        </div>
+
+        <!-- การอนุมัติสิทธิ์ทันที -->
+        <div class="admin-box accent-emerald">
+          <div class="section-head-row">
+              <h2>การอนุมัติสิทธิ์การเข้าถึงทันที (ไม่ต้องรอยื่นคำขอ)</h2>
+              <span class="lbl box" style="color:var(--emerald); border-color:var(--emerald);">INSTANT CLEARANCE</span>
+          </div>
+          <label>1. เลือกระบบงาน หรือ โฟลเดอร์ (ให้สิทธิ์ทั้งโฟลเดอร์):</label>
+          <select id="directJobSelect"><option value="">-- กำลังโหลดข้อมูลระบบงาน... --</option></select>
+          <label>2. รหัสผู้รับสิทธิ์ (สามารถใส่หลายผู้ใช้ได้ คั่นด้วยลูกน้ำ (,) หรือขึ้นบรรทัดใหม่):</label>
+          <textarea id="directStudentId" placeholder="ตัวอย่าง: 6810210178, 6810210220" style="height: 85px;"></textarea>
      
-      <div class="nav-header" id="adminNavHeader" style="display: none;">
-         <button class="back-btn" onclick="navigateAdminUp()">< ย้อนกลับ</button>
-         <div class="path-title" id="currentAdminPathTitle">หน้าหลัก</div>
-         <div style="width: 70px;"></div>
-      </div>
-      
-      <div style="display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap; justify-content: center;">
-         <button class="btn-blue" style="background: #e8e8ed; color: var(--pink-primary); box-shadow: none; margin: 0; width: auto; font-size: 14px;" onclick="addNewJobHere()">+ สร้างเอกสารในหน้านี้</button>
-         <button class="btn-blue" style="background: #e8e8ed; color: var(--pink-primary); box-shadow: none; margin: 0; width: auto; font-size: 14px;" onclick="createNewFolder()">+ สร้างโฟลเดอร์ว่าง</button>
-         <button class="btn-red" id="btnDeleteEmptyFolder" style="display: none; margin: 0; width: auto; font-size: 14px;" onclick="deleteCurrentEmptyFolder()">🗑️ ลบโฟลเดอร์นี้ (ว่าง)</button>
-      </div>
-      
-      <div id="explorerDropZone" class="explorer-zone">
-         <div id="adminFileExplorer"></div>
-      </div>
-    </div>
+          <button class="btn-green" onclick="grantDirectDownload()">ยืนยันการให้สิทธิ์การดาวน์โหลด</button>
+        </div>
 
-    <!-- ส่วนจัดการผู้ใช้งานที่เพิ่มใหม่ -->
-    <div class="admin-box">
-      <h2>ข้อมูลบัญชีผู้ใช้งาน (User Profiles)</h2>
-      <p style="color:#86868b; font-size:13px; margin-top:-5px; margin-bottom:15px;">แสดงข้อมูลโปรไฟล์ รหัสผ่าน และการตั้งชื่อของผู้ใช้งานในระบบ</p>
-      <div class="table-responsive">
-        <div id="usersTable"></div>
-      </div>
-    </div>
-
-    <div class="admin-box">
-      <h2>จัดการรายการเอกสารทั้งหมด (Table)</h2>
-      <div class="table-responsive">
-        <div id="jobsTable"></div>
-      </div>
-    </div>
-
-    <div class="admin-box">
-      <h2>
-        <div style="display:flex; align-items:center;">
-          จัดการคำขอสิทธิ์การเข้าถึง/ดาวน์โหลด
-          <div id="requestBadge" style="display:none; background: #ff3b30; color: white; border-radius: 20px; padding: 4px 12px; font-size: 12px; margin-left: 12px; font-weight: 600; align-items: center; gap: 4px; box-shadow: 0 4px 10px rgba(255,59,48,0.3);">
-              <span class="bell-icon" style="font-size: 14px;">🔔</span>
-              <span id="requestBadgeCount">0</span>
+        <!-- ตารางจัดการคำขอ -->
+        <div class="admin-box accent-vermilion">
+          <div class="section-head-row">
+              <h2>
+                <div style="display:flex; align-items:center; flex-wrap:wrap; gap:10px;">
+                  <span>จัดการคำขอสิทธิ์การเข้าถึง/ดาวน์โหลด</span>
+                  <div id="requestBadge" style="display:none; background: var(--vermilion); color: #F4F2ED; padding: 4px 10px; font-family: var(--font-sans); font-size: 11px; letter-spacing: .06em; font-weight: 600; align-items: center; gap: 5px;">
+                      <span class="bell-icon" style="font-size: 13px;">🔔</span>
+                      <span id="requestBadgeCount">0</span>
+                  </div>
+                </div>
+              </h2>
+              <span class="lbl box">APPROVAL LOG</span>
+          </div>
+          <div class="table-responsive">
+            <div id="requestsTable"></div>
           </div>
         </div>
-      </h2>
-      <div class="table-responsive">
-        <div id="requestsTable"></div>
-      </div>
-    </div>
+    </section>
 
-    <div class="admin-box">
-      <h2>ประวัติการดาวน์โหลด (ผู้ชม)</h2>
-      <div class="table-responsive">
-        <div id="historyTable"></div>
-      </div>
-    </div>
+    <!-- ============================================================
+         หน้า 3: ป้ายโฆษณา & ตารางเรียน (BANNERS & CLASS SCHEDULES)
+         ============================================================ -->
+    <section class="admin-page" id="page-media">
+        <div class="page-banner-header">
+            <div>
+                <span class="lbl page-kicker">SECTION 03 / VISUAL BANNERS & TIMETABLES</span>
+                <h1>จัดการป้ายโฆษณาและตารางเรียน</h1>
+            </div>
+            <span class="lbl box">CAROUSEL · SCHEDULES</span>
+        </div>
 
-    <!-- ส่วนสถิติการเข้าสู่ระบบแบบจัดกลุ่มผู้ใช้ (Group By User) -->
-    <div class="admin-box">
-      <h2>สถิติการเข้าสู่ระบบ (Access Logs)</h2>
-      <div class="table-responsive">
-        <div id="accessLogsTable"></div>
-      </div>
-    </div>
+        <!-- ป้ายโฆษณา -->
+        <div class="admin-box accent-cobalt">
+          <div class="section-head-row">
+              <h2>จัดการป้ายโฆษณา (Banners)</h2>
+              <span class="lbl box" style="color:var(--cobalt); border-color:var(--cobalt);">1200 × 600 PX · DRAG TO REORDER</span>
+          </div>
+          <p style="color:var(--muted); font-size:13px; margin-bottom:14px;">
+            💡 ระบบจะแสดงป้ายโฆษณาที่ด้านบนของหน้าเว็บผู้ใช้ และจะเลื่อนอัตโนมัติ (ขนาดแนะนำ 1200 × 600 px)<br>
+            <strong style="color:var(--cobalt);">เคล็ดลับ: สามารถคลิกค้างแล้วลาก (Drag & Drop) ที่แถวในตารางเพื่อสลับตำแหน่งแสดงผลป้ายโฆษณาได้ทันที</strong>
+          </p>
+          
+          <input type="hidden" id="editBannerId">
+          <label>1. ลิงก์รูปภาพ (Image URL):</label>
+          <input type="text" id="bannerImageUrl" placeholder="ระบุ URL รูปภาพโฆษณา..." required>
+          
+          <label>2. ลิงก์ปลายทาง (Target URL - แตะแล้วเปิดลิงก์นี้, ไม่บังคับ):</label>
+          <input type="text" id="bannerLinkUrl" placeholder="ระบุ URL ลิงก์ปลายทาง (ถ้ามี)...">
 
-    <!-- ส่วนข้อมูลสถิติและความยินยอมคุกกี้ที่แก้ไขใหม่ ให้กราฟและการรวมข้อมูลถูกต้อง 100% -->
-    <div class="admin-box">
-      <h2>ข้อมูลสถิติและความยินยอมคุกกี้ (Cookies & Analytics)</h2>
-      <p style="color:#86868b; font-size:13px; margin-top:-5px; margin-bottom:15px;">ระบบบันทึกข้อมูลและสถิติการใช้งานของผู้ใช้ตามประเภทความยินยอมของคุกกี้ (นับเฉพาะผู้ใช้ 1 บัญชี/อุปกรณ์ ไม่นับซ้ำ)</p>
-      
-      <div style="background:#f5f5f7; padding:15px; border-radius:12px; margin-bottom:20px; font-size:13px; color:#1d1d1f; line-height:1.6;">
-        <strong style="color:var(--pink-primary);">ประเภทข้อมูลที่บันทึก (อ้างอิงตามสิทธิ์การยินยอม):</strong><br>
-        <b style="color:#0071e3;">1. เพื่อความสะดวกในการใช้งาน (Functional):</b> ช่วยจดจำสถานะการเข้าสู่ระบบ (Log in) จดจำภาษาที่คุณเลือก หรือจดจำสินค้าที่คุณกดใส่ตะกร้าไว้ ทำให้คุณไม่ต้องคอยตั้งค่าใหม่หรือพิมพ์รหัสผ่านใหม่ทุกครั้งที่กลับมาเปิดเว็บเดิม<br>
-        <b style="color:#34c759;">2. เพื่อเก็บสถิติ (Analytics):</b> ช่วยให้เจ้าของเว็บรู้ว่าผู้ใช้งานชอบอ่านเนื้อหาหน้าไหน หรือใช้เวลาอยู่ในเว็บไซต์นานแค่ไหน เพื่อนำข้อมูลไปปรับปรุงเว็บให้ใช้งานง่ายขึ้น<br>
-        <b style="color:#ff9500;">3. เพื่อการโฆษณา (Marketing):</b> คุกกี้ประเภทนี้จะติดตามพฤติกรรมการท่องเว็บของคุณ ว่าคุณสนใจเรื่องอะไร เพื่อนำไปวิเคราะห์และยิงโฆษณา (Ads) สินค้าหรือบริการกลับมาหาคุณได้ตรงใจมากที่สุด
-      </div>
+          <div style="display: flex; gap: 10px;">
+            <button class="btn-blue" id="btnSaveBanner" onclick="saveBanner()">เพิ่มป้ายโฆษณา</button>
+            <button class="btn-gray" id="btnCancelBanner" onclick="cancelEditBanner()">ยกเลิกการแก้ไข</button>
+          </div>
 
-      <!-- กล่องสำหรับแสดงกราฟ -->
-      <div style="width: 100%; max-width: 600px; margin: 0 auto 20px auto; background: #fff; padding: 15px; border-radius: 12px; border: 1px solid #d2d2d7;">
-        <canvas id="cookieChart"></canvas>
-      </div>
+          <div class="table-responsive">
+            <div id="bannersTable"></div>
+          </div>
+        </div>
 
-      <div class="table-responsive">
-        <div id="cookieStatsTable"></div>
-      </div>
-    </div>
+        <!-- ตารางเรียน -->
+        <div class="admin-box accent-ink">
+          <div class="section-head-row">
+              <h2>จัดการตารางเรียน (Class Schedules)</h2>
+              <span class="lbl box">ACADEMIC TIMETABLE</span>
+          </div>
+          
+          <input type="hidden" id="editScheduleId">
+          
+          <label>1. ชื่อตารางเรียน:</label>
+          <input type="text" id="schTitle" placeholder="เช่น: ตารางเรียน ภาคการศึกษา 1/2569" required>
+
+          <label>2. ลิงก์รูปภาพตารางเรียน (URL):</label>
+          <input type="text" id="schImageUrl" placeholder="ระบุ URL รูปภาพตารางเรียน..." required>
+          
+          <label>3. รหัสผู้ใช้เป้าหมายที่อนุญาตให้ดูตารางนี้:</label>
+          <textarea id="schAllowedUsers" placeholder="เช่น: 6810210178, 6810210220" style="height: 70px;"></textarea>
+          
+          <div style="display: flex; gap: 10px;">
+            <button class="btn-blue" id="btnSaveSchedule" onclick="saveSchedule()">เพิ่มตารางเรียน</button>
+            <button class="btn-gray" id="btnCancelSchedule" onclick="cancelEditSchedule()">ยกเลิกการแก้ไข</button>
+          </div>
+
+          <div class="table-responsive">
+            <div id="schedulesTable"></div>
+          </div>
+        </div>
+    </section>
+
+    <!-- ============================================================
+         หน้า 4: แจ้งเตือนความจำ (REMINDERS)
+         ============================================================ -->
+    <section class="admin-page" id="page-reminders">
+        <div class="page-banner-header">
+            <div>
+                <span class="lbl page-kicker">SECTION 04 / CALENDAR & DISPATCH</span>
+                <h1>จัดการแจ้งเตือนความจำ (Reminders)</h1>
+            </div>
+            <span class="lbl box">EVENTS · RECURRENCE · TARGETS</span>
+        </div>
+
+        <div class="admin-box accent-cobalt">
+          <div class="section-head-row">
+              <h2>สร้างและแก้ไขการแจ้งเตือนบนปฏิทิน</h2>
+              <span class="lbl box">DISPATCH SYSTEM</span>
+          </div>
+          <p style="color:var(--muted); font-size:13px; margin-bottom:14px;">สร้างการแจ้งเตือนบนปฏิทินให้ผู้ใช้งานเป้าหมาย พร้อมระบบค้นหาและย้อนกลับการแก้ไขล่าสุด</p>
+          
+          <div style="display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 14px; flex-wrap: wrap;">
+             <input type="text" id="searchReminder" placeholder="ค้นหาแจ้งเตือน (ชื่อ, รายละเอียด)..." oninput="loadReminders()" style="flex: 1; min-width: 220px; margin: 0;">
+             <button class="btn-yellow" id="btnUndoReminder" onclick="undoReminder()" style="width: auto; margin: 0; display: none;">↩ ย้อนกลับ (UNDO)</button>
+          </div>
+
+          <input type="hidden" id="editReminderId">
+          <label>1. ชื่องาน / หัวข้อ:</label>
+          <input type="text" id="remTitle" placeholder="เช่น: ส่งเอกสารภาษี" required>
+          
+          <div style="display:flex; gap:12px; flex-wrap:wrap;">
+              <div style="flex:1; min-width:180px;">
+                 <label>2. วันที่เริ่ม:</label>
+                 <input type="date" id="remStartDate">
+              </div>
+              <div style="flex:1; min-width:180px;">
+                 <label>3. วันที่สิ้นสุด (ถ้ามี):</label>
+                 <input type="date" id="remEndDate">
+              </div>
+          </div>
+          <div style="display:flex; gap:12px; flex-wrap:wrap;">
+              <div style="flex:1; min-width:180px;">
+                 <label>4. เวลาเริ่ม (ถ้ามี):</label>
+                 <input type="time" id="remStartTime">
+              </div>
+              <div style="flex:1; min-width:180px;">
+                 <label>5. เวลาสิ้นสุด (ถ้ามี):</label>
+                 <input type="time" id="remEndTime">
+              </div>
+          </div>
+          
+          <label>6. ตั้งค่าการทำซ้ำ:</label>
+          <select id="remRecurring">
+             <option value="ไม่ทำประจำ">ไม่ทำประจำ</option>
+             <option value="ทุกวัน">ทุกวัน</option>
+             <option value="ทุกสัปดาห์">ทุกสัปดาห์</option>
+          </select>
+
+          <label>7. สถานที่ / URL / โน้ตเพิ่มเติม:</label>
+          <input type="text" id="remLocation" placeholder="สถานที่">
+          <input type="text" id="remUrl" placeholder="URL ลิงก์แนบ">
+          <textarea id="remDetails" placeholder="รายละเอียดงาน..." style="height: 70px;"></textarea>
+
+          <label>8. รหัสผู้ใช้เป้าหมาย (คั่นด้วยลูกน้ำ หรือ ขึ้นบรรทัดใหม่):</label>
+          <textarea id="remAllowedUsers" placeholder="เช่น: 6810210178, 6810210220" style="height: 70px;"></textarea>
+          
+          <label>9. สถานะ:</label>
+          <select id="remStatus">
+             <option value="Pending">รอการดำเนินการ (Pending)</option>
+             <option value="Complete">เสร็จสิ้นแล้ว (Complete)</option>
+          </select>
+
+          <div style="display: flex; gap: 10px;">
+            <button class="btn-blue" id="btnSaveReminder" onclick="saveReminder()">สร้างการแจ้งเตือน</button>
+            <button class="btn-gray" id="btnCancelReminder" onclick="cancelEditReminder()">ยกเลิกการแก้ไข</button>
+          </div>
+
+          <div class="table-responsive">
+            <div id="remindersTable"></div>
+          </div>
+        </div>
+    </section>
+
+    <!-- ============================================================
+         หน้า 5: ผู้ใช้งาน & สถิติระบบ (PROFILES, LOGS & ANALYTICS)
+         ============================================================ -->
+    <section class="admin-page" id="page-analytics">
+        <div class="page-banner-header">
+            <div>
+                <span class="lbl page-kicker">SECTION 05 / DIRECTORY & TELEMETRY</span>
+                <h1>ข้อมูลผู้ใช้งาน ประวัติ และสถิติระบบ</h1>
+            </div>
+            <span class="lbl box">PROFILES · LOGS · COOKIE ANALYTICS</span>
+        </div>
+
+        <!-- ข้อมูลบัญชีผู้ใช้งาน -->
+        <div class="admin-box accent-ink">
+          <div class="section-head-row">
+              <h2>ข้อมูลบัญชีผู้ใช้งาน (User Profiles)</h2>
+              <span class="lbl box">DIRECTORY</span>
+          </div>
+          <p style="color:var(--muted); font-size:13px; margin-bottom:12px;">แสดงข้อมูลโปรไฟล์ รหัสผ่าน และการตั้งชื่อของผู้ใช้งานในระบบ</p>
+          <div class="table-responsive">
+            <div id="usersTable"></div>
+          </div>
+        </div>
+
+        <!-- ประวัติการดาวน์โหลด -->
+        <div class="admin-box">
+          <div class="section-head-row">
+              <h2>ประวัติการดาวน์โหลด (ผู้ชม)</h2>
+              <span class="lbl box">DOWNLOAD ARCHIVE</span>
+          </div>
+          <div class="table-responsive">
+            <div id="historyTable"></div>
+          </div>
+        </div>
+
+        <!-- สถิติการเข้าสู่ระบบ -->
+        <div class="admin-box">
+          <div class="section-head-row">
+              <h2>สถิติการเข้าสู่ระบบ (Access Logs)</h2>
+              <span class="lbl box">GROUPED SESSIONS</span>
+          </div>
+          <div class="table-responsive">
+            <div id="accessLogsTable"></div>
+          </div>
+        </div>
+
+        <!-- ข้อมูลสถิติและความยินยอมคุกกี้ -->
+        <div class="admin-box accent-cobalt">
+          <div class="section-head-row">
+              <h2>ข้อมูลสถิติและความยินยอมคุกกี้ (Cookies & Analytics)</h2>
+              <span class="lbl box" style="color:var(--cobalt); border-color:var(--cobalt);">UNIQUE USER TELEMETRY</span>
+          </div>
+          <p style="color:var(--muted); font-size:13px; margin-bottom:14px;">ระบบบันทึกข้อมูลและสถิติการใช้งานของผู้ใช้ตามประเภทความยินยอมของคุกกี้ (นับเฉพาะผู้ใช้ 1 บัญชี/อุปกรณ์ ไม่นับซ้ำ)</p>
+          
+          <div style="background:var(--paper); border:1px solid var(--rule); padding:16px; margin-bottom:20px; font-size:13px; color:var(--ink); line-height:1.65;">
+            <strong style="color:var(--cobalt); font-family:var(--font-sans); letter-spacing:.04em;">ประเภทข้อมูลที่บันทึก (อ้างอิงตามสิทธิ์การยินยอม):</strong><br>
+            <b style="color:var(--cobalt);">1. เพื่อความสะดวกในการใช้งาน (Functional):</b> ช่วยจดจำสถานะการเข้าสู่ระบบ (Log in) จดจำภาษาที่คุณเลือก หรือจดจำสินค้าที่คุณกดใส่ตะกร้าไว้ ทำให้คุณไม่ต้องคอยตั้งค่าใหม่หรือพิมพ์รหัสผ่านใหม่ทุกครั้งที่กลับมาเปิดเว็บเดิม<br>
+            <b style="color:var(--emerald);">2. เพื่อเก็บสถิติ (Analytics):</b> ช่วยให้เจ้าของเว็บรู้ว่าผู้ใช้งานชอบอ่านเนื้อหาหน้าไหน หรือใช้เวลาอยู่ในเว็บไซต์นานแค่ไหน เพื่อนำข้อมูลไปปรับปรุงเว็บให้ใช้งานง่ายขึ้น<br>
+            <b style="color:var(--vermilion);">3. เพื่อการโฆษณา (Marketing):</b> คุกกี้ประเภทนี้จะติดตามพฤติกรรมการท่องเว็บของคุณ ว่าคุณสนใจเรื่องอะไร เพื่อนำไปวิเคราะห์และยิงโฆษณา (Ads) สินค้าหรือบริการกลับมาหาคุณได้ตรงใจมากที่สุด
+          </div>
+
+          <!-- กล่องสำหรับแสดงกราฟ -->
+          <div style="width: 100%; max-width: 640px; margin: 0 auto 20px auto; background: var(--paper); padding: 18px; border: 1px solid var(--rule);">
+            <canvas id="cookieChart"></canvas>
+          </div>
+
+          <div class="table-responsive">
+            <div id="cookieStatsTable"></div>
+          </div>
+        </div>
+    </section>
+
   </div>
 
+  <!-- ==========================================
+       FIREBASE & ADMIN APPLICATION SCRIPT
+       ========================================== -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getFirestore, doc, setDoc, addDoc, getDoc, deleteDoc, collection, getDocs, serverTimestamp, updateDoc, query, writeBatch } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
@@ -619,29 +1610,29 @@
     }
 
     const appleColors = {
-        blue: ['#89C4FA', '#74B5F6', '#0071e3'],
-        red: ['#ff8a8a', '#ff5c5c', '#ff3b30'],
-        orange: ['#ffb380', '#ff944d', '#ff9500'],
-        yellow: ['#ffe082', '#ffcc33', '#ffcc00'],
-        green: ['#85e098', '#5cd675', '#34c759'],
-        purple: ['#d1a3ff', '#b870ff', '#af52de'],
-        gray: ['#c2c2c2', '#a8a8a8', '#8e8e93']
+        blue: ['#4A6CD4', '#1F3FB0', '#17318F'],
+        red: ['#DF6858', '#C83E2B', '#A63120'],
+        orange: ['#E6944C', '#D97724', '#B55E14'],
+        yellow: ['#E6BE53', '#D9A726', '#B38616'],
+        green: ['#45A36E', '#1E7E48', '#156136'],
+        purple: ['#8B6CD9', '#6B46C1', '#5332A1'],
+        gray: ['#8E8B84', '#6D6A63', '#4F4D47']
     };
     const icons = {
-      pdf: `<svg class="icon-file" viewBox="0 0 64 80" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="4" y="4" width="56" height="72" rx="6" fill="#F9F9FB" stroke="#D2D2D7" stroke-width="2"/><path d="M40 4L60 24V10C60 6.68629 57.3137 4 54 4H40Z" fill="#E5E5EA"/><path d="M40 4V18C40 21.3137 42.6863 24 46 24H60" stroke="#D2D2D7" stroke-width="2" stroke-linejoin="round"/><rect x="16" y="32" width="32" height="4" rx="2" fill="#FF3B30"/><rect x="16" y="44" width="24" height="4" rx="2" fill="#D2D2D7"/><rect x="16" y="56" width="28" height="4" rx="2" fill="#D2D2D7"/></svg>`,
-      image: `<svg class="icon-wide" viewBox="0 0 80 64" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="4" y="4" width="72" height="56" rx="8" fill="#F9F9FB" stroke="#D2D2D7" stroke-width="2"/><circle cx="24" cy="24" r="6" fill="#FFCC00"/><path d="M4 48L28 28L52 48L64 38L76 48V52C76 56.4183 72.4183 60 68 60H12C7.58172 60 4 56.4183 4 52V48Z" fill="#34C759"/></svg>`,
-      youtube: `<svg class="icon-wide" viewBox="0 0 80 56" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="4" y="4" width="72" height="48" rx="12" fill="#FF3B30"/><path d="M34 18L52 28L34 38V18Z" fill="white"/></svg>`,
-      link: `<svg class="icon-file" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="40" cy="40" r="36" fill="#F9F9FB" stroke="#D2D2D7" stroke-width="2"/><path d="M40 10C28 10 20 25 20 40C20 55 28 70 40 70C52 70 60 55 60 40C60 25 52 10 40 10Z" stroke="#0071E3" stroke-width="2"/><path d="M10 40H70" stroke="#0071E3" stroke-width="2"/><path d="M20 25H60" stroke="#0071E3" stroke-width="2"/><path d="M20 55H60" stroke="#0071E3" stroke-width="2"/></svg>`,
-      lock: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle;"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>`,
-      text: `<svg class="icon-file" viewBox="0 0 64 80" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="4" y="4" width="56" height="72" rx="6" fill="#F9F9FB" stroke="#D2D2D7" stroke-width="2"/><rect x="16" y="24" width="32" height="4" rx="2" fill="#0071E3"/><rect x="16" y="36" width="32" height="4" rx="2" fill="#D2D2D7"/><rect x="16" y="48" width="24" height="4" rx="2" fill="#D2D2D7"/></svg>`
+      pdf: `<svg class="icon-file" viewBox="0 0 64 80" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="4" y="4" width="56" height="72" rx="2" fill="#F4F2ED" stroke="#141414" stroke-width="2"/><path d="M40 4L60 24V6C60 4.89543 59.1046 4 58 4H40Z" fill="#EDEBE6"/><path d="M40 4V20C40 22.2091 41.7909 24 44 24H60" stroke="#141414" stroke-width="2" stroke-linejoin="round"/><rect x="16" y="34" width="32" height="4" fill="#C83E2B"/><rect x="16" y="45" width="24" height="3" fill="#6D6A63"/><rect x="16" y="55" width="28" height="3" fill="#6D6A63"/></svg>`,
+      image: `<svg class="icon-wide" viewBox="0 0 80 64" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="4" y="4" width="72" height="56" rx="2" fill="#F4F2ED" stroke="#141414" stroke-width="2"/><circle cx="24" cy="22" r="6" fill="#C83E2B"/><path d="M4 48L28 28L52 48L64 38L76 48V58C76 59.1046 75.1046 60 74 60H6C4.89543 60 4 59.1046 4 58V48Z" fill="#1F3FB0"/></svg>`,
+      youtube: `<svg class="icon-wide" viewBox="0 0 80 56" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="4" y="4" width="72" height="48" rx="2" fill="#C83E2B" stroke="#141414" stroke-width="2"/><path d="M34 18L52 28L34 38V18Z" fill="#F4F2ED"/></svg>`,
+      link: `<svg class="icon-file" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="40" cy="40" r="34" fill="#F4F2ED" stroke="#141414" stroke-width="2"/><path d="M40 12C29 12 22 25 22 40C22 55 29 68 40 68C51 68 58 55 58 40C58 25 51 12 40 12Z" stroke="#1F3FB0" stroke-width="2"/><path d="M12 40H68" stroke="#1F3FB0" stroke-width="2"/><path d="M20 26H60" stroke="#1F3FB0" stroke-width="2"/><path d="M20 54H60" stroke="#1F3FB0" stroke-width="2"/></svg>`,
+      lock: `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle;"><rect x="3" y="11" width="18" height="11" rx="1" ry="1"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>`,
+      text: `<svg class="icon-file" viewBox="0 0 64 80" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="4" y="4" width="56" height="72" rx="2" fill="#F4F2ED" stroke="#141414" stroke-width="2"/><rect x="16" y="22" width="32" height="4" fill="#1F3FB0"/><rect x="16" y="34" width="32" height="3" fill="#141414"/><rect x="16" y="44" width="26" height="3" fill="#6D6A63"/><rect x="16" y="54" width="30" height="3" fill="#6D6A63"/></svg>`
     };
     function getFolderIcon(color, emoji) {
         let c = appleColors[color] || appleColors.blue;
         let svg = `<svg class="icon-folder" viewBox="0 0 100 80" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M0 12C0 5.37258 5.37258 0 12 0H36.5C39.5 0 42.2 1.5 43.8 4L51 15H88C94.6274 15 100 20.3726 100 27V68C100 74.6274 94.6274 80 88 80H12C5.37258 80 0 74.6274 0 68V12Z" fill="${c[0]}"/>
-            <path d="M0 24C0 20.6863 2.68629 18 6 18H94C97.3137 18 100 20.6863 100 24V68C100 74.6274 94.6274 80 88 80H12C5.37258 80 0 74.6274 0 68V24Z" fill="${c[1]}"/>`;
+            <path d="M2 8C2 4.68629 4.68629 2 8 2H36.5C39.5 2 42.2 3.5 43.8 6L51 16H92C95.3137 16 98 18.6863 98 22V72C98 75.3137 95.3137 78 92 78H8C4.68629 78 2 75.3137 2 72V8Z" fill="${c[0]}" stroke="#141414" stroke-width="2"/>
+            <path d="M2 24C2 21.7909 3.79086 20 6 20H94C96.2091 20 98 21.7909 98 24V72C98 75.3137 95.3137 78 92 78H8C4.68629 78 2 75.3137 2 72V24Z" fill="${c[1]}" stroke="#141414" stroke-width="2"/>`;
         if (emoji) {
-            svg += `<text x="50%" y="55%" dominant-baseline="middle" text-anchor="middle" font-size="28">${emoji}</text>`;
+            svg += `<text x="50%" y="56%" dominant-baseline="middle" text-anchor="middle" font-size="26">${emoji}</text>`;
         }
         svg += `</svg>`;
         return svg;
@@ -708,11 +1699,11 @@
       }
 
       errorMsg.style.display = "none";
-      document.querySelector("#adminLoginWrapper button").innerText = "กำลังเข้าสู่ระบบ...";
+      document.querySelector("#adminLoginWrapper button").innerText = "AUTHENTICATING / กำลังเข้าสู่ระบบ...";
       signInWithEmailAndPassword(auth, email, pwd)
-        .then(() => { document.querySelector("#adminLoginWrapper button").innerText = "เข้าสู่ระบบ"; })
+        .then(() => { document.querySelector("#adminLoginWrapper button").innerText = "ENTER CONSOLE / เข้าสู่ระบบ"; })
         .catch(() => {
-          document.querySelector("#adminLoginWrapper button").innerText = "เข้าสู่ระบบ";
+          document.querySelector("#adminLoginWrapper button").innerText = "ENTER CONSOLE / เข้าสู่ระบบ";
           errorMsg.style.display = "block";
           errorMsg.innerText = "อีเมลหรือรหัสผ่านไม่ถูกต้อง กรุณาลองใหม่";
         });
@@ -724,13 +1715,18 @@
       }
     }
 
-    // แก้ไขระบบโหลดข้อมูลใช้ Promise.all แบบสมบูรณ์ เพื่อป้องกันบัค (เสถียรภาพสูงสุด 100%)
+    // โหลดข้อมูลทั้งหมดด้วย Promise.all
     onAuthStateChanged(auth, async (user) => {
       if (user) {
         document.getElementById("adminLoginWrapper").style.display = "none";
+        document.getElementById("topLogoutBtn").style.display = "inline-flex";
         document.getElementById("mainAdminContent").style.display = "flex";
         document.getElementById("mainAdminContent").style.opacity = "0.5";
         document.getElementById("mainAdminContent").style.pointerEvents = "none";
+
+        if (window.updateTabIndicator) {
+            requestAnimationFrame(() => window.updateTabIndicator());
+        }
         
         try {
             await Promise.all([
@@ -750,11 +1746,15 @@
 
         document.getElementById("mainAdminContent").style.opacity = "1";
         document.getElementById("mainAdminContent").style.pointerEvents = "auto";
+        if (window.updateTabIndicator) {
+            window.updateTabIndicator();
+        }
         
         setupExternalDragAndDrop();
         setTimeout(() => processDiscordActions(), 1000);
       } else {
         document.getElementById("adminLoginWrapper").style.display = "flex";
+        document.getElementById("topLogoutBtn").style.display = "none";
         document.getElementById("mainAdminContent").style.display = "none";
       }
     });
@@ -768,12 +1768,12 @@
     // ==========================================
     window.loadUsers = async function() {
       const tableDiv = document.getElementById("usersTable");
-      tableDiv.innerHTML = "<p style='text-align:center;'>กำลังโหลดข้อมูลผู้ใช้งาน...</p>";
+      tableDiv.innerHTML = "<p style='text-align:center; padding:16px;'>กำลังโหลดข้อมูลผู้ใช้งาน...</p>";
 
       try {
         const querySnapshot = await getDocs(collection(db, "users"));
         if (querySnapshot.empty) {
-          tableDiv.innerHTML = "<p style='text-align:center; color:#86868b;'>ไม่พบข้อมูลผู้ใช้งาน</p>";
+          tableDiv.innerHTML = "<p style='text-align:center; color:var(--muted); padding:16px;'>ไม่พบข้อมูลผู้ใช้งาน</p>";
           return;
         }
 
@@ -798,9 +1798,9 @@
         users.forEach((data) => {
           const id = data.id;
 
-          let picHtml = `<svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" stroke-width="1" style="color: var(--apple-text-muted); margin: 0 auto; display: block;"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>`;
+          let picHtml = `<svg viewBox="0 0 24 24" width="38" height="38" fill="none" stroke="currentColor" stroke-width="1.2" style="color: var(--muted); margin: 0 auto; display: block;"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>`;
           if (data.profilePic) {
-              picHtml = `<img src="${data.profilePic}" style="width: 45px; height: 45px; border-radius: 50%; object-fit: cover; border: 2px solid #d2d2d7; margin: 0 auto; display: block;">`;
+              picHtml = `<img src="${data.profilePic}" style="width: 44px; height: 44px; border-radius: 50%; object-fit: cover; border: 1px solid var(--rule); margin: 0 auto; display: block;">`;
           }
 
           let timeStr = "-";
@@ -812,14 +1812,14 @@
                     <td style="text-align:center; vertical-align: middle;">${picHtml}</td>
                     <td style="text-align:center; vertical-align: middle;"><b>${id}</b></td>
                     <td style="vertical-align: middle;">${data.displayName || '-'}</td>
-                    <td style="text-align:center; vertical-align: middle;">${data.password ? `<span style="color:#ff3b30; font-weight:bold;">${data.password}</span>` : `<span style="color:#86868b;">-</span>`}</td>
+                    <td style="text-align:center; vertical-align: middle;">${data.password ? `<span style="color:var(--vermilion); font-weight:bold;">${data.password}</span>` : `<span style="color:var(--muted);">-</span>`}</td>
                     <td style="text-align:center; vertical-align: middle;">${timeStr}</td>
                   </tr>`;
         });
         html += "</table>";
         tableDiv.innerHTML = html;
       } catch (error) {
-        tableDiv.innerHTML = "<p style='color:red; text-align:center;'>การเรียกข้อมูลผู้ใช้งานล้มเหลว</p>";
+        tableDiv.innerHTML = "<p style='color:var(--vermilion); text-align:center; padding:16px;'>การเรียกข้อมูลผู้ใช้งานล้มเหลว</p>";
       }
     }
 
@@ -838,12 +1838,12 @@
         
         filtered.sort((a,b) => new Date(a.startDate || a.date) - new Date(b.startDate || b.date));
 
-        if(filtered.length === 0) { div.innerHTML = "<p style='text-align:center; color:#86868b;'>ไม่พบการแจ้งเตือน</p>"; return; }
+        if(filtered.length === 0) { div.innerHTML = "<p style='text-align:center; color:var(--muted); padding:16px;'>ไม่พบการแจ้งเตือน</p>"; return; }
         
         let html = `<table><tr><th width="30%">ชื่องาน / วันที่</th><th width="20%">ผู้ใช้เป้าหมาย</th><th width="20%">สถานะ</th><th width="30%">จัดการ</th></tr>`;
         filtered.forEach(data => {
            const safeData = encodeURIComponent(JSON.stringify(data));
-           const statusTxt = data.status === 'Complete' ? `<span style="color:#34c759;">สำเร็จแล้ว</span>` : `<span style="color:#ff3b30;">รอทำ</span>`;
+           const statusTxt = data.status === 'Complete' ? `<span style="color:var(--emerald); font-weight:600;">สำเร็จแล้ว</span>` : `<span style="color:var(--vermilion); font-weight:600;">รอทำ</span>`;
            const targetLen = data.allowedUsers ? data.allowedUsers.length : 0;
            
            let dateStr = data.startDate || data.date;
@@ -855,7 +1855,7 @@
            }
 
            html += `<tr>
-             <td><b>${data.title}</b><br><small>${dateStr} ${timeStr}</small></td>
+             <td><b>${data.title}</b><br><small style="color:var(--muted);">${dateStr} ${timeStr}</small></td>
              <td style="text-align:center;">${targetLen} บัญชี</td>
              <td style="text-align:center;">${statusTxt}</td>
              <td style="text-align:center;">
@@ -867,7 +1867,7 @@
            </tr>`;
         });
         html += `</table>`; div.innerHTML = html;
-      } catch(e) { div.innerHTML = "<p style='color:red;'>ดึงข้อมูลล้มเหลว</p>"; }
+      } catch(e) { div.innerHTML = "<p style='color:var(--vermilion); padding:16px;'>ดึงข้อมูลล้มเหลว</p>"; }
     }
 
     window.saveReminder = async function() {
@@ -982,7 +1982,7 @@
         allSchedules = [];
         snap.forEach(doc => allSchedules.push({id: doc.id, ...doc.data()}));
 
-        if(allSchedules.length === 0) { div.innerHTML = "<p style='text-align:center; color:#86868b;'>ไม่มีข้อมูลตารางเรียน</p>"; return; }
+        if(allSchedules.length === 0) { div.innerHTML = "<p style='text-align:center; color:var(--muted); padding:16px;'>ไม่มีข้อมูลตารางเรียน</p>"; return; }
         
         let html = `<table><tr><th width="20%">ชื่อตารางเรียน</th><th width="30%">รูปภาพ</th><th width="30%">กลุ่มผู้ใช้เป้าหมาย</th><th width="20%">จัดการ</th></tr>`;
         allSchedules.forEach(data => {
@@ -991,7 +1991,7 @@
            const title = data.title || data.name || "-";
            html += `<tr>
              <td><b>${title}</b></td>
-             <td style="text-align:center;"><img src="${data.imageUrl}" style="max-width:150px; border-radius:8px; border:1px solid #d2d2d7;"></td>
+             <td style="text-align:center;"><img src="${data.imageUrl}" style="max-width:150px; border:1px solid var(--rule);"></td>
              <td style="word-break: break-all;">${users}</td>
              <td style="text-align:center;">
                 <div class="action-btns">
@@ -1002,7 +2002,7 @@
            </tr>`;
         });
         html += `</table>`; div.innerHTML = html;
-      } catch(e) { div.innerHTML = "<p style='color:red;'>ดึงข้อมูลล้มเหลว</p>"; }
+      } catch(e) { div.innerHTML = "<p style='color:var(--vermilion); padding:16px;'>ดึงข้อมูลล้มเหลว</p>"; }
     }
 
     window.saveSchedule = async function() {
@@ -1051,20 +2051,20 @@
     // ==========================================
     window.loadBanners = async function() {
       const div = document.getElementById("bannersTable");
-      div.innerHTML = "<p style='text-align:center;'>กำลังโหลดข้อมูลโฆษณา...</p>";
+      div.innerHTML = "<p style='text-align:center; padding:16px;'>กำลังโหลดข้อมูลโฆษณา...</p>";
       try {
         const snap = await getDocs(collection(db, "banners"));
         adminBanners = [];
         snap.forEach(doc => adminBanners.push({id: doc.id, ...doc.data()}));
         adminBanners.sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0));
 
-        if(adminBanners.length === 0) { div.innerHTML = "<p style='text-align:center; color:#86868b;'>ไม่มีป้ายโฆษณาในระบบ</p>"; return; }
+        if(adminBanners.length === 0) { div.innerHTML = "<p style='text-align:center; color:var(--muted); padding:16px;'>ไม่มีป้ายโฆษณาในระบบ</p>"; return; }
         
         let html = `<table><tr><th width="40%">รูปภาพ (Image)</th><th width="40%">ลิงก์ปลายทาง (Target URL)</th><th width="20%">จัดการ</th></tr>`;
         adminBanners.forEach(data => {
            const safeData = encodeURIComponent(JSON.stringify(data));
            html += `<tr draggable="true" data-banner-id="${data.id}" ondragstart="bannerDragStart(event)" ondragover="bannerDragOver(event)" ondragenter="bannerDragEnter(event)" ondragleave="bannerDragLeave(event)" ondrop="bannerDrop(event, '${data.id}')" style="cursor: grab;">
-             <td style="text-align:center;"><img src="${data.imageUrl}" style="max-width:150px; border-radius:8px; border:1px solid #d2d2d7;"></td>
+             <td style="text-align:center;"><img src="${data.imageUrl}" style="max-width:150px; border:1px solid var(--rule);"></td>
              <td style="word-break: break-all;">${data.link || '-'}</td>
              <td style="text-align:center;">
                 <div class="action-btns">
@@ -1077,7 +2077,7 @@
         html += `</table>`;
         div.innerHTML = html;
       } catch (e) {
-        div.innerHTML = "<p style='color:red; text-align:center;'>การเรียกข้อมูลโฆษณาล้มเหลว</p>";
+        div.innerHTML = "<p style='color:var(--vermilion); text-align:center; padding:16px;'>การเรียกข้อมูลโฆษณาล้มเหลว</p>";
       }
     }
 
@@ -1086,7 +2086,7 @@
         e.currentTarget.style.opacity = "0.5";
     }
     window.bannerDragOver = function(e) { e.preventDefault(); }
-    window.bannerDragEnter = function(e) { e.currentTarget.style.background = "#e5e5ea"; }
+    window.bannerDragEnter = function(e) { e.currentTarget.style.background = "rgba(31,63,176,.1)"; }
     window.bannerDragLeave = function(e) { e.currentTarget.style.background = ""; }
     window.bannerDrop = async function(e, targetId) {
         e.preventDefault();
@@ -1164,7 +2164,7 @@
 
     window.loadJobs = async function() {
       const explorerDiv = document.getElementById("adminFileExplorer");
-      explorerDiv.innerHTML = "<p style='text-align:center;'>กำลังโหลดข้อมูล...</p>";
+      explorerDiv.innerHTML = "<p style='text-align:center; padding:16px;'>กำลังโหลดข้อมูล...</p>";
 
       try {
         const querySnapshot = await getDocs(collection(db, "jobs"));
@@ -1212,14 +2212,14 @@
         allJobsAdmin.forEach((job) => {
           const displayFolder = job.folder ? `📁 ${job.folder}` : "หน้าหลัก (ไม่ระบุโฟลเดอร์)";
           let lockTxt = job.password ? ` ${icons.lock}` : "";
-          let pauseTxt = job.isPaused ? ` <span style="color:var(--apple-text-muted); font-size:12px;">(กำลังพัก)</span>` : "";
+          let pauseTxt = job.isPaused ? ` <span style="color:var(--muted); font-size:12px;">(กำลังพัก)</span>` : "";
           
           if (job.type === "system_folder") {
               const displayName = getLocalizedName(job.title, folderMeta[job.normalizedPath]);
               tableHtml += `<tr>
-                        <td><b>${displayName}</b>${lockTxt}${pauseTxt}<br><small style="color:gray;">(แฟ้มข้อมูล / กำหนดสี)</small></td>
+                        <td><b>${displayName}</b>${lockTxt}${pauseTxt}<br><small style="color:var(--muted);">(แฟ้มข้อมูล / กำหนดสี)</small></td>
                         <td style="text-align:center;">โฟลเดอร์</td>
-                        <td style="text-align:center; color:gray;">-</td>
+                        <td style="text-align:center; color:var(--muted);">-</td>
                         <td>
                           <div class="action-btns">
                             <button class="btn-red" onclick="deleteJob('${job.id}')">ลบโฟลเดอร์</button>
@@ -1230,9 +2230,9 @@
               const userCount = job.allowedUsers ? job.allowedUsers.length : 0;
               const displayName = getLocalizedFileTitle(job);
               tableHtml += `<tr>
-                        <td><b>${displayName}</b>${lockTxt}${pauseTxt}<br><small style="color:gray;">${displayFolder}</small></td>
+                        <td><b>${displayName}</b>${lockTxt}${pauseTxt}<br><small style="color:var(--muted);">${displayFolder}</small></td>
                         <td style="text-align:center;">${job.type}</td>
-                        <td style="text-align:center; color:#34c759; font-weight:bold;">${userCount} บัญชี</td>
+                        <td style="text-align:center; color:var(--emerald); font-weight:bold;">${userCount} บัญชี</td>
                         <td>
                           <div class="action-btns">
                             <button class="btn-yellow" onclick="editJob('${job.id}')">แก้ไข</button>
@@ -1245,7 +2245,7 @@
         
         tableHtml += "</table>";
         if(querySnapshot.empty) {
-           tableHtml = "<p style='text-align:center; color:#86868b;'>ไม่พบข้อมูลรายการในระบบ</p>";
+           tableHtml = "<p style='text-align:center; color:var(--muted); padding:16px;'>ไม่พบข้อมูลรายการในระบบ</p>";
         }
 
         document.getElementById("jobsTable").innerHTML = tableHtml;
@@ -1253,7 +2253,7 @@
         
         renderAdminExplorer();
       } catch (error) {
-        explorerDiv.innerHTML = "<p style='color:red; text-align:center;'>การเรียกข้อมูลล้มเหลว</p>";
+        explorerDiv.innerHTML = "<p style='color:var(--vermilion); text-align:center; padding:16px;'>การเรียกข้อมูลล้มเหลว</p>";
       }
     }
 
@@ -1312,7 +2312,7 @@
     window.selectFolderColor = function(colorKey) {
         window.selectedFolderColor = colorKey;
         document.querySelectorAll('.color-circle').forEach(el => {
-            el.style.border = el.getAttribute('data-color') === colorKey ? `3px solid #1d1d1f` : '3px solid transparent';
+            el.style.border = el.getAttribute('data-color') === colorKey ? `2px solid var(--ink)` : '2px solid transparent';
             if (el.getAttribute('data-color') === colorKey) el.style.transform = 'scale(1.15)';
             else el.style.transform = 'scale(1)';
         });
@@ -1448,7 +2448,7 @@
               <div class="grid-item folder-target" 
                    data-target-folder="${targetPath}"
                    ondragover="handleDragOverFolder(event)" 
-                   onDragleave="handleDragLeaveFolder(event)" 
+                   ondragleave="handleDragLeaveFolder(event)" 
                    ondrop="handleDropOnFolder(event)">
                 <div class="grid-icon" 
                      ontouchstart="startFolderPress(event, '${safeTarget}')"
@@ -1512,7 +2512,7 @@
         
         html += `</div>`;
         if (foldersInCurrentPath.size === 0 && filesInCurrentPath.length === 0) {
-            html = "<p style='text-align:center; color:#86868b; margin-top:30px; margin-bottom: 20px;'>โฟลเดอร์ว่างเปล่า</p>";
+            html = "<p style='text-align:center; color:var(--muted); margin-top:26px; margin-bottom: 20px;'>โฟลเดอร์ว่างเปล่า</p>";
         }
 
         document.getElementById("adminFileExplorer").innerHTML = html;
@@ -1664,6 +2664,7 @@
     }
     
     window.addNewJobHere = function() {
+       if (window.switchAdminPage) window.switchAdminPage('page-docs');
        cancelEdit();
        document.getElementById("jobFolder").value = currentAdminPath;
        document.getElementById("formBox").scrollIntoView({ behavior: 'smooth' }); 
@@ -1685,7 +2686,7 @@
           if(tinymce.get('editor-container')) {
               textContent = tinymce.get('editor-container').getContent();
           }
-          url = "-"; // ป้องกัน error
+          url = "-";
       }
 
       const rawUsers = document.getElementById("allowedUsers").value;
@@ -1696,7 +2697,7 @@
       
       if (!title || (!url && type !== "text")) {
         statusText.innerText = "กรุณาระบุข้อมูลไฟล์และลิงก์/ข้อความให้ครบถ้วน";
-        statusText.style.color = "red";
+        statusText.style.color = "var(--vermilion)";
         return;
       }
 
@@ -1706,7 +2707,7 @@
       url = cleanUrl(type, url);
 
       statusText.innerText = "ระบบกำลังบันทึกข้อมูล...";
-      statusText.style.color = "#0071e3";
+      statusText.style.color = "var(--cobalt)";
 
       try {
         const jobData = {
@@ -1734,19 +2735,20 @@
           statusText.innerText = "สร้างข้อมูลระบบงานสำเร็จ";
         }
         
-        statusText.style.color = "#34c759";
+        statusText.style.color = "var(--emerald)";
         cancelEdit(); 
         loadJobs();   
       } catch (error) { 
         statusText.innerText = "เกิดข้อผิดพลาดในการบันทึกข้อมูล";
-        statusText.style.color = "red";
+        statusText.style.color = "var(--vermilion)";
       }
     }
 
-    // อัปเดต editJob โดยใช้ ID เพื่อดึงข้อมูลแทนการส่ง Object ที่มีข้อความยาวๆ ซึ่งอาจทำให้พัง
     window.editJob = function(jobId) {
       const data = allJobsAdmin.find(j => j.id === jobId);
       if(!data) return;
+
+      if (window.switchAdminPage) window.switchAdminPage('page-docs');
 
       document.getElementById("formTitle").innerText = "แก้ไขข้อมูลและสิทธิ์ระบบงาน";
       document.getElementById("editJobId").value = data.id;
@@ -1756,7 +2758,6 @@
       document.getElementById("jobFolder").value = data.folder || "";
       document.getElementById("fileType").value = data.type;
       
-      // ควบคุมการแสดงผลตามประเภท
       if (data.type === "text") {
           if (tinymce.get('editor-container')) {
               tinymce.get('editor-container').setContent(data.textContent || "");
@@ -1844,29 +2845,38 @@
     window.updateRequestBadge = function(count) {
         const badge = document.getElementById("requestBadge");
         const countEl = document.getElementById("requestBadgeCount");
+        const tabPill = document.getElementById("tabRequestCount");
         if (!badge || !countEl) return;
         
         const bellIcon = badge.querySelector('.bell-icon');
         if (count > 0) {
-            badge.style.display = "flex";
+            badge.style.display = "inline-flex";
             countEl.innerText = count + " คำขอใหม่";
             bellIcon.classList.add('ringing');
+            if (tabPill) {
+                tabPill.style.display = "inline-block";
+                tabPill.innerText = count;
+            }
         } else {
             badge.style.display = "none";
             bellIcon.classList.remove('ringing');
+            if (tabPill) {
+                tabPill.style.display = "none";
+            }
         }
+        if (window.updateTabIndicator) window.updateTabIndicator();
     }
 
     window.loadRequests = async function() {
       const tableDiv = document.getElementById("requestsTable");
-      tableDiv.innerHTML = "<p style='text-align:center;'>กำลังโหลดข้อมูลคำขอ...</p>";
+      tableDiv.innerHTML = "<p style='text-align:center; padding:16px;'>กำลังโหลดข้อมูลคำขอ...</p>";
 
       try {
         const querySnapshot = await getDocs(collection(db, "download_requests"));
         let pendingCount = 0;
 
         if (querySnapshot.empty) {
-          tableDiv.innerHTML = "<p style='text-align:center; color:#86868b;'>ไม่พบข้อมูลคำขอในระบบ</p>";
+          tableDiv.innerHTML = "<p style='text-align:center; color:var(--muted); padding:16px;'>ไม่พบข้อมูลคำขอในระบบ</p>";
           window.updateRequestBadge(0);
           return;
         }
@@ -1886,12 +2896,12 @@
           if (data.status === "pending") pendingCount++;
           
           let badge = "";
-          if (data.status === "pending") badge = `<span style="color:#d97706; font-weight:600;">รอการตรวจสอบ</span>`;
+          if (data.status === "pending") badge = `<span style="color:var(--amber); font-weight:600;">รอการตรวจสอบ</span>`;
           else if (data.status === "approved") {
-            badge = `<span style="color:#34c759; font-weight:600;">อนุมัติการเข้าถึง</span>`;
-            if (data.expiresAt) badge += `<br><small style="color:#86868b;">หมดเขต: ${data.expiresAt.toDate().toLocaleString('th-TH')}</small>`;
-            else badge += `<br><small style="color:#86868b;">ไม่มีวันหมดอายุ</small>`;
-          } else if (data.status === "rejected") badge = `<span style="color:#ff3b30; font-weight:600;">ปฏิเสธการเข้าถึง</span>`;
+            badge = `<span style="color:var(--emerald); font-weight:600;">อนุมัติการเข้าถึง</span>`;
+            if (data.expiresAt) badge += `<br><small style="color:var(--muted);">หมดเขต: ${data.expiresAt.toDate().toLocaleString('th-TH')}</small>`;
+            else badge += `<br><small style="color:var(--muted);">ไม่มีวันหมดอายุ</small>`;
+          } else if (data.status === "rejected") badge = `<span style="color:var(--vermilion); font-weight:600;">ปฏิเสธการเข้าถึง</span>`;
 
           html += `<tr>
                     <td style="text-align:center;"><b>${data.studentId}</b></td>
@@ -1913,7 +2923,7 @@
         html += "</table>";
         tableDiv.innerHTML = html;
         window.updateRequestBadge(pendingCount);
-      } catch (error) { tableDiv.innerHTML = "<p style='color:red; text-align:center;'>การเรียกข้อมูลล้มเหลว</p>"; }
+      } catch (error) { tableDiv.innerHTML = "<p style='color:var(--vermilion); text-align:center; padding:16px;'>การเรียกข้อมูลล้มเหลว</p>"; }
     }
 
     window.deleteRequest = async function(reqId) {
@@ -2010,12 +3020,12 @@
 
     window.loadHistory = async function() {
       const tableDiv = document.getElementById("historyTable");
-      tableDiv.innerHTML = "<p style='text-align:center;'>กำลังโหลดข้อมูลประวัติ...</p>";
+      tableDiv.innerHTML = "<p style='text-align:center; padding:16px;'>กำลังโหลดข้อมูลประวัติ...</p>";
 
       try {
         const querySnapshot = await getDocs(collection(db, "download_history"));
         if (querySnapshot.empty) {
-          tableDiv.innerHTML = "<p style='text-align:center; color:#86868b;'>ไม่พบข้อมูลประวัติการดาวน์โหลด</p>";
+          tableDiv.innerHTML = "<p style='text-align:center; color:var(--muted); padding:16px;'>ไม่พบข้อมูลประวัติการดาวน์โหลด</p>";
           return;
         }
         let histories = [];
@@ -2033,33 +3043,31 @@
         });
         html += "</table>";
         tableDiv.innerHTML = html;
-      } catch (error) { tableDiv.innerHTML = "<p style='color:red; text-align:center;'>การเรียกข้อมูลประวัติล้มเหลว</p>";
+      } catch (error) { tableDiv.innerHTML = "<p style='color:var(--vermilion); text-align:center; padding:16px;'>การเรียกข้อมูลประวัติล้มเหลว</p>";
       }
     }
 
-    // ฟังก์ชันสำหรับโหลดสถิติการเข้าสู่ระบบแบบใหม่ (จัดกลุ่มผู้ใช้)
+    // ฟังก์ชันสำหรับโหลดสถิติการเข้าสู่ระบบแบบจัดกลุ่มผู้ใช้
     window.loadAccessLogs = async function() {
       const tableDiv = document.getElementById("accessLogsTable");
-      tableDiv.innerHTML = "<p style='text-align:center;'>กำลังโหลดข้อมูลสถิติ...</p>";
+      tableDiv.innerHTML = "<p style='text-align:center; padding:16px;'>กำลังโหลดข้อมูลสถิติ...</p>";
 
       try {
         const querySnapshot = await getDocs(collection(db, "access_logs"));
         if (querySnapshot.empty) {
-          tableDiv.innerHTML = "<p style='text-align:center; color:#86868b;'>ไม่พบข้อมูลสถิติการเข้าสู่ระบบ</p>";
+          tableDiv.innerHTML = "<p style='text-align:center; color:var(--muted); padding:16px;'>ไม่พบข้อมูลสถิติการเข้าสู่ระบบ</p>";
           return;
         }
         
         let logs = [];
         querySnapshot.forEach(doc => { logs.push({ id: doc.id, ...doc.data() }); });
         
-        // เรียงจากเวลาล่าสุดไปเก่าสุด
         logs.sort((a, b) => {
             const timeA = a.loginTime ? a.loginTime.toMillis() : 0;
             const timeB = b.loginTime ? b.loginTime.toMillis() : 0;
             return timeB - timeA;
         });
         
-        // จัดกลุ่ม (Group by) รหัสบัญชี (studentId)
         window.groupedLogs = {};
         logs.forEach(log => {
             let sId = log.studentId || 'ไม่ระบุ';
@@ -2075,17 +3083,16 @@
                         <th width="20%">จัดการ</th>
                       </tr>`;
         
-        // วนลูปข้อมูลที่จัดกลุ่มแล้วมาสร้างตาราง
         for (const [sId, userLogs] of Object.entries(window.groupedLogs)) {
             let lastLoginStr = "-";
             if (userLogs[0].loginTime) lastLoginStr = userLogs[0].loginTime.toDate().toLocaleString('th-TH');
             
             html += `<tr>
                 <td style="text-align:center;"><b>${sId}</b></td>
-                <td style="text-align:center; color:#0071e3; font-weight:bold;">${userLogs.length} ครั้ง</td>
+                <td style="text-align:center; color:var(--cobalt); font-weight:bold;">${userLogs.length} ครั้ง</td>
                 <td style="text-align:center;">${lastLoginStr}</td>
                 <td style="text-align:center;">
-                    <button class="btn-blue" style="padding: 6px 12px; font-size: 12px; border-radius: 8px; margin:0;" onclick="viewUserLogs('${sId}')">ดูประวัติ</button>
+                    <button class="btn-blue" style="padding: 6px 12px; font-size: 10.5px; margin:0; width:auto;" onclick="viewUserLogs('${sId}')">ดูประวัติ</button>
                 </td>
             </tr>`;
         }
@@ -2094,7 +3101,7 @@
         tableDiv.innerHTML = html;
         
       } catch (error) { 
-        tableDiv.innerHTML = "<p style='color:red; text-align:center;'>การเรียกข้อมูลสถิติล้มเหลว</p>"; 
+        tableDiv.innerHTML = "<p style='color:var(--vermilion); text-align:center; padding:16px;'>การเรียกข้อมูลสถิติล้มเหลว</p>"; 
       }
     }
 
@@ -2111,7 +3118,7 @@
           if (data.logoutTime) logoutStr = data.logoutTime.toDate().toLocaleString('th-TH');
           html += `<tr>
             <td style="text-align:center;">${loginStr}</td>
-            <td style="text-align:center; color: ${data.logoutTime ? '#1d1d1f' : '#ff9500'}">${logoutStr}</td>
+            <td style="text-align:center; color: ${data.logoutTime ? 'var(--ink)' : 'var(--amber)'}">${logoutStr}</td>
           </tr>`;
         });
         html += "</table>";
@@ -2120,24 +3127,22 @@
         document.getElementById('userLogsModal').style.display = 'flex';
     }
 
-    // ฟังก์ชันปิด Modal ประวัติรายบุคคล
     window.closeUserLogsModal = function() {
         document.getElementById('userLogsModal').style.display = 'none';
     }
 
-    // ฟังก์ชันที่เพิ่มใหม่สำหรับดึงข้อมูลและสถิติคุกกี้
+    // ฟังก์ชันสำหรับดึงข้อมูลและสถิติคุกกี้
     window.loadCookieStats = async function() {
       const tableDiv = document.getElementById("cookieStatsTable");
-      tableDiv.innerHTML = "<p style='text-align:center;'>กำลังโหลดข้อมูลสถิติจากคุกกี้...</p>";
+      tableDiv.innerHTML = "<p style='text-align:center; padding:16px;'>กำลังโหลดข้อมูลสถิติจากคุกกี้...</p>";
 
       try {
         const querySnapshot = await getDocs(collection(db, "cookie_stats"));
         if (querySnapshot.empty) {
-          tableDiv.innerHTML = "<p style='text-align:center; color:#86868b;'>ไม่พบข้อมูลสถิติและการยินยอมคุกกี้ในระบบ</p>";
+          tableDiv.innerHTML = "<p style='text-align:center; color:var(--muted); padding:16px;'>ไม่พบข้อมูลสถิติและการยินยอมคุกกี้ในระบบ</p>";
           return;
         }
         
-        // ใช้ Map เพื่อนับผู้ใช้แค่ 1 อัน (ไม่ซ้ำ) โดยให้ความสำคัญกับ userId ก่อน ถ้าไม่มีใช้ deviceId
         let uniqueUsersMap = new Map();
         
         querySnapshot.forEach(doc => { 
@@ -2148,7 +3153,6 @@
         
         let stats = Array.from(uniqueUsersMap.values());
         
-        // ตัวแปรเก็บจำนวนสำหรับนำไปแสดงกราฟ
         let countFunctional = 0;
         let countAnalytics = 0;
         let countMarketing = 0;
@@ -2162,7 +3166,6 @@
           </tr>`;
           
         stats.forEach(data => {
-          // ตรวจสอบว่าผู้ใช้ยินยอมหรือไม่ (มีข้อมูลหรือไม่ และไม่ใช่ขีด หรือ false)
           let hasFunctional = data.functionalData === 'ยอมรับ';
           let hasAnalytics = data.analyticsData === 'ยอมรับ';
           let hasMarketing = data.marketingData === 'ยอมรับ';
@@ -2173,19 +3176,18 @@
             
           html += `<tr>
             <td style="text-align:center;"><b>${data.userId || data.deviceId || '-'}</b></td>
-            <td style="text-align:center; color:#0071e3;">${data.functionalData || '-'}</td>
-            <td style="text-align:center; color:#34c759;">${data.analyticsData || '-'}</td>
-            <td style="text-align:center; color:#ff9500;">${data.marketingData || '-'}</td>
+            <td style="text-align:center; color:var(--cobalt); font-weight:600;">${data.functionalData || '-'}</td>
+            <td style="text-align:center; color:var(--emerald); font-weight:600;">${data.analyticsData || '-'}</td>
+            <td style="text-align:center; color:var(--vermilion); font-weight:600;">${data.marketingData || '-'}</td>
           </tr>`;
         });
         html += "</table>";
         tableDiv.innerHTML = html;
         
-        // วาดกราฟแท่ง (Bar Chart) ด้วย Chart.js
         const ctx = document.getElementById('cookieChart');
         if (ctx) {
             if (cookieChartInstance) {
-                cookieChartInstance.destroy(); // ลบกราฟเก่าก่อนวาดใหม่
+                cookieChartInstance.destroy();
             }
             cookieChartInstance = new Chart(ctx, {
                 type: 'bar',
@@ -2195,33 +3197,35 @@
                         label: 'จำนวนผู้ใช้ที่ยินยอม (คน)',
                         data: [countFunctional, countAnalytics, countMarketing],
                         backgroundColor: [
-                            'rgba(0, 113, 227, 0.7)',
-                            'rgba(52, 199, 89, 0.7)',
-                            'rgba(255, 149, 0, 0.7)'
+                            'rgba(31, 63, 176, 0.85)',
+                            'rgba(30, 126, 72, 0.85)',
+                            'rgba(200, 62, 43, 0.85)'
                         ],
-                        borderColor: ['#0071e3', '#34c759', '#ff9500'],
+                        borderColor: ['#141414', '#141414', '#141414'],
                         borderWidth: 1,
-                        borderRadius: 6
+                        borderRadius: 0
                     }]
                 },
                 options: {
                     responsive: true,
                     scales: {
-                        y: { beginAtZero: true, ticks: { stepSize: 1 } }
+                        y: { beginAtZero: true, ticks: { stepSize: 1, color: '#141414' } },
+                        x: { ticks: { color: '#141414' } }
                     },
                     plugins: {
                         legend: { display: false },
                         title: {
                             display: true,
+                            color: '#141414',
                             text: 'แผนภูมิแท่งแสดงจำนวนความยินยอมแยกตามหมวดหมู่ (คน)',
-                            font: { family: "'Sarabun', sans-serif", size: 15 }
+                            font: { family: "'Sarabun', sans-serif", size: 15, weight: '600' }
                         }
                     }
                 }
             });
         }
       } catch (error) { 
-        tableDiv.innerHTML = "<p style='color:red; text-align:center;'>การเรียกข้อมูลสถิติคุกกี้ล้มเหลว</p>"; 
+        tableDiv.innerHTML = "<p style='color:var(--vermilion); text-align:center; padding:16px;'>การเรียกข้อมูลสถิติคุกกี้ล้มเหลว</p>"; 
       }
     }
 
@@ -2281,62 +3285,104 @@
     }
   </script>
 
+  <!-- ==========================================
+       PAGE NAVIGATION, SLIDING INDICATOR, CURSOR & TINYMCE
+       ========================================== -->
   <script>
-    function initAccordion() {
-      const adminBoxes = document.querySelectorAll('.admin-box');
-      const excludeText = [
-        "จัดการป้ายโฆษณา",
-        "การอนุมัติสิทธิ์การเข้าถึงทันที",
-        "การจัดการรายการ (File Explorer)"
-      ];
-      adminBoxes.forEach(box => {
-        const header = box.querySelector('h2');
-        if (!header) return;
-        
-        const titleText = header.innerText.trim();
-        const isFormBox = box.id === "formBox"; 
-        const shouldExclude = isFormBox || excludeText.some(t => titleText.includes(t));
-        
-        if (!shouldExclude && !header.querySelector('.toggle-arrow')) {
-          box.classList.add('collapsible-box');
-          const arrow = document.createElement('span');
-          arrow.className = 'toggle-arrow';
-          arrow.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>'; 
-          
-          header.appendChild(arrow);
-          const contentWrapper = document.createElement('div');
-          contentWrapper.className = 'accordion-content';
-          const innerWrapper = document.createElement('div');
-          innerWrapper.className = 'accordion-inner';
-          while (header.nextSibling) {
-              innerWrapper.appendChild(header.nextSibling);
-          }
-          contentWrapper.appendChild(innerWrapper);
-          box.appendChild(contentWrapper);
-          box.classList.add('collapsed');
-          header.addEventListener('click', () => {
-            box.classList.toggle('collapsed');
-          });
-        }
-      });
-    }
+    // 1. ระบบสลับหน้าการทำงาน + แถบสีโคบอลต์เลื่อนตามแท็บ (Leon Vasari Style)
+    window.updateTabIndicator = function() {
+        const activeBtn = document.querySelector('.page-tab-btn.active');
+        const indicator = document.getElementById('adminTabIndicator');
+        if (!activeBtn || !indicator) return;
+        indicator.style.width = activeBtn.offsetWidth + 'px';
+        indicator.style.height = activeBtn.offsetHeight + 'px';
+        indicator.style.transform = `translate3d(${activeBtn.offsetLeft}px, ${activeBtn.offsetTop}px, 0)`;
+    };
 
+    window.switchAdminPage = function(pageId) {
+        const tabs = document.querySelectorAll('.page-tab-btn');
+        const pages = document.querySelectorAll('.admin-page');
+
+        tabs.forEach(btn => {
+            if (btn.getAttribute('data-target') === pageId) {
+                btn.classList.add('active');
+            } else {
+                btn.classList.remove('active');
+            }
+        });
+
+        pages.forEach(page => {
+            if (page.id === pageId) {
+                page.classList.add('active');
+            } else {
+                page.classList.remove('active');
+            }
+        });
+
+        window.updateTabIndicator();
+    };
+
+    window.addEventListener('resize', () => {
+        window.updateTabIndicator();
+    });
+
+    // 2. Custom Ring Cursor (single rAF loop)
+    (function initEditorialCursor() {
+        const cursor = document.getElementById('customCursor');
+        if (!cursor || !window.matchMedia('(pointer: fine)').matches) return;
+
+        let mx = window.innerWidth / 2;
+        let my = window.innerHeight / 2;
+        let cx = mx;
+        let cy = my;
+        let lastTime = performance.now();
+
+        document.addEventListener('pointermove', (e) => {
+            mx = e.clientX;
+            my = e.clientY;
+            const target = e.target;
+            if (target && target.closest && target.closest('.tox-tinymce')) {
+                cursor.classList.add('hidden-over-editor');
+            } else {
+                cursor.classList.remove('hidden-over-editor');
+            }
+
+            const isInteractive = target && target.closest && target.closest('button, a, select, .grid-icon, .grid-name, .color-circle, .slider, label');
+            if (isInteractive) {
+                cursor.classList.add('btn');
+            } else {
+                cursor.classList.remove('btn');
+            }
+        }, { passive: true });
+
+        function loop(now) {
+            const dt = Math.min(0.05, (now - lastTime) / 1000);
+            lastTime = now;
+            const ease = 1 - Math.exp(-16 * dt);
+            cx += (mx - cx) * ease;
+            cy += (my - cy) * ease;
+            cursor.style.transform = `translate3d(${cx}px, ${cy}px, 0)`;
+            requestAnimationFrame(loop);
+        }
+        requestAnimationFrame(loop);
+    })();
+
+    // 3. กำหนดค่าและสร้าง TinyMCE Editor แบบ Full Option
     document.addEventListener('DOMContentLoaded', () => {
-        initAccordion();
-        
-        // กำหนดค่าและสร้าง TinyMCE Editor แบบ Full Option (ให้ตรงตามภาพ)
+        window.updateTabIndicator();
+
         tinymce.init({
             selector: '#editor-container',
-            height: 500, // ความสูงเหมาะสมสำหรับแถบเครื่องมือเยอะ
-            menubar: 'edit view insert format tools table help', // เมนูบาร์ด้านบน
+            height: 500,
+            menubar: 'edit view insert format tools table help',
             plugins: [
                 'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
                 'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
                 'insertdatetime', 'media', 'table', 'wordcount'
             ],
             toolbar: 'undo redo | bold italic underline strikethrough | fontfamily fontsize blocks | alignleft aligncenter alignright alignjustify | outdent indent |  numlist bullist | forecolor backcolor removeformat | pagebreak | charmap | fullscreen preview print | image media link codesample table | ltr rtl',
-            content_style: "body { font-family: 'Sarabun', sans-serif; font-size: 15px; }",
-            branding: false, // เอาลายน้ำ TinyMCE ออก
+            content_style: "body { font-family: 'Sarabun', sans-serif; font-size: 15px; background-color: #F4F2ED; color: #141414; }",
+            branding: false,
             promotion: false
         });
     });
