@@ -1,24 +1,3473 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="th">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>ระบบผู้ดูแล — จัดการสิทธิ์แบบรวมศูนย์</title>
-    <meta name="description" content="Centralized document access, schedule, reminder, and analytics admin console styled as an editorial 3D shelf archive." />
-    <meta property="og:title" content="ระบบผู้ดูแล — จัดการสิทธิ์แบบรวมศูนย์" />
-    <meta property="og:description" content="Centralized document access, schedule, reminder, and analytics admin console styled as an editorial 3D shelf archive." />
-    <meta property="og:type" content="website" />
-    <meta name="twitter:card" content="summary_large_image" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@500;600&family=Newsreader:ital,opsz,wght@0,6..72,400;1,6..72,400&family=Noto+Sans+JP:wght@500&family=Sarabun:wght@300;400;500;600;700&display=swap"
-      rel="stylesheet"
-    />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/tinymce/6.8.2/tinymce.min.js" defer></script>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ระบบผู้ดูแล — จัดการสิทธิ์แบบรวมศูนย์</title>
+
+  <!-- Fonts: Editorial Serif + Inter Tight + Japanese + Thai (Sarabun) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Noto+Sans+JP:wght@400;500;600&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Chart.js & TinyMCE 6.8.2 -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tinymce/6.8.2/tinymce.min.js"></script>
+
+  <style>
+    :root {
+      --paper: #EDEBE6;
+      --sheet: #F4F2ED;
+      --ink: #141414;
+      --muted: #6D6A63;
+      --cobalt: #1F3FB0;
+      --vermilion: #B8332A;
+      --forest: #1F5B42;
+      --ochre: #C47F17;
+      --rule: rgba(20, 20, 20, 0.9);
+      --hairline: rgba(20, 20, 20, 0.14);
+      --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+      --H: min(46vh, 31vw);
+      --sans: "Inter Tight", "Sarabun", "Noto Sans JP", system-ui, sans-serif;
+      --serif: "Newsreader", "Sarabun", Georgia, serif;
+    }
+
+    @media (max-width: 767px) {
+      :root {
+        --H: min(60vw, 40svh);
+      }
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      background-color: var(--paper);
+      color: var(--ink);
+      font-family: var(--sans);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      min-height: 100vh;
+      overflow: hidden;
+      line-height: 1.6;
+    }
+
+    @media (pointer: fine) {
+      html.custom-cursor-active,
+      html.custom-cursor-active body,
+      html.custom-cursor-active button,
+      html.custom-cursor-active a,
+      html.custom-cursor-active select,
+      html.custom-cursor-active [role="button"] {
+        cursor: none !important;
+      }
+    }
+
+    /* Editorial Label & Box Buttons */
+    .lbl {
+      font-family: var(--sans);
+      font-weight: 600;
+      font-size: 10.5px;
+      line-height: 1;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .box {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      height: 23px;
+      padding: 0 9px;
+      border: 1px solid var(--rule);
+      background: transparent;
+      color: var(--ink);
+      text-decoration: none;
+      cursor: pointer;
+      transition: background-color 0.25s var(--ease), color 0.25s var(--ease), border-color 0.25s var(--ease), transform 0.2s var(--ease);
+    }
+
+    .box:hover {
+      background-color: var(--ink);
+      color: var(--paper);
+    }
+
+    .box-cobalt {
+      border-color: var(--cobalt);
+      color: var(--cobalt);
+    }
+    .box-cobalt:hover {
+      background-color: var(--cobalt);
+      color: var(--sheet);
+    }
+
+    .box-vermilion {
+      border-color: var(--vermilion);
+      color: var(--vermilion);
+    }
+    .box-vermilion:hover {
+      background-color: var(--vermilion);
+      color: var(--sheet);
+    }
+
+    .box-forest {
+      border-color: var(--forest);
+      color: var(--forest);
+    }
+    .box-forest:hover {
+      background-color: var(--forest);
+      color: var(--sheet);
+    }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      height: 40px;
+      padding: 0 22px;
+      background: var(--cobalt);
+      color: #ffffff;
+      border: 1px solid var(--cobalt);
+      cursor: pointer;
+      transition: opacity 0.2s var(--ease), transform 0.2s var(--ease);
+    }
+    .btn-primary:hover { opacity: 0.9; }
+    .btn-primary.is-edit {
+      background: var(--ochre);
+      border-color: var(--ochre);
+    }
+    .btn-primary.is-forest {
+      background: var(--forest);
+      border-color: var(--forest);
+    }
+
+    /* Paper Grain Overlay */
+    .paper-grain {
+      position: fixed;
+      inset: 0;
+      z-index: 40;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      opacity: 0.55;
+      mix-blend-mode: multiply;
+    }
+
+    /* Custom Ring Cursor */
+    .custom-cursor {
+      position: fixed;
+      left: 0;
+      top: 0;
+      width: 58px;
+      height: 58px;
+      margin-left: -29px;
+      margin-top: -29px;
+      z-index: 120;
+      pointer-events: none;
+      will-change: transform;
+      display: none;
+    }
+
+    @media (pointer: fine) {
+      .custom-cursor {
+        display: block;
+      }
+    }
+
+    .cursor-ring {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      border: 1.5px solid var(--ink);
+      background: transparent;
+      transition: transform 0.5s var(--ease), background-color 0.4s var(--ease), border-color 0.4s var(--ease);
+    }
+
+    .cursor-dot {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 6px;
+      height: 6px;
+      margin-left: -3px;
+      margin-top: -3px;
+      border-radius: 50%;
+      background: var(--ink);
+      transition: transform 0.4s var(--ease);
+    }
+
+    .cursor-label {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--sans);
+      font-weight: 600;
+      font-size: 9.5px;
+      line-height: 1.25;
+      letter-spacing: 0.1em;
+      color: #ffffff;
+      text-transform: uppercase;
+      transform: scale(0);
+      transition: transform 0.45s var(--ease);
+    }
+
+    .custom-cursor.spine .cursor-ring { transform: scale(0.72); }
+    .custom-cursor.btn .cursor-ring { transform: scale(0.55); }
+    .custom-cursor.btn .cursor-dot { transform: scale(0); }
+    .custom-cursor.open .cursor-ring {
+      transform: scale(1.75);
+      background: var(--cobalt);
+      border-color: var(--cobalt);
+    }
+    .custom-cursor.open .cursor-dot { transform: scale(0); }
+    .custom-cursor.open .cursor-label { transform: scale(1); }
+
+    /* Login Wrapper */
+    #adminLoginWrapper {
+      position: fixed;
+      inset: 0;
+      z-index: 50;
+      background-color: var(--paper);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 24px 32px;
+    }
+
+    .login-top-bar {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      height: 64px;
+    }
+
+    .login-brand {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 5px;
+      color: var(--cobalt);
+    }
+
+    .login-brand-title {
+      font-family: var(--serif);
+      font-size: 22px;
+      font-weight: 600;
+      line-height: 1;
+    }
+
+    .login-brand-sub {
+      font-family: var(--sans);
+      font-weight: 600;
+      font-size: 9px;
+      letter-spacing: 0.34em;
+      padding-left: 0.34em;
+      text-transform: uppercase;
+    }
+
+    .login-center {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .login-card {
+      width: 100%;
+      max-width: 420px;
+      padding: 36px;
+      background-color: var(--sheet);
+      border: 1px solid var(--rule);
+      box-shadow: 0 24px 50px -24px rgba(20, 16, 10, 0.25);
+    }
+
+    .login-card-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 22px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--hairline);
+    }
+
+    .login-card h1 {
+      font-family: var(--serif);
+      font-size: 28px;
+      line-height: 1.15;
+      margin-bottom: 8px;
+      color: var(--ink);
+    }
+
+    .login-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    /* Hero Shelf View */
+    #heroShelfWrapper {
+      position: fixed;
+      inset: 0;
+      background-color: var(--paper);
+      user-select: none;
+      overflow: hidden;
+      display: none;
+    }
+
+    .hero-header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 84px;
+      padding: 0 32px;
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      gap: 12px;
+      z-index: 20;
+    }
+
+    @media (max-width: 767px) {
+      .hero-header {
+        height: 64px;
+        padding: 0 12px;
+      }
+    }
+
+    .hero-header-left { justify-self: start; display: flex; align-items: center; gap: 8px; }
+    .hero-header-center {
+      justify-self: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 5px;
+      white-space: nowrap;
+      color: var(--cobalt);
+    }
+    .hero-header-right { justify-self: end; display: flex; align-items: center; gap: 12px; }
+
+    .hero-title {
+      font-family: var(--serif);
+      font-size: clamp(16px, 1.8vw, 22px);
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      line-height: 1;
+    }
+
+    .hero-subtitle {
+      font-family: var(--sans);
+      font-weight: 600;
+      font-size: clamp(7px, 0.7vw, 9px);
+      letter-spacing: 0.28em;
+      padding-left: 0.28em;
+      line-height: 1;
+      text-transform: uppercase;
+    }
+
+    .desktop-only { display: inline; }
+    .sm-only { display: inline; }
+    @media (max-width: 767px) { .desktop-only { display: none; } }
+    @media (max-width: 639px) { .sm-only { display: none; } }
+
+    /* Category Tabs */
+    .category-tabs {
+      position: fixed;
+      left: 50%;
+      transform: translateX(-50%);
+      top: calc(50% - var(--H) / 2 - 82px);
+      z-index: 20;
+      display: flex;
+      align-items: center;
+    }
+
+    .tab-indicator {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 23px;
+      background-color: var(--cobalt);
+      transition: width 0.6s var(--ease), transform 0.6s var(--ease);
+      z-index: 0;
+    }
+
+    .tab-btn {
+      position: relative;
+      z-index: 10;
+      height: 23px;
+      padding: 0 11px;
+      background: transparent;
+      border: 1px solid var(--rule);
+      margin-left: -1px;
+      color: var(--ink);
+      cursor: pointer;
+      font-size: clamp(9px, 0.8vw, 10.5px);
+      transition: color 0.45s var(--ease);
+    }
+    .tab-btn:first-of-type { margin-left: 0; }
+    .tab-btn.is-active { color: #ffffff; }
+    @media (max-width: 767px) {
+      .tab-btn { padding: 0 7px; }
+    }
+
+    /* 3D Shelf Stage */
+    .shelf-section {
+      position: fixed;
+      left: 0;
+      right: 0;
+      top: calc(50% - var(--H) / 2 - 40px);
+      height: calc(var(--H) + 80px);
+      perspective: 2200px;
+      perspective-origin: 50% 50%;
+      touch-action: pan-y;
+      user-select: none;
+      z-index: 10;
+    }
+
+    .shelf-stage {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 0;
+      height: 0;
+      transform-style: preserve-3d;
+    }
+
+    .tape {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 0;
+      height: 0;
+      transform-style: preserve-3d;
+      will-change: transform;
+      cursor: pointer;
+    }
+
+    .tape-face {
+      position: absolute;
+      height: var(--H);
+      top: calc(var(--H) / -2);
+      backface-visibility: hidden;
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .tape-face::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: 30;
+      background: #000000;
+      opacity: var(--shade, 0);
+      pointer-events: none;
+    }
+
+    .tape-face.sp {
+      width: var(--ws);
+      left: calc(var(--ws) / -2);
+      transform: translateZ(calc(var(--d) / 2));
+    }
+
+    .tape-face.cv {
+      width: var(--d);
+      left: calc(var(--d) / -2);
+      transform: rotateY(90deg) translateZ(calc(var(--ws) / 2));
+      box-shadow: 0 30px 60px -28px rgba(20, 16, 10, 0.55);
+    }
+
+    /* VHS Face Inner Layouts */
+    .vhs-spine {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      padding: 6% 10%;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.08), inset 0 0 18px rgba(0,0,0,0.22);
+    }
+
+    .vhs-spine-win {
+      width: 84%;
+      aspect-ratio: 1 / 1;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 8%;
+      border: 1px solid rgba(255,255,255,0.2);
+    }
+
+    .vhs-spine-title {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      margin: 8px 0;
+      writing-mode: vertical-rl;
+      text-orientation: mixed;
+      font-family: var(--serif);
+      font-size: clamp(11px, 1.55vw, 22px);
+      letter-spacing: 0.07em;
+      line-height: 1;
+      white-space: nowrap;
+    }
+
+    .vhs-spine-badge {
+      padding: 2px 6px;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      opacity: 0.88;
+    }
+
+    .vhs-cover {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 7%;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.12), inset 0 0 28px rgba(0,0,0,0.2);
+    }
+
+    .vhs-cover-wear {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0.2;
+      background-image: repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,0,0,0.06) 3px, rgba(0,0,0,0.06) 4px);
+    }
+
+    .vhs-cover-head {
+      position: relative;
+      z-index: 10;
+      text-align: center;
+    }
+
+    .vhs-cover-art {
+      position: relative;
+      z-index: 10;
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 4% 0;
+      padding: 0 8%;
+    }
+
+    .vhs-cover-foot {
+      position: relative;
+      z-index: 10;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 8px;
+      padding-top: 4px;
+      border-top: 1px solid currentColor;
+    }
+
+    /* Play Ring */
+    #playRingBtn {
+      position: fixed;
+      z-index: 20;
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      border: 1px solid var(--cobalt);
+      color: var(--cobalt);
+      background-color: rgba(237, 235, 230, 0.82);
+      transform: translate(-50%, -50%) scale(1);
+    }
+
+    /* Captions */
+    .shelf-caption {
+      position: fixed;
+      left: 50%;
+      transform: translateX(-50%);
+      top: calc(50% + var(--H) / 2 + 30px);
+      width: min(92vw, 760px);
+      z-index: 20;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 9px;
+      pointer-events: none;
+    }
+
+    .mask-line {
+      position: relative;
+      overflow: hidden;
+      width: 100%;
+      text-align: center;
+    }
+
+    .shelf-arrow {
+      position: fixed;
+      top: calc(50% + var(--H) / 2 + 36px);
+      z-index: 20;
+      width: 44px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+      border: 0;
+      color: var(--ink);
+      cursor: pointer;
+    }
+    .shelf-arrow.prev { left: 20px; }
+    .shelf-arrow.next { right: 20px; }
+    @media (max-width: 767px) {
+      .shelf-arrow.prev { left: 6px; }
+      .shelf-arrow.next { right: 6px; }
+    }
+
+    .hero-footer {
+      position: fixed;
+      left: 32px;
+      right: 32px;
+      bottom: 26px;
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    @media (max-width: 767px) {
+      .hero-footer { left: 16px; right: 16px; bottom: 18px; }
+    }
+
+    /* Detail Paper Sheet Overlay */
+    #detailSheet {
+      position: fixed;
+      inset: 0;
+      z-index: 60;
+      background-color: var(--sheet);
+      overflow-y: auto;
+      overflow-x: hidden;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    #detailSheet.is-visible {
+      visibility: visible;
+      pointer-events: auto;
+    }
+
+    .sheet-topbar {
+      position: sticky;
+      top: 0;
+      z-index: 30;
+      padding: 0 32px;
+      height: 80px;
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      border-bottom: 1px solid rgba(20, 20, 20, 0.15);
+      background-color: var(--sheet);
+    }
+    @media (max-width: 767px) {
+      .sheet-topbar { padding: 0 16px; height: 64px; }
+    }
+
+    .sheet-dir-nav {
+      border-bottom: 1px solid rgba(20, 20, 20, 0.15);
+      padding: 10px 32px;
+      background-color: rgba(20, 20, 20, 0.025);
+    }
+
+    .sheet-dir-inner {
+      max-width: 1160px;
+      margin: 0 auto;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .dir-tab {
+      height: 26px;
+      padding: 0 10px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border: 1px solid var(--rule);
+      background: transparent;
+      color: var(--ink);
+      cursor: pointer;
+      transition: background-color 0.2s var(--ease), color 0.2s var(--ease);
+    }
+    .dir-tab.is-current {
+      background: var(--cobalt);
+      color: #ffffff;
+    }
+
+    #mainAdminContent {
+      max-width: 1160px;
+      margin: 0 auto;
+      padding: 40px 32px 64px;
+    }
+    @media (max-width: 767px) {
+      #mainAdminContent { padding: 24px 16px 48px; }
+    }
+
+    .sheet-page-header {
+      margin-bottom: 32px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid rgba(20, 20, 20, 0.2);
+    }
+
+    .work-page { display: none; }
+    .work-page.is-active { display: block; }
+
+    /* Form Controls & Tables */
+    .paper-input, .paper-select, .paper-textarea {
+      width: 100%;
+      padding: 10px 12px;
+      background: #ffffff;
+      border: 1px solid rgba(20, 20, 20, 0.28);
+      border-radius: 2px;
+      color: var(--ink);
+      font-family: var(--sans);
+      font-size: 14px;
+      transition: border-color 0.2s var(--ease), box-shadow 0.2s var(--ease);
+    }
+    .paper-input:focus, .paper-select:focus, .paper-textarea:focus {
+      outline: none;
+      border-color: var(--cobalt);
+      box-shadow: 0 0 0 2px rgba(31, 63, 176, 0.12);
+    }
+    .paper-textarea { min-height: 82px; resize: vertical; }
+
+    .grid-2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+    .col-span-2 { grid-column: span 2; }
+    @media (max-width: 767px) {
+      .grid-2, .grid-3 { grid-template-columns: 1fr; }
+      .col-span-2 { grid-column: span 1; }
+    }
+
+    .paper-note {
+      padding: 14px 16px;
+      border: 1px solid rgba(20, 20, 20, 0.15);
+      background: rgba(255, 255, 255, 0.68);
+      font-size: 13.5px;
+      line-height: 1.65;
+    }
+
+    .table-responsive { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .paper-table {
+      width: 100%;
+      min-width: 680px;
+      border-collapse: collapse;
+      font-size: 13px;
+      font-variant-numeric: tabular-nums;
+    }
+    .paper-table th {
+      text-align: left;
+      padding: 10px 12px;
+      border-top: 1px solid var(--rule);
+      border-bottom: 1px solid var(--rule);
+      background: rgba(20, 20, 20, 0.03);
+      font-weight: 600;
+      font-size: 11px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--ink);
+    }
+    .paper-table td {
+      padding: 11px 12px;
+      border-bottom: 1px solid var(--hairline);
+      vertical-align: middle;
+    }
+    .paper-table tr:hover td {
+      background: rgba(31, 63, 176, 0.03);
+    }
+
+    /* Switch */
+    .paper-switch {
+      position: relative;
+      display: inline-block;
+      width: 46px;
+      height: 24px;
+      flex-shrink: 0;
+    }
+    .paper-switch input { opacity: 0; width: 0; height: 0; }
+    .paper-slider {
+      position: absolute;
+      cursor: pointer;
+      inset: 0;
+      background-color: rgba(20, 20, 20, 0.2);
+      transition: 0.25s var(--ease);
+      border-radius: 2px;
+      border: 1px solid var(--rule);
+    }
+    .paper-slider::before {
+      position: absolute;
+      content: "";
+      height: 16px;
+      width: 16px;
+      left: 3px;
+      bottom: 3px;
+      background-color: var(--sheet);
+      border: 1px solid var(--rule);
+      transition: 0.25s var(--ease);
+      border-radius: 1px;
+    }
+    .paper-switch input:checked + .paper-slider { background-color: var(--cobalt); }
+    .paper-switch input:checked + .paper-slider::before { transform: translateX(22px); }
+
+    /* Explorer Grid */
+    .explorer-zone {
+      border: 2px dashed rgba(20, 20, 20, 0.16);
+      padding: 16px;
+      transition: background-color 0.2s var(--ease), border-color 0.2s var(--ease);
+    }
+    .explorer-zone.dragover-active {
+      border-color: var(--cobalt);
+      background: rgba(31, 63, 176, 0.04);
+    }
+    .explorer-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 16px;
+    }
+    @media (max-width: 900px) { .explorer-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+    @media (max-width: 600px) { .explorer-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+    .explorer-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 16px 12px;
+      border: 1px solid var(--hairline);
+      background: rgba(255, 255, 255, 0.48);
+      border-radius: 2px;
+      user-select: none;
+      transition: background-color 0.2s var(--ease), border-color 0.2s var(--ease), transform 0.2s var(--ease);
+    }
+    .explorer-card:hover { background: #ffffff; border-color: var(--rule); }
+    .explorer-card.dragover-active {
+      border-color: var(--cobalt);
+      background: rgba(31, 63, 176, 0.08);
+      transform: scale(1.03);
+    }
+    .explorer-card.dragging-item { opacity: 0.4; }
+
+    /* Sleeping Z & Bell Animations */
+    .loader-wrapper {
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 65px;
+      width: 100%;
+    }
+    .z {
+      position: absolute;
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--cobalt);
+      opacity: 0;
+    }
+    .z-1 { animation: swayUpToRight 2s ease-out infinite; }
+    .z-2 { animation: swayUpToRight 2s ease-out 0.5s infinite; }
+    .z-3 { animation: swayUpToRight 2s ease-out 1s infinite; }
+    .z-4 { animation: swayUpToRight 2s ease-out 1.5s infinite; }
+
+    @keyframes swayUpToRight {
+      0% { transform: translate(0, 0) rotate(0deg); opacity: 1; }
+      100% { transform: translate(24px, -32px) rotate(25deg); opacity: 0; }
+    }
+
+    @keyframes bell-ring {
+      0%, 100% { transform: rotate(0); }
+      10%, 30%, 50% { transform: rotate(14deg); }
+      20%, 40% { transform: rotate(-14deg); }
+    }
+    .bell-ringing {
+      display: inline-block;
+      animation: bell-ring 1.5s ease-in-out infinite;
+      transform-origin: top center;
+    }
+
+    /* Modals */
+    .modal-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      background-color: rgba(20, 20, 20, 0.45);
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    .modal-card {
+      width: 100%;
+      max-width: 390px;
+      padding: 24px;
+      background-color: var(--sheet);
+      border: 1px solid var(--rule);
+      box-shadow: 0 24px 60px -20px rgba(20, 16, 10, 0.35);
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+    .color-circle {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      cursor: pointer;
+      border: 2.5px solid transparent;
+      transition: transform 0.15s;
+    }
+    .color-circle:hover { transform: scale(1.1); }
+  </style>
+</head>
+<body oncontextmenu="return false;">
+
+  <!-- Paper Grain SVG Overlay -->
+  <svg class="paper-grain" aria-hidden="true">
+    <filter id="paperGrainFilter">
+      <feTurbulence type="fractalNoise" baseFrequency="0.82" numOctaves="3" stitchTiles="stitch" />
+      <feColorMatrix type="saturate" values="0" />
+      <feComponentTransfer>
+        <feFuncA type="table" tableValues="0 0.08" />
+      </feComponentTransfer>
+    </filter>
+    <rect width="100%" height="100%" filter="url(#paperGrainFilter)" />
+  </svg>
+
+  <!-- Custom Ring Cursor -->
+  <div id="customCursor" class="custom-cursor" aria-hidden="true">
+    <div class="cursor-ring"></div>
+    <div class="cursor-dot"></div>
+    <div class="cursor-label">
+      <span>OPEN</span>
+      <span>เปิดหน้า</span>
+    </div>
+  </div>
+
+  <!-- ==========================================
+       MODALS (Time Picker / Folder Settings / User Logs)
+       ========================================== -->
+  <div id="timePickerModal" class="modal-backdrop">
+    <div class="modal-card">
+      <div class="lbl" style="color: var(--cobalt); margin-bottom: 8px;">ACCESS DURATION / ระยะเวลา</div>
+      <h3 style="font-family: var(--serif); font-size: 22px; margin-bottom: 16px;">กำหนดเวลาการเข้าถึง</h3>
+      <div style="background: #ffffff; border: 1px solid var(--hairline); padding: 14px; margin-bottom: 18px;">
+        <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:14px;">
+          <input type="radio" name="timeType" value="unlimited" checked onchange="toggleTimePicker()">
+          <span>ไม่จำกัดเวลา (ถาวร)</span>
+        </label>
+        <hr style="border:none; border-top:1px solid var(--hairline); margin:12px 0;">
+        <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:14px;">
+          <input type="radio" name="timeType" value="custom" onchange="toggleTimePicker()">
+          <span>กำหนดเวลาหมดอายุ:</span>
+        </label>
+        <input type="datetime-local" id="customExpireDate" class="paper-input" style="display:none; margin-top:10px;">
+      </div>
+      <div style="display:flex; gap:10px;">
+        <button type="button" class="lbl box" style="flex:1; height:38px;" onclick="closeTimePicker()">ยกเลิก</button>
+        <button type="button" class="lbl btn-primary" style="flex:1; height:38px;" onclick="confirmTimePicker()">ยืนยัน</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="folderSettingsModal" class="modal-backdrop">
+    <div class="modal-card">
+      <div id="folderPreviewIcon" style="width:90px; height:76px; margin:0 auto 14px; display:flex; justify-content:center; align-items:center;"></div>
+      <input type="hidden" id="editFolderPath">
+
+      <div style="margin-bottom:14px;">
+        <label class="lbl" style="display:block; margin-bottom:4px; color:var(--cobalt);">ชื่อโฟลเดอร์ (ภาษาไทย - บังคับ/ตัวหลัก)</label>
+        <input type="text" id="editFolderName" placeholder="ชื่อโฟลเดอร์" class="paper-input" style="text-align:center; font-weight:600; margin-bottom:10px;">
+
+        <label class="lbl" style="display:block; margin-bottom:4px; color:var(--muted);">Folder Name (English - Optional)</label>
+        <input type="text" id="editFolderNameEN" placeholder="Optional English Name" class="paper-input" style="text-align:center; margin-bottom:10px;">
+
+        <label class="lbl" style="display:block; margin-bottom:4px; color:var(--muted);">文件夹名称 (中文 - 可选)</label>
+        <input type="text" id="editFolderNameCN" placeholder="可选中文名称" class="paper-input" style="text-align:center;">
+      </div>
+
+      <div style="display:flex; justify-content:space-between; align-items:center; background:#ffffff; border:1px solid var(--hairline); padding:10px 12px; margin-bottom:12px;">
+        <div>
+          <div style="font-size:13.5px; font-weight:600;">โหมดกำลังพัก</div>
+          <div style="font-size:11px; color:var(--muted);">ซ่อนการแสดงผลชั่วคราว</div>
+        </div>
+        <label class="paper-switch">
+          <input type="checkbox" id="editFolderIsPaused">
+          <span class="paper-slider"></span>
+        </label>
+      </div>
+
+      <div style="background:#ffffff; border:1px solid var(--hairline); padding:10px 12px; margin-bottom:12px;">
+        <label class="lbl" style="display:block; margin-bottom:6px;">รหัสผ่านโฟลเดอร์</label>
+        <input type="text" id="editFolderPassword" placeholder="เว้นว่างหากไม่ล็อก..." class="paper-input">
+      </div>
+
+      <div style="background:#ffffff; border:1px solid var(--hairline); padding:10px 12px; margin-bottom:12px;">
+        <label class="lbl" style="display:block; margin-bottom:8px; color:var(--muted);">สีโฟลเดอร์ (Tags)</label>
+        <div style="display:flex; justify-content:space-between; gap:6px;">
+          <div class="color-circle" data-color="red" style="background:#ff3b30;" onclick="selectFolderColor('red')"></div>
+          <div class="color-circle" data-color="orange" style="background:#ff9500;" onclick="selectFolderColor('orange')"></div>
+          <div class="color-circle" data-color="yellow" style="background:#ffcc00;" onclick="selectFolderColor('yellow')"></div>
+          <div class="color-circle" data-color="green" style="background:#34c759;" onclick="selectFolderColor('green')"></div>
+          <div class="color-circle" data-color="blue" style="background:#0071e3;" onclick="selectFolderColor('blue')"></div>
+          <div class="color-circle" data-color="purple" style="background:#af52de;" onclick="selectFolderColor('purple')"></div>
+          <div class="color-circle" data-color="gray" style="background:#8e8e93;" onclick="selectFolderColor('gray')"></div>
+        </div>
+      </div>
+
+      <div style="display:flex; justify-content:space-between; align-items:center; background:#ffffff; border:1px solid var(--hairline); padding:10px 12px; margin-bottom:18px;">
+        <label class="lbl">อีโมจิ (Emoji)</label>
+        <input type="text" id="editFolderEmoji" maxlength="2" placeholder="😀" style="font-size:24px; text-align:center; width:48px; height:48px; border:1px solid var(--hairline); background:#fff;">
+      </div>
+
+      <div style="display:flex; gap:10px;">
+        <button type="button" class="lbl box" style="flex:1; height:38px;" onclick="closeFolderSettings()">ยกเลิก</button>
+        <button type="button" class="lbl btn-primary" style="flex:1; height:38px;" onclick="saveFolderSettings()">บันทึก</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="userLogsModal" class="modal-backdrop">
+    <div class="modal-card" style="max-width:640px; max-height:80vh; display:flex; flex-direction:column;">
+      <div style="display:flex; justify-content:space-between; align-items:center; padding-bottom:12px; margin-bottom:14px; border-bottom:1px solid var(--hairline);">
+        <div>
+          <div class="lbl" style="color:var(--cobalt);">SESSION TELEMETRY</div>
+          <h3 id="userLogsModalTitle" style="font-family:var(--serif); font-size:22px;">ประวัติการเข้าสู่ระบบ</h3>
+        </div>
+        <button type="button" class="lbl box" onclick="closeUserLogsModal()">CLOSE / ปิด</button>
+      </div>
+      <div class="table-responsive" style="flex:1; overflow-y:auto;">
+        <div id="userLogsModalContent"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================
+       1. LOGIN SCREEN (Editorial Paper)
+       ========================================== -->
+  <div id="adminLoginWrapper">
+    <header class="login-top-bar">
+      <div style="justify-self:start;"><span class="lbl box">DOCUM ARCHIVE</span></div>
+      <div class="login-brand" style="justify-self:center;">
+        <div class="login-brand-title">ระบบผู้ดูแล · DOCUM</div>
+        <div class="login-brand-sub">CENTRALIZED ADMIN</div>
+      </div>
+      <div class="desktop-only" style="justify-self:end;"><span class="lbl">ACCESS CONTROL CONSOLE</span></div>
+    </header>
+
+    <div class="login-center">
+      <div class="login-card">
+        <div class="login-card-meta">
+          <span class="lbl" style="color:var(--cobalt);">AUTHENTICATION / ยืนยันตัวตน</span>
+          <span class="lbl" style="color:var(--muted);">ADMIN ONLY</span>
+        </div>
+        <h1>ระบบจัดการสำหรับผู้ดูแล</h1>
+        <p style="font-size:14px; color:var(--muted); margin-bottom:22px;">
+          กรุณาเข้าสู่ระบบด้วยบัญชีผู้ดูแลระบบเพื่อเปิดชั้นวางหน้าทำงาน
+        </p>
+
+        <div style="margin-bottom:14px;">
+          <label for="adminEmail" class="lbl" style="display:block; margin-bottom:6px;">อีเมลแอดมิน / ADMIN EMAIL</label>
+          <input type="email" id="adminEmail" placeholder="admin@example.com" class="paper-input" required>
+        </div>
+
+        <div style="margin-bottom:16px;">
+          <label for="adminPassword" class="lbl" style="display:block; margin-bottom:6px;">รหัสผ่าน / PASSWORD</label>
+          <input type="password" id="adminPassword" placeholder="••••••••" class="paper-input" required>
+        </div>
+
+        <button type="button" id="loginSubmitBtn" class="lbl btn-primary" style="width:100%; height:42px;" onclick="loginAdmin()">
+          เข้าสู่ระบบ / SIGN IN
+        </button>
+
+        <p id="loginError" style="color:var(--vermilion); display:none; margin-top:14px; font-weight:600; font-size:13.5px; text-align:center;">
+          อีเมลหรือรหัสผ่านไม่ถูกต้อง
+        </p>
+      </div>
+    </div>
+
+    <footer class="login-footer">
+      <span class="lbl">© DOCUM ADMIN SYSTEM. ALL RIGHTS RESERVED.</span>
+      <span class="lbl" style="color:var(--muted);">FIREBASE AUTH</span>
+    </footer>
+  </div>
+
+  <!-- ==========================================
+       2. 3D VHS SHELF HERO (12 Working Pages)
+       ========================================== -->
+  <div id="heroShelfWrapper">
+    <div id="heightProbe" aria-hidden="true" style="position:fixed; height:var(--H); width:0; visibility:hidden; pointer-events:none;"></div>
+
+    <header class="hero-header">
+      <div class="hero-header-left">
+        <button type="button" class="lbl box" onclick="logoutAdmin()">
+          <span>LOGOUT</span><span class="desktop-only">&nbsp;/ ออกจากระบบ</span>
+        </button>
+      </div>
+
+      <div class="hero-header-center">
+        <div class="hero-title">ระบบผู้ดูแล · DOCUM</div>
+        <div class="hero-subtitle">CENTRALIZED ADMIN</div>
+      </div>
+
+      <div class="hero-header-right">
+        <button type="button" id="shelfRequestBell" class="lbl box box-vermilion" style="display:none; gap:6px;" onclick="jumpToShelfModule('requests')">
+          <svg class="bell-ringing" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+            <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+          </svg>
+          <span id="shelfBellCount">0</span>
+          <span class="sm-only">คำขอใหม่</span>
+        </button>
+        <span class="lbl desktop-only" style="color:var(--ink);">12 WORKING PAGES · LIVE</span>
+      </div>
+    </header>
+
+    <nav class="category-tabs" aria-label="Module categories">
+      <div id="tabIndicator" class="tab-indicator" aria-hidden="true"></div>
+      <button type="button" class="lbl tab-btn" data-cat="all" data-target="banners">ALL / ทั้งหมด</button>
+      <button type="button" class="lbl tab-btn" data-cat="content" data-target="banners">CONTENT</button>
+      <button type="button" class="lbl tab-btn" data-cat="files" data-target="form">FILES</button>
+      <button type="button" class="lbl tab-btn" data-cat="access" data-target="direct">ACCESS</button>
+      <button type="button" class="lbl tab-btn" data-cat="analytics" data-target="history">ANALYTICS</button>
+    </nav>
+
+    <section class="shelf-section" id="shelfSection" aria-label="Admin modules shelf">
+      <div class="shelf-stage" id="shelfStage"></div>
+    </section>
+
+    <button type="button" id="playRingBtn" aria-label="Open selected working page" onclick="openActiveCover()">
+      <svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor" style="margin-left:2px;">
+        <path d="M2 1.5 L10.5 6 L2 10.5 Z"/>
+      </svg>
+    </button>
+
+    <div class="shelf-caption" aria-live="polite">
+      <div id="captionTitleMask" class="mask-line" style="font-family:var(--serif); font-size:clamp(24px, 2.4vw, 31px); line-height:1.15; letter-spacing:-0.01em; color:var(--ink);">
+        <span style="display:block;">จัดการแฟ้มเอกสาร</span>
+      </div>
+      <div id="captionSubMask" class="lbl mask-line" style="color:var(--cobalt); font-weight:500;">
+        <span style="display:block;">FILE EXPLORER / แฟ้มงาน</span>
+      </div>
+      <div id="captionMetaMask" class="mask-line" style="font-family:var(--sans); font-weight:500; font-size:11px; letter-spacing:0.08em; color:var(--ink);">
+        <span style="display:block;">PAGE 06 — 12</span>
+      </div>
+    </div>
+
+    <button type="button" class="shelf-arrow prev" aria-label="Previous module" onclick="stepShelf(-1)">
+      <svg width="18" height="10" viewBox="0 0 18 10" fill="none" stroke="currentColor" stroke-width="1.2">
+        <path d="M5 1 L1 5 L5 9 M1 5 H17"/>
+      </svg>
+    </button>
+    <button type="button" class="shelf-arrow next" aria-label="Next module" onclick="stepShelf(1)">
+      <svg width="18" height="10" viewBox="0 0 18 10" fill="none" stroke="currentColor" stroke-width="1.2">
+        <path d="M13 1 L17 5 L13 9 M17 5 H1"/>
+      </svg>
+    </button>
+
+    <footer class="hero-footer">
+      <span class="lbl" style="color:var(--ink);">© DOCUM ADMIN SYSTEM<span class="desktop-only"> · ALL RIGHTS RESERVED</span></span>
+      <button type="button" id="footerOpenBtn" class="lbl" style="background:transparent; border:0; color:var(--cobalt); cursor:pointer;" onclick="openActiveCover()">
+        OPEN <span id="footerOpenCode">06</span><span class="sm-only"> / เปิดหน้าทำงาน</span>
+      </button>
+    </footer>
+  </div>
+
+  <!-- ==========================================
+       3. DETAIL PAPER SHEET (Separated 12 Pages)
+       ========================================== -->
+  <div id="detailSheet" role="dialog" aria-modal="true">
+    <header class="sheet-topbar">
+      <div style="justify-self:start;">
+        <button type="button" class="lbl box" onclick="closeDetailSheet()">
+          <span>CLOSE</span><span class="sm-only">&nbsp;/ กลับชั้นวาง</span>
+        </button>
+      </div>
+      <div style="justify-self:center; display:flex; align-items:center; gap:12px;">
+        <button type="button" id="prevPageBtn" class="lbl box sm-only" onclick="stepWorkingPage(-1)">← 05</button>
+        <div style="display:flex; flex-direction:column; align-items:center; gap:4px; color:var(--cobalt);">
+          <div style="font-family:var(--serif); font-size:clamp(16px, 1.4vw, 20px); font-weight:600; line-height:1;">ระบบผู้ดูแล · DOCUM</div>
+          <div id="sheetPageCounter" class="lbl" style="font-size:9px; letter-spacing:0.26em;">PAGE 06 / 12</div>
+        </div>
+        <button type="button" id="nextPageBtn" class="lbl box sm-only" onclick="stepWorkingPage(1)">07 →</button>
+      </div>
+      <div style="justify-self:end; display:flex; align-items:center; gap:8px;">
+        <button type="button" id="sheetBellBtn" class="lbl box box-vermilion desktop-only" style="display:none; gap:4px;" onclick="switchWorkingPage('requests')">
+          <svg class="bell-ringing" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+            <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+          </svg>
+          <span id="sheetBellCount">0</span>
+        </button>
+        <button type="button" class="lbl box box-vermilion" onclick="logoutAdmin()">LOGOUT</button>
+      </div>
+    </header>
+
+    <!-- Separated 12-Page Directory Switcher -->
+    <nav class="sheet-dir-nav" aria-label="Working pages switcher">
+      <div id="sheetDirNav" class="sheet-dir-inner"></div>
+    </nav>
+
+    <main id="mainAdminContent">
+      <div class="sheet-page-header">
+        <div style="overflow:hidden; margin-bottom:8px;">
+          <div id="pageHeaderSub" class="lbl sheet-line" style="color:var(--cobalt);">FILE EXPLORER / แฟ้มงาน</div>
+        </div>
+        <div style="overflow:hidden; margin-bottom:8px;">
+          <h1 id="pageHeaderTitle" class="sheet-line" style="font-family:var(--serif); font-size:clamp(30px, 3.6vw, 48px); line-height:1.08; letter-spacing:-0.02em;">จัดการแฟ้มเอกสาร</h1>
+        </div>
+        <div style="overflow:hidden;">
+          <p id="pageHeaderDesc" class="sheet-line" style="font-size:15px; color:var(--muted); max-width:68ch;">
+            สำรวจและจัดระเบียบโฟลเดอร์ ลากย้ายไฟล์ ตั้งค่าสี อีโมจิ รหัสผ่าน และโหมดกำลังพักของแฟ้มงาน
+          </p>
+        </div>
+      </div>
+
+      <!-- PAGE 01: BANNERS -->
+      <section class="work-page" data-page="banners">
+        <div class="paper-note" style="margin-bottom:20px;">
+          ระบบจะแสดงป้ายโฆษณาที่ด้านบนของหน้าเว็บผู้ใช้ และจะเลื่อนอัตโนมัติ (ขนาดแนะนำ 1200 × 600 px) —
+          <strong style="color:var(--cobalt);">เคล็ดลับ: สามารถคลิกค้างแล้วลาก (Drag & Drop) ที่ตารางเพื่อสลับตำแหน่งแสดงผลป้ายโฆษณาได้ทันที</strong>
+        </div>
+        <input type="hidden" id="editBannerId">
+        <div class="grid-2" style="margin-bottom:16px;">
+          <div>
+            <label class="lbl" style="display:block; margin-bottom:6px;">1. ลิงก์รูปภาพ (IMAGE URL)</label>
+            <input type="text" id="bannerImageUrl" placeholder="ระบุ URL รูปภาพโฆษณา..." class="paper-input">
+          </div>
+          <div>
+            <label class="lbl" style="display:block; margin-bottom:6px;">2. ลิงก์ปลายทาง (TARGET URL - ไม่บังคับ)</label>
+            <input type="text" id="bannerLinkUrl" placeholder="ระบุ URL ลิงก์ปลายทาง (ถ้ามี)..." class="paper-input">
+          </div>
+        </div>
+        <div style="display:flex; gap:10px; margin-bottom:24px;">
+          <button type="button" class="lbl btn-primary" id="btnSaveBanner" onclick="saveBanner()">เพิ่มป้ายโฆษณา</button>
+          <button type="button" class="lbl box" id="btnCancelBanner" style="display:none; height:40px; padding:0 18px;" onclick="cancelEditBanner()">ยกเลิกการแก้ไข</button>
+        </div>
+        <div class="table-responsive"><div id="bannersTable"></div></div>
+      </section>
+
+      <!-- PAGE 02: REMINDERS -->
+      <section class="work-page" data-page="reminders">
+        <div style="display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:12px; margin-bottom:20px;">
+          <input type="text" id="searchReminder" placeholder="ค้นหาแจ้งเตือน (ชื่อ, รายละเอียด)..." oninput="loadReminders()" class="paper-input" style="max-width:420px;">
+          <button type="button" class="lbl box" id="btnUndoReminder" onclick="undoReminder()" style="display:none; height:36px; padding:0 16px;">ย้อนกลับ (UNDO)</button>
+        </div>
+        <input type="hidden" id="editReminderId">
+        <div class="grid-2" style="margin-bottom:16px;">
+          <div class="col-span-2">
+            <label class="lbl" style="display:block; margin-bottom:6px;">1. ชื่องาน / หัวข้อ</label>
+            <input type="text" id="remTitle" placeholder="เช่น: ส่งเอกสารภาษี" class="paper-input">
+          </div>
+          <div>
+            <label class="lbl" style="display:block; margin-bottom:6px;">2. วันที่เริ่ม</label>
+            <input type="date" id="remStartDate" class="paper-input">
+          </div>
+          <div>
+            <label class="lbl" style="display:block; margin-bottom:6px;">3. วันที่สิ้นสุด (ถ้ามี)</label>
+            <input type="date" id="remEndDate" class="paper-input">
+          </div>
+          <div>
+            <label class="lbl" style="display:block; margin-bottom:6px;">4. เวลาเริ่ม (ถ้ามี)</label>
+            <input type="time" id="remStartTime" class="paper-input">
+          </div>
+          <div>
+            <label class="lbl" style="display:block; margin-bottom:6px;">5. เวลาสิ้นสุด (ถ้ามี)</label>
+            <input type="time" id="remEndTime" class="paper-input">
+          </div>
+          <div>
+            <label class="lbl" style="display:block; margin-bottom:6px;">6. ตั้งค่าการทำซ้ำ</label>
+            <select id="remRecurring" class="paper-select">
+              <option value="ไม่ทำประจำ">ไม่ทำประจำ</option>
+              <option value="ทุกวัน">ทุกวัน</option>
+              <option value="ทุกสัปดาห์">ทุกสัปดาห์</option>
+            </select>
+          </div>
+          <div>
+            <label class="lbl" style="display:block; margin-bottom:6px;">9. สถานะ</label>
+            <select id="remStatus" class="paper-select">
+              <option value="Pending">รอการดำเนินการ (Pending)</option>
+              <option value="Complete">เสร็จสิ้นแล้ว (Complete)</option>
+            </select>
+          </div>
+          <div>
+            <label class="lbl" style="display:block; margin-bottom:6px;">7. สถานที่</label>
+            <input type="text" id="remLocation" placeholder="สถานที่" class="paper-input">
+          </div>
+          <div>
+            <label class="lbl" style="display:block; margin-bottom:6px;">URL ลิงก์แนบ</label>
+            <input type="text" id="remUrl" placeholder="URL ลิงก์แนบ" class="paper-input">
+          </div>
+          <div>
+            <label class="lbl" style="display:block; margin-bottom:6px;">โน้ต / รายละเอียดงาน</label>
+            <textarea id="remDetails" placeholder="รายละเอียดงาน..." class="paper-textarea"></textarea>
+          </div>
+          <div>
+            <label class="lbl" style="display:block; margin-bottom:6px;">8. รหัสผู้ใช้เป้าหมาย (คั่นด้วยลูกน้ำ หรือ ขึ้นบรรทัดใหม่)</label>
+            <textarea id="remAllowedUsers" placeholder="เช่น: 6810210178, 6810210220" class="paper-textarea"></textarea>
+          </div>
+        </div>
+        <div style="display:flex; gap:10px; margin-bottom:24px;">
+          <button type="button" class="lbl btn-primary" id="btnSaveReminder" onclick="saveReminder()">สร้างการแจ้งเตือน</button>
+          <button type="button" class="lbl box" id="btnCancelReminder" style="display:none; height:40px; padding:0 18px;" onclick="cancelEditReminder()">ยกเลิกการแก้ไข</button>
+        </div>
+        <div class="table-responsive"><div id="remindersTable"></div></div>
+      </section>
+
+      <!-- PAGE 03: SCHEDULES -->
+      <section class="work-page" data-page="schedules">
+        <input type="hidden" id="editScheduleId">
+        <div class="grid-2" style="margin-bottom:16px;">
+          <div>
+            <label class="lbl" style="display:block; margin-bottom:6px;">1. ชื่อตารางเรียน</label>
+            <input type="text" id="schTitle" placeholder="เช่น: ตารางเรียน ภาคการศึกษา 1/2569" class="paper-input">
+          </div>
+          <div>
+            <label class="lbl" style="display:block; margin-bottom:6px;">2. ลิงก์รูปภาพตารางเรียน (URL)</label>
+            <input type="text" id="schImageUrl" placeholder="ระบุ URL รูปภาพตารางเรียน..." class="paper-input">
+          </div>
+          <div class="col-span-2">
+            <label class="lbl" style="display:block; margin-bottom:6px;">3. รหัสผู้ใช้เป้าหมายที่อนุญาตให้ดูตารางนี้</label>
+            <textarea id="schAllowedUsers" placeholder="เช่น: 6810210178, 6810210220" class="paper-textarea"></textarea>
+          </div>
+        </div>
+        <div style="display:flex; gap:10px; margin-bottom:24px;">
+          <button type="button" class="lbl btn-primary" id="btnSaveSchedule" onclick="saveSchedule()">เพิ่มตารางเรียน</button>
+          <button type="button" class="lbl box" id="btnCancelSchedule" style="display:none; height:40px; padding:0 18px;" onclick="cancelEditSchedule()">ยกเลิกการแก้ไข</button>
+        </div>
+        <div class="table-responsive"><div id="schedulesTable"></div></div>
+      </section>
+
+      <!-- PAGE 04: DIRECT GRANT -->
+      <section class="work-page" data-page="direct">
+        <div style="max-width:720px;">
+          <div style="margin-bottom:16px;">
+            <label class="lbl" style="display:block; margin-bottom:6px;">1. เลือกระบบงาน หรือ โฟลเดอร์ (ให้สิทธิ์ทั้งโฟลเดอร์)</label>
+            <select id="directJobSelect" class="paper-select"><option value="">-- กำลังโหลดข้อมูลระบบงาน... --</option></select>
+          </div>
+          <div style="margin-bottom:20px;">
+            <label class="lbl" style="display:block; margin-bottom:6px;">2. รหัสผู้รับสิทธิ์ (สามารถใส่หลายผู้ใช้ได้ คั่นด้วยลูกน้ำ (,) หรือขึ้นบรรทัดใหม่)</label>
+            <textarea id="directStudentId" placeholder="ตัวอย่าง: 6810210178, 6810210220" class="paper-textarea" style="height:110px;"></textarea>
+          </div>
+          <button type="button" class="lbl btn-primary is-forest" onclick="grantDirectDownload()">ยืนยันการให้สิทธิ์การดาวน์โหลด</button>
+        </div>
+      </section>
+
+      <!-- PAGE 05: DOCUMENT FORM -->
+      <section class="work-page" data-page="form" id="formBox">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; padding-bottom:12px; margin-bottom:18px; border-bottom:1px solid var(--hairline);">
+          <h3 id="formTitle" style="font-family:var(--serif); font-size:24px;">เพิ่มรายการเข้าสู่ระบบ</h3>
+          <button type="button" class="lbl box" onclick="switchWorkingPage('explorer')">ไปที่ FILE EXPLORER →</button>
+        </div>
+
+        <input type="hidden" id="editJobId">
+        <div class="grid-3" style="margin-bottom:16px;">
+          <div>
+            <label class="lbl" style="display:block; margin-bottom:6px;">1. ชื่อรายการ (ภาษาไทย - บังคับ)</label>
+            <input type="text" id="jobTitle" placeholder="ตัวอย่าง: เอกสารประกอบการเรียน" class="paper-input">
+          </div>
+          <div>
+            <label class="lbl" style="display:block; margin-bottom:6px; color:var(--muted);">1.1 ชื่อรายการ (English)</label>
+            <input type="text" id="jobTitleEN" placeholder="Example: Study Materials" class="paper-input">
+          </div>
+          <div>
+            <label class="lbl" style="display:block; margin-bottom:6px; color:var(--muted);">1.2 ชื่อรายการ (中文)</label>
+            <input type="text" id="jobTitleCN" placeholder="例如: 学习资料" class="paper-input">
+          </div>
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr auto; gap:16px; align-items:end; margin-bottom:16px;">
+          <div>
+            <label class="lbl" style="display:block; margin-bottom:6px;">2. โฟลเดอร์ (ใช้ / เพื่อซ้อนโฟลเดอร์ เช่น คณิตศาสตร์/ม.1)</label>
+            <input type="text" id="jobFolder" placeholder="ระบุชื่อโฟลเดอร์..." class="paper-input">
+          </div>
+          <div style="display:flex; align-items:center; gap:10px; padding:10px 12px; border:1px solid var(--hairline); background:#fff;">
+            <span class="lbl" style="color:var(--muted);">กำลังพัก</span>
+            <label class="paper-switch">
+              <input type="checkbox" id="jobIsPaused">
+              <span class="paper-slider"></span>
+            </label>
+          </div>
+        </div>
+
+        <div style="margin-bottom:16px;">
+          <label class="lbl" style="display:block; margin-bottom:6px;">3. ประเภทของไฟล์</label>
+          <select id="fileType" onchange="toggleInputType()" class="paper-select">
+            <option value="youtube">วิดีโอ (ลิงก์ YouTube)</option>
+            <option value="image">รูปภาพ (ลิงก์ภาพ)</option>
+            <option value="pdf">ไฟล์ PDF / Google Drive (ลิงก์เอกสาร)</option>
+            <option value="link">ลิงก์เว็บไซต์ภายนอก (URL)</option>
+            <option value="text">แบบข้อความ (เขียนข้อความจัดรูปแบบได้)</option>
+          </select>
+        </div>
+
+        <div id="urlInputGroup" style="margin-bottom:16px;">
+          <label class="lbl" style="display:block; margin-bottom:6px;">4. ข้อมูลลิงก์ (URL)</label>
+          <input type="text" id="fileUrl" placeholder="ระบุลิงก์ข้อมูลที่นี่..." class="paper-input">
+        </div>
+
+        <div id="textInputGroup" style="display:none; margin-bottom:18px;">
+          <label class="lbl" style="display:block; margin-bottom:6px;">4. เนื้อหาข้อความ (ปรับแต่งได้ไม่จำกัด)</label>
+          <textarea id="editor-container" class="paper-textarea" style="min-height:260px;"></textarea>
+        </div>
+
+        <div style="margin-bottom:16px;">
+          <label class="lbl" style="display:block; margin-bottom:6px;">5. กำหนดรายชื่อผู้มีสิทธิ์เข้าชมเบื้องต้น (คั่นด้วยลูกน้ำ หรือ ขึ้นบรรทัดใหม่)</label>
+          <textarea id="allowedUsers" placeholder="ระบุรหัสประจำตัว เช่น: 6810210178, 6810210220" class="paper-textarea" style="height:92px;"></textarea>
+        </div>
+
+        <div class="grid-2" style="margin-bottom:20px;">
+          <div>
+            <label class="lbl" style="display:block; margin-bottom:6px;">6. เปิดใช้งานลายน้ำในเอกสาร (Watermark)</label>
+            <select id="showWatermark" class="paper-select">
+              <option value="true">เปิด (แสดงลายน้ำ)</option>
+              <option value="false">ปิด (ซ่อนลายน้ำ)</option>
+            </select>
+          </div>
+          <div>
+            <label class="lbl" style="display:block; margin-bottom:6px;">7. รหัสผ่านเอกสาร (เว้นว่างหากไม่ต้องการล็อก)</label>
+            <input type="text" id="jobPassword" placeholder="ตั้งรหัสผ่านสำหรับเอกสารนี้..." class="paper-input">
+          </div>
+        </div>
+
+        <div style="display:flex; gap:10px;">
+          <button type="button" class="lbl btn-primary" id="btnSave" onclick="saveJob()">บันทึกข้อมูลระบบงาน</button>
+          <button type="button" class="lbl box" id="btnCancel" style="display:none; height:40px; padding:0 18px;" onclick="cancelEdit()">ยกเลิกการแก้ไข</button>
+        </div>
+        <p id="status" style="margin-top:12px; font-weight:600; font-size:14px;"></p>
+      </section>
+
+      <!-- PAGE 06: FILE EXPLORER -->
+      <section class="work-page" data-page="explorer">
+        <p style="font-size:14px; color:var(--muted); margin-bottom:16px;">
+          กดค้างหรือคลิกขวาที่โฟลเดอร์เพื่อตั้งค่าสี, อีโมจิ, ใส่รหัสผ่าน, โหมดกำลังพัก หรือเปลี่ยนชื่อภาษาอื่นๆ
+        </p>
+        <div id="adminNavHeader" style="display:none; align-items:center; justify-content:space-between; padding:12px 16px; border:1px solid var(--hairline); background:#fff; margin-bottom:16px;">
+          <button type="button" class="lbl box box-cobalt" onclick="navigateAdminUp()">&lt; ย้อนกลับ</button>
+          <div id="currentAdminPathTitle" style="font-weight:600; font-size:14px;">หน้าหลัก</div>
+          <div style="width:70px;"></div>
+        </div>
+
+        <div style="display:flex; flex-wrap:wrap; gap:10px; margin-bottom:16px;">
+          <button type="button" class="lbl box box-cobalt" style="height:34px; padding:0 14px;" onclick="addNewJobHere()">+ สร้างเอกสารในหน้านี้</button>
+          <button type="button" class="lbl box" style="height:34px; padding:0 14px;" onclick="createNewFolder()">+ สร้างโฟลเดอร์ว่าง</button>
+          <button type="button" id="btnDeleteEmptyFolder" class="lbl box box-vermilion" style="display:none; height:34px; padding:0 14px;" onclick="deleteCurrentEmptyFolder()">🗑️ ลบโฟลเดอร์นี้ (ว่าง)</button>
+        </div>
+
+        <div id="explorerDropZone" class="explorer-zone">
+          <div id="adminFileExplorer"></div>
+        </div>
+      </section>
+
+      <!-- PAGE 07: USERS -->
+      <section class="work-page" data-page="users">
+        <div class="table-responsive"><div id="usersTable"></div></div>
+      </section>
+
+      <!-- PAGE 08: JOBS TABLE -->
+      <section class="work-page" data-page="jobs">
+        <div class="table-responsive"><div id="jobsTable"></div></div>
+      </section>
+
+      <!-- PAGE 09: REQUESTS -->
+      <section class="work-page" data-page="requests">
+        <div id="requestBadge" style="display:none; align-items:center; gap:8px; padding:6px 12px; border:1px solid var(--vermilion); color:var(--vermilion); background:#fff; width:fit-content; margin-bottom:16px;">
+          <svg class="bell-ringing" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+            <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+          </svg>
+          <span id="requestBadgeCount" class="lbl">0 คำขอใหม่</span>
+        </div>
+        <div class="table-responsive"><div id="requestsTable"></div></div>
+      </section>
+
+      <!-- PAGE 10: DOWNLOAD HISTORY -->
+      <section class="work-page" data-page="history">
+        <div class="table-responsive"><div id="historyTable"></div></div>
+      </section>
+
+      <!-- PAGE 11: ACCESS LOGS -->
+      <section class="work-page" data-page="accesslogs">
+        <div class="table-responsive"><div id="accessLogsTable"></div></div>
+      </section>
+
+      <!-- PAGE 12: COOKIE STATS -->
+      <section class="work-page" data-page="cookies">
+        <div class="paper-note" style="margin-bottom:20px;">
+          <div class="lbl" style="color:var(--cobalt); margin-bottom:6px;">
+            ประเภทข้อมูลที่บันทึก (อ้างอิงตามสิทธิ์การยินยอม — นับเฉพาะผู้ใช้ 1 บัญชี/อุปกรณ์ ไม่นับซ้ำ)
+          </div>
+          <div><strong style="color:var(--cobalt);">1. เพื่อความสะดวกในการใช้งาน (Functional):</strong> ช่วยจดจำสถานะการเข้าสู่ระบบ (Log in) จดจำภาษาที่คุณเลือก หรือสถานะการใช้งานต่างๆ</div>
+          <div><strong style="color:var(--forest);">2. เพื่อเก็บสถิติ (Analytics):</strong> ช่วยให้เจ้าของเว็บรู้ว่าผู้ใช้งานชอบอ่านเนื้อหาหน้าไหน หรือใช้เวลาอยู่ในเว็บไซต์นานแค่ไหน</div>
+          <div><strong style="color:var(--vermilion);">3. เพื่อการโฆษณา (Marketing):</strong> ติดตามพฤติกรรมการท่องเว็บเพื่อวิเคราะห์ความสนใจและแสดงข้อมูลที่ตรงใจผู้ใช้</div>
+        </div>
+        <div style="max-width:640px; margin:0 auto 24px; padding:16px; background:#fff; border:1px solid var(--hairline);">
+          <canvas id="cookieChart"></canvas>
+        </div>
+        <div class="table-responsive"><div id="cookieStatsTable"></div></div>
+      </section>
+    </main>
+  </div>
+
+  <!-- ==========================================
+       FIREBASE + 3D VHS SHELF + FULL ADMIN LOGIC
+       ========================================== -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, doc, setDoc, addDoc, getDoc, deleteDoc, collection, getDocs, serverTimestamp, updateDoc, writeBatch } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBLyMpowfyQK_1UnredPFmXdBdtQZKpY-c",
+      authDomain: "datapdf-d14d0.firebaseapp.com",
+      databaseURL: "https://datapdf-d14d0-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "datapdf-d14d0",
+      storageBucket: "datapdf-d14d0.firebasestorage.app",
+      messagingSenderId: "1034739093928",
+      appId: "1:1034739093928:web:cd56cc0e208d7d00f24d9d"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+
+    /* ==========================================
+       1. MODULES METADATA & VHS SVG ARTWORK
+       ========================================== */
+    const ADMIN_MODULES = [
+      { id: 'banners', code: '01', title: 'จัดการป้ายโฆษณา', subtitle: 'BANNERS / ป้ายประกาศ', spineTitle: 'BANNERS', coverTitle: ['BANNER', 'CAROUSEL'], category: 'content', description: 'จัดการรูปภาพป้ายโฆษณาด้านบนหน้าเว็บ ลิงก์ปลายทาง และลากสลับลำดับการแสดงผลได้ทันที', palette: 'vermilion', motif: 'banner' },
+      { id: 'reminders', code: '02', title: 'แจ้งเตือนความจำ', subtitle: 'REMINDERS / ปฏิทินนัดหมาย', spineTitle: 'REMINDERS', coverTitle: ['CALENDAR', 'REMINDERS'], category: 'content', description: 'สร้าง แก้ไข ค้นหา และย้อนกลับ (Undo) รายการแจ้งเตือนบนปฏิทินสำหรับผู้ใช้เป้าหมาย', palette: 'cream', motif: 'calendar' },
+      { id: 'schedules', code: '03', title: 'จัดการตารางเรียน', subtitle: 'SCHEDULES / ตารางเรียน', spineTitle: 'SCHEDULES', coverTitle: ['CLASS', 'SCHEDULES'], category: 'content', description: 'อัปเดตรูปภาพตารางเรียนรายภาคการศึกษาและกำหนดกลุ่มรหัสผู้ใช้งานที่ได้รับสิทธิ์เข้าชม', palette: 'cobalt', motif: 'schedule' },
+      { id: 'direct', code: '04', title: 'อนุมัติสิทธิ์ทันที', subtitle: 'DIRECT GRANT / มอบสิทธิ์', spineTitle: 'DIRECT GRANT', coverTitle: ['DIRECT', 'ACCESS'], category: 'access', description: 'มอบสิทธิ์การเข้าถึงทั้งโฟลเดอร์หรือรายไฟล์แบบกำหนดวันหมดอายุได้ทันทีโดยไม่ต้องรออนุมัติคำขอ', palette: 'forest', motif: 'key' },
+      { id: 'form', code: '05', title: 'เพิ่ม / แก้ไขเอกสาร', subtitle: 'DOCUMENT EDITOR / เอกสาร', spineTitle: 'DOCUMENT FORM', coverTitle: ['DOCUMENT', 'COMPOSER'], category: 'files', description: 'เพิ่มและแก้ไขไฟล์ 3 ภาษา (TH/EN/CN) รองรับ YouTube, รูปภาพ, PDF, ลิงก์ และข้อความ Rich Text', palette: 'charcoal', motif: 'quill' },
+      { id: 'explorer', code: '06', title: 'จัดการแฟ้มเอกสาร', subtitle: 'FILE EXPLORER / แฟ้มงาน', spineTitle: 'FILE EXPLORER', coverTitle: ['ARCHIVE', 'EXPLORER'], category: 'files', description: 'สำรวจและจัดระเบียบโฟลเดอร์ ลากย้ายไฟล์ ตั้งค่าสี อีโมจิ รหัสผ่าน และโหมดกำลังพักของแฟ้มงาน', palette: 'cream', motif: 'folder' },
+      { id: 'users', code: '07', title: 'บัญชีผู้ใช้งาน', subtitle: 'USER PROFILES / ผู้ใช้งาน', spineTitle: 'USER PROFILES', coverTitle: ['USER', 'DIRECTORY'], category: 'access', description: 'ตรวจสอบโปรไฟล์ผู้ใช้งาน รูปประจำตัว ชื่อแสดงผล รหัสผ่าน และเวลาการแก้ไขชื่อล่าสุด', palette: 'charcoal', motif: 'portrait' },
+      { id: 'jobs', code: '08', title: 'รายการเอกสารทั้งหมด', subtitle: 'MASTER TABLE / ตารางไฟล์', spineTitle: 'JOBS TABLE', coverTitle: ['MASTER', 'CATALOG'], category: 'files', description: 'ดูรายการไฟล์และโฟลเดอร์ทั้งหมดในระบบในรูปแบบตาราง พร้อมปุ่มแก้ไขและลบไฟล์ต้นทางใน Storage', palette: 'cream', motif: 'ledger' },
+      { id: 'requests', code: '09', title: 'คำขอสิทธิ์เข้าถึง', subtitle: 'ACCESS REQUESTS / คำขอสิทธิ์', spineTitle: 'REQUESTS', coverTitle: ['ACCESS', 'REQUESTS'], category: 'access', description: 'ตรวจสอบ อนุมัติ ปฏิเสธ แก้ไขวันหมดอายุคำขอสิทธิ์ และรองรับการดำเนินการลิงก์จาก Discord', palette: 'vermilion', motif: 'inbox' },
+      { id: 'history', code: '10', title: 'ประวัติการดาวน์โหลด', subtitle: 'DOWNLOAD LOGS / ประวัติผู้ชม', spineTitle: 'DOWNLOAD LOG', coverTitle: ['VIEWER', 'HISTORY'], category: 'analytics', description: 'ติดตามประวัติการเข้าถึงและดาวน์โหลดเอกสารของผู้ใช้งานแต่ละบัญชีเรียงตามเวลาล่าสุด', palette: 'cobalt', motif: 'archive' },
+      { id: 'accesslogs', code: '11', title: 'สถิติการเข้าสู่ระบบ', subtitle: 'ACCESS LOGS / สถิติเข้าใช้งาน', spineTitle: 'ACCESS LOGS', coverTitle: ['SESSION', 'TELEMETRY'], category: 'analytics', description: 'สรุปจำนวนครั้งการเข้าสู่ระบบจัดกลุ่มตามผู้ใช้ พร้อมหน้าต่างตรวจสอบเวลาเข้า-ออกรายบุคคล', palette: 'charcoal', motif: 'pulse' },
+      { id: 'cookies', code: '12', title: 'สถิติคุกกี้ & ยินยอม', subtitle: 'COOKIES & ANALYTICS / คุกกี้', spineTitle: 'COOKIE STATS', coverTitle: ['CONSENT', 'ANALYTICS'], category: 'analytics', description: 'แผนภูมิแท่ง Chart.js และตารางสรุปความยินยอมคุกกี้แยกตาม Functional, Analytics และ Marketing', palette: 'cream', motif: 'chart' }
+    ];
+
+    const PALETTES = {
+      vermilion: { bg: '#7A241E', bgEdge: '#581712', text: '#EDE4D3', accent: '#D85A4A', sub: '#E6D6BE', badgeBg: 'rgba(237,228,211,0.12)', badgeInk: '#EDE4D3' },
+      charcoal: { bg: '#23211E', bgEdge: '#151412', text: '#EDE7DA', accent: '#C44536', sub: '#C6BEB0', badgeBg: 'rgba(237,231,218,0.1)', badgeInk: '#EDE7DA' },
+      cobalt: { bg: '#1A3B8E', bgEdge: '#112763', text: '#F2ECE1', accent: '#6EA1FF', sub: '#D4DFEE', badgeBg: 'rgba(242,236,225,0.12)', badgeInk: '#F2ECE1' },
+      cream: { bg: '#E3DBC9', bgEdge: '#C7BDA7', text: '#1B2D6B', accent: '#B8332A', sub: '#3A3731', badgeBg: 'rgba(20,20,20,0.08)', badgeInk: '#141414' },
+      forest: { bg: '#1D4433', bgEdge: '#122B20', text: '#EAE3D2', accent: '#82B99E', sub: '#C7D6CB', badgeBg: 'rgba(234,227,210,0.12)', badgeInk: '#EAE3D2' }
+    };
+
+    function motifSvg(motif, ink, accent, cream, sw) {
+      switch (motif) {
+        case 'banner': return `<svg viewBox="0 0 120 120" width="100%" height="100%" fill="none"><circle cx="60" cy="48" r="24" fill="${accent}" opacity="0.85"/><rect x="18" y="34" width="84" height="46" stroke="${ink}" stroke-width="${sw}" fill="${cream}" fill-opacity="0.35"/><path d="M22 76 L46 50 L64 66 L80 54 L98 76 Z" fill="${ink}" opacity="0.85"/><path d="M16 92 H104" stroke="${ink}" stroke-width="${sw}" stroke-dasharray="4 3"/></svg>`;
+        case 'calendar': return `<svg viewBox="0 0 120 120" width="100%" height="100%" fill="none"><circle cx="60" cy="60" r="32" fill="${accent}" opacity="0.22"/><rect x="24" y="28" width="72" height="68" stroke="${ink}" stroke-width="${sw}"/><path d="M24 46 H96 M42 20 V34 M78 20 V34" stroke="${ink}" stroke-width="${sw}"/><circle cx="44" cy="62" r="5" fill="${accent}"/><circle cx="60" cy="62" r="4" fill="${ink}"/><circle cx="76" cy="62" r="4" fill="${ink}"/><path d="M38 79 H82" stroke="${ink}" stroke-width="${sw}"/></svg>`;
+        case 'schedule': return `<svg viewBox="0 0 120 120" width="100%" height="100%" fill="none"><circle cx="60" cy="44" r="22" fill="${cream}" opacity="0.9"/><rect x="20" y="34" width="80" height="58" stroke="${ink}" stroke-width="${sw}"/><path d="M20 52 H100 M20 72 H100 M48 34 V92 M74 34 V92" stroke="${ink}" stroke-width="${sw}" opacity="0.85"/><rect x="49" y="53" width="24" height="18" fill="${accent}" opacity="0.9"/></svg>`;
+        case 'key': return `<svg viewBox="0 0 120 120" width="100%" height="100%" fill="none"><circle cx="44" cy="56" r="22" stroke="${cream}" stroke-width="${sw+0.5}" fill="${accent}" fill-opacity="0.25"/><circle cx="44" cy="56" r="8" fill="${cream}"/><path d="M66 56 H102 M86 56 V72 M98 56 V68" stroke="${cream}" stroke-width="${sw+0.8}"/><path d="M22 92 Q60 76 98 92" stroke="${accent}" stroke-width="${sw}"/></svg>`;
+        case 'quill': return `<svg viewBox="0 0 120 120" width="100%" height="100%" fill="none"><circle cx="62" cy="52" r="28" fill="${accent}" opacity="0.8"/><path d="M36 86 L82 24 C86 38 78 58 60 72 L36 86 Z" fill="${cream}" stroke="${ink}" stroke-width="${sw}"/><path d="M26 92 H94" stroke="${cream}" stroke-width="${sw}"/><path d="M26 100 H72" stroke="${cream}" stroke-width="${sw}" opacity="0.6"/></svg>`;
+        case 'folder': return `<svg viewBox="0 0 120 120" width="100%" height="100%" fill="none"><circle cx="60" cy="40" r="24" fill="${accent}" opacity="0.24"/><path d="M18 36 H48 L56 46 H102 V92 H18 Z" fill="${ink}" opacity="0.88"/><path d="M18 52 H102" stroke="${cream}" stroke-width="${sw}"/><rect x="30" y="64" width="60" height="6" fill="${cream}" opacity="0.7"/><rect x="30" y="76" width="40" height="5" fill="${accent}"/></svg>`;
+        case 'portrait': return `<svg viewBox="0 0 120 120" width="100%" height="100%" fill="none"><rect x="26" y="20" width="68" height="80" stroke="${cream}" stroke-width="${sw}" fill="${accent}" fill-opacity="0.18"/><circle cx="60" cy="48" r="16" fill="${cream}"/><path d="M34 94 C36 74 46 68 60 68 C74 68 84 74 86 94" fill="${cream}"/></svg>`;
+        case 'ledger': return `<svg viewBox="0 0 120 120" width="100%" height="100%" fill="none"><rect x="22" y="22" width="76" height="76" stroke="${ink}" stroke-width="${sw}" fill="${cream}" fill-opacity="0.2"/><path d="M34 40 H86 M34 54 H86 M34 68 H86 M34 82 H68" stroke="${ink}" stroke-width="${sw}"/><circle cx="82" cy="80" r="10" fill="${accent}"/></svg>`;
+        case 'inbox': return `<svg viewBox="0 0 120 120" width="100%" height="100%" fill="none"><circle cx="60" cy="46" r="24" fill="${accent}" opacity="0.75"/><path d="M22 64 L36 32 H84 L98 64 V92 H22 Z" stroke="${cream}" stroke-width="${sw}" fill="rgba(20,20,20,0.25)"/><path d="M22 64 H44 L50 74 H70 L76 64 H98" stroke="${cream}" stroke-width="${sw}"/></svg>`;
+        case 'archive': return `<svg viewBox="0 0 120 120" width="100%" height="100%" fill="none"><circle cx="60" cy="46" r="22" fill="${cream}" opacity="0.9"/><path d="M18 76 Q40 66 60 76 T102 76" stroke="${cream}" stroke-width="${sw}"/><path d="M18 86 Q40 76 60 86 T102 86" stroke="${accent}" stroke-width="${sw}"/><path d="M60 36 V64 M50 54 L60 64 L70 54" stroke="${ink}" stroke-width="${sw}"/></svg>`;
+        case 'pulse': return `<svg viewBox="0 0 120 120" width="100%" height="100%" fill="none"><circle cx="60" cy="60" r="32" stroke="${cream}" stroke-width="1.2" stroke-dasharray="3 3" opacity="0.5"/><path d="M16 64 H38 L48 36 L60 86 L72 48 L80 64 H104" stroke="${accent}" stroke-width="${sw+0.8}"/><circle cx="60" cy="60" r="4" fill="${cream}"/></svg>`;
+        case 'chart': return `<svg viewBox="0 0 120 120" width="100%" height="100%" fill="none"><path d="M22 92 H98 M22 28 V92" stroke="${ink}" stroke-width="${sw}"/><rect x="32" y="54" width="14" height="38" fill="#1F3FB0"/><rect x="54" y="36" width="14" height="56" fill="#1F5B42"/><rect x="76" y="64" width="14" height="28" fill="${accent}"/></svg>`;
+        default: return '';
+      }
+    }
+
+    /* ==========================================
+       2. SHELF 3D ENGINE + CUSTOM CURSOR + WAAPI SHEET
+       ========================================== */
+    const MODULE_COUNT = ADMIN_MODULES.length;
+    const TOTAL_VIRTUAL = MODULE_COUNT * 3;
+    const moduleCounts = {};
+    ADMIN_MODULES.forEach(m => { moduleCounts[m.id] = `MODULE ${m.code}`; });
+
+    let sPos = 5 + MODULE_COUNT;
+    let TPos = 5 + MODULE_COUNT;
+    let activeModIdx = 5;
+    let activePageId = 'explorer';
+    let isSheetOpen = false;
+    let activeCoverRect = null;
+    let hoverV = -1;
+    let dragging = false;
+    let dragStartX = 0;
+    let dragStartT = 0;
+    let suppressClick = false;
+    let wheelTimer = null;
+    let tilt = { x: 0, y: 0 };
+    const lifts = new Array(TOTAL_VIRTUAL).fill(0);
+    let dims = { H: 360, ws: 60.8, d: 189.6, gap: 10.8 };
+    let cursorMode = 'default';
+    let pointer = { mx: window.innerWidth / 2, my: window.innerHeight / 2 };
+    let smoothCur = { cx: window.innerWidth / 2, cy: window.innerHeight / 2 };
+    let sheetAnim = null;
+    let isClosingSheet = false;
+
+    const tapeRefs = [];
+    const spineRefs = [];
+    const coverRefs = [];
+
+    function modIndex(val, count) {
+      return ((Math.round(val) % count) + count) % count;
+    }
+
+    function smoothstep(x) {
+      const c = Math.max(0, Math.min(1, x));
+      return c * c * (3 - 2 * c);
+    }
+
+    function smoothStepB(r) {
+      if (Math.abs(r) < 1) return (r + Math.sin(Math.PI * r) / Math.PI) / 2;
+      return r >= 0 ? 0.5 : -0.5;
+    }
+
+    function wrapRelativeIndex(v, s) {
+      const half = TOTAL_VIRTUAL / 2;
+      let r = ((v - s) % TOTAL_VIRTUAL + TOTAL_VIRTUAL) % TOTAL_VIRTUAL;
+      if (r > half) r -= TOTAL_VIRTUAL;
+      return r;
+    }
+
+    function shortestTarget(currentT, modIdx) {
+      const curMod = ((Math.round(currentT) % MODULE_COUNT) + MODULE_COUNT) % MODULE_COUNT;
+      let diff = modIdx - curMod;
+      if (diff > MODULE_COUNT / 2) diff -= MODULE_COUNT;
+      if (diff < -MODULE_COUNT / 2) diff += MODULE_COUNT;
+      return Math.round(currentT) + diff;
+    }
+
+    function measureDims() {
+      const probe = document.getElementById('heightProbe');
+      const stage = document.getElementById('shelfStage');
+      if (!probe || !stage) return;
+      const H = probe.getBoundingClientRect().height || 360;
+      dims = { H, ws: (H * 142) / 840, d: (H * 474) / 900, gap: H * 0.03 };
+      stage.style.setProperty('--ws', `${dims.ws}px`);
+      stage.style.setProperty('--d', `${dims.d}px`);
+      syncCategoryTabs(ADMIN_MODULES[activeModIdx].category);
+    }
+
+    function syncCategoryTabs(category) {
+      const buttons = document.querySelectorAll('.tab-btn');
+      const ind = document.getElementById('tabIndicator');
+      let targetBtn = null;
+      buttons.forEach(btn => {
+        const isAct = btn.getAttribute('data-cat') === category;
+        btn.classList.toggle('is-active', isAct);
+        if (isAct) targetBtn = btn;
+      });
+      if (targetBtn && ind) {
+        ind.style.width = `${targetBtn.offsetWidth}px`;
+        ind.style.transform = `translateX(${targetBtn.offsetLeft}px)`;
+      }
+    }
+
+    function runMaskedSwap(maskEl, text, dir) {
+      if (!maskEl) return;
+      const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const existing = Array.from(maskEl.children);
+      const nextSpan = document.createElement('span');
+      nextSpan.textContent = text;
+      nextSpan.style.display = 'block';
+      nextSpan.style.width = '100%';
+      nextSpan.style.textAlign = 'center';
+      maskEl.appendChild(nextSpan);
+
+      if (reduced) {
+        existing.forEach(el => el.remove());
+        return;
+      }
+
+      const sign = dir >= 0 ? 1 : -1;
+      existing.forEach(oldEl => {
+        if (oldEl.dataset.leaving === '1') return;
+        oldEl.dataset.leaving = '1';
+        oldEl.style.position = 'absolute';
+        oldEl.style.left = '0';
+        oldEl.style.right = '0';
+        oldEl.style.top = '0';
+        const anim = oldEl.animate(
+          [{ transform: 'translateY(0%)' }, { transform: `translateY(${-sign * 105}%)` }],
+          { duration: 650, easing: 'cubic-bezier(0.2, 0.8, 0.2, 1)', fill: 'both' }
+        );
+        anim.onfinish = () => oldEl.remove();
+      });
+
+      nextSpan.animate(
+        [{ transform: `translateY(${sign * 105}%)` }, { transform: 'translateY(0%)' }],
+        { duration: 650, easing: 'cubic-bezier(0.2, 0.8, 0.2, 1)', fill: 'both' }
+      );
+    }
+
+    function buildShelfDom() {
+      const stage = document.getElementById('shelfStage');
+      const dirNav = document.getElementById('sheetDirNav');
+      stage.innerHTML = '';
+      dirNav.innerHTML = '';
+
+      for (let v = 0; v < TOTAL_VIRTUAL; v++) {
+        const mod = ADMIN_MODULES[v % MODULE_COUNT];
+        const p = PALETTES[mod.palette];
+        const primaryInk = mod.palette === 'cream' ? '#1F3FB0' : p.text;
+        const subInk = mod.palette === 'cream' ? '#141414' : p.sub;
+        const winBg = mod.palette === 'cream' ? 'rgba(20,20,20,0.05)' : 'rgba(0,0,0,0.22)';
+        const artInk = mod.palette === 'cream' ? '#1B2D6B' : '#EDE7DA';
+        const artCream = mod.palette === 'cream' ? '#E3DBC9' : '#F4F2ED';
+
+        const tape = document.createElement('div');
+        tape.className = 'tape';
+        tape.setAttribute('role', 'button');
+        tape.setAttribute('aria-label', `${mod.code} ${mod.title}`);
+
+        const sp = document.createElement('div');
+        sp.className = 'tape-face sp';
+        sp.innerHTML = `
+          <div class="vhs-spine" style="background:linear-gradient(90deg,${p.bgEdge} 0%,${p.bg} 18%,${p.bg} 82%,${p.bgEdge} 100%); color:${p.text};">
+            <div class="vhs-spine-win" style="background:${winBg};">
+              ${motifSvg(mod.motif, artInk, p.accent, artCream, 2.4)}
+              <span class="spine-pending-badge" data-mod="${mod.id}" style="display:none; position:absolute; top:3px; right:3px; padding:0 4px; font-size:8px; font-weight:700; background:#B8332A; color:#fff;"></span>
+            </div>
+            <div class="vhs-spine-title" style="color:${p.text};">${mod.spineTitle}</div>
+            <div style="display:flex; flex-direction:column; align-items:center; gap:4px; width:100%;">
+              <span style="font-size:7.5px; letter-spacing:0.18em; opacity:0.78;">MOD ${mod.code}</span>
+              <div class="vhs-spine-badge" style="border:1px solid ${p.text}; background:${p.badgeBg}; color:${p.badgeInk};">SYS</div>
+            </div>
+          </div>`;
+
+        const cv = document.createElement('div');
+        cv.className = 'tape-face cv';
+        cv.innerHTML = `
+          <div class="vhs-cover" style="background:linear-gradient(155deg,${p.bg} 0%,${p.bgEdge} 100%); color:${primaryInk};">
+            <div class="vhs-cover-wear"></div>
+            <div class="vhs-cover-head">
+              <div style="font-size:clamp(6.5px,0.7vw,9px); letter-spacing:0.22em; color:${subInk}; opacity:0.85;">DOCUM ADMIN MODULE · ${mod.code}</div>
+              <div style="margin-top:5px; font-family:var(--serif); font-size:clamp(16px,2.25vw,31px); line-height:0.96; letter-spacing:-0.02em; color:${primaryInk}; text-transform:uppercase;">
+                ${mod.coverTitle.map(l => `<div>${l}</div>`).join('')}
+              </div>
+              <div style="margin-top:5px; font-size:clamp(9px,0.9vw,12px); font-weight:500; color:${subInk}; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${mod.title}</div>
+            </div>
+            <div class="vhs-cover-art">
+              <div style="width:100%; aspect-ratio:1/1; max-height:82%;">
+                ${motifSvg(mod.motif, artInk, p.accent, mod.palette === 'cream' ? '#EDE4D3' : '#F4F2ED', 1.9)}
+              </div>
+            </div>
+            <div class="vhs-cover-foot">
+              <span class="cover-count-label" data-mod="${mod.id}" style="font-size:clamp(7px,0.72vw,9.5px); letter-spacing:0.1em; color:${subInk}; text-transform:uppercase; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${moduleCounts[mod.id]}</span>
+              <span style="padding:2px 6px; font-size:clamp(7.5px,0.75vw,10px); font-weight:700; letter-spacing:0.12em; border:1.2px solid ${primaryInk}; background:${p.badgeBg}; color:${primaryInk}; flex-shrink:0;">PAGE ${mod.code}</span>
+            </div>
+          </div>`;
+
+        tape.appendChild(sp);
+        tape.appendChild(cv);
+        tape.addEventListener('pointerenter', () => { hoverV = v; });
+        tape.addEventListener('pointerleave', () => { if (hoverV === v) hoverV = -1; });
+        tape.addEventListener('click', () => {
+          if (suppressClick) return;
+          const r = wrapRelativeIndex(v, sPos);
+          if (Math.abs(r) < 0.5) openActiveCover();
+          else TPos = Math.round(TPos + r);
+        });
+
+        stage.appendChild(tape);
+        tapeRefs[v] = tape;
+        spineRefs[v] = sp;
+        coverRefs[v] = cv;
+      }
+
+      ADMIN_MODULES.forEach(m => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'lbl dir-tab';
+        btn.setAttribute('data-dir-id', m.id);
+        btn.innerHTML = `<span style="opacity:0.7;">${m.code}</span><span>${m.title}</span>`;
+        btn.onclick = () => switchWorkingPage(m.id);
+        dirNav.appendChild(btn);
+      });
+    }
+
+    function updateCoverLabels() {
+      document.querySelectorAll('.cover-count-label').forEach(el => {
+        const modId = el.getAttribute('data-mod');
+        if (moduleCounts[modId]) el.textContent = moduleCounts[modId];
+      });
+    }
+
+    window.stepShelf = function(delta) {
+      TPos = Math.round(TPos) + delta;
+    };
+
+    window.jumpToShelfModule = function(modId) {
+      const idx = ADMIN_MODULES.findIndex(m => m.id === modId);
+      if (idx !== -1) TPos = shortestTarget(TPos, idx);
+    };
+
+    window.openActiveCover = function() {
+      const modIdx = modIndex(sPos, MODULE_COUNT);
+      let bestV = modIdx;
+      let bestDist = Infinity;
+      for (let v = 0; v < TOTAL_VIRTUAL; v++) {
+        const dist = Math.abs(wrapRelativeIndex(v, sPos));
+        if (dist < bestDist) { bestDist = dist; bestV = v; }
+      }
+      const coverEl = coverRefs[bestV];
+      activeCoverRect = coverEl ? coverEl.getBoundingClientRect() : null;
+      TPos = Math.round(TPos);
+      openDetailSheet(ADMIN_MODULES[modIdx].id);
+    };
+
+    window.switchWorkingPage = function(pageId) {
+      activePageId = pageId;
+      const idx = ADMIN_MODULES.findIndex(m => m.id === pageId);
+      const mod = ADMIN_MODULES[idx] || ADMIN_MODULES[0];
+      const prev = ADMIN_MODULES[(idx - 1 + MODULE_COUNT) % MODULE_COUNT];
+      const next = ADMIN_MODULES[(idx + 1) % MODULE_COUNT];
+
+      document.querySelectorAll('.work-page').forEach(sec => {
+        sec.classList.toggle('is-active', sec.getAttribute('data-page') === pageId);
+      });
+      document.querySelectorAll('.dir-tab').forEach(btn => {
+        btn.classList.toggle('is-current', btn.getAttribute('data-dir-id') === pageId);
+      });
+
+      document.getElementById('sheetPageCounter').textContent = `PAGE ${mod.code} / 12`;
+      document.getElementById('prevPageBtn').textContent = `← ${prev.code}`;
+      document.getElementById('nextPageBtn').textContent = `${next.code} →`;
+      document.getElementById('pageHeaderSub').textContent = mod.subtitle;
+      document.getElementById('pageHeaderTitle').textContent = mod.title;
+      document.getElementById('pageHeaderDesc').textContent = mod.description;
+
+      const sheet = document.getElementById('detailSheet');
+      if (sheet) sheet.scrollTop = 0;
+
+      if (pageId === 'cookies' && window.cookieChartInstance) {
+        window.cookieChartInstance.resize();
+      }
+    };
+
+    window.stepWorkingPage = function(delta) {
+      const idx = ADMIN_MODULES.findIndex(m => m.id === activePageId);
+      const nextIdx = (idx + delta + MODULE_COUNT) % MODULE_COUNT;
+      switchWorkingPage(ADMIN_MODULES[nextIdx].id);
+    };
+
+    function openDetailSheet(pageId) {
+      const sheet = document.getElementById('detailSheet');
+      if (!sheet) return;
+      cursorMode = 'default';
+      isClosingSheet = false;
+      isSheetOpen = true;
+      switchWorkingPage(pageId);
+      sheet.classList.add('is-visible');
+      sheet.scrollTop = 0;
+
+      const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const vw = window.innerWidth;
+      const vh = window.innerHeight;
+      let fromClip = 'inset(20% 35% 20% 35% round 3px)';
+      let origin = '50% 50%';
+      if (activeCoverRect) {
+        fromClip = `inset(${Math.max(0, activeCoverRect.top)}px ${Math.max(0, vw - activeCoverRect.right)}px ${Math.max(0, vh - activeCoverRect.bottom)}px ${Math.max(0, activeCoverRect.left)}px round 3px)`;
+        origin = `${activeCoverRect.left + activeCoverRect.width / 2}px ${activeCoverRect.top + activeCoverRect.height / 2}px`;
+      }
+      sheet.style.transformOrigin = origin;
+      if (sheetAnim) sheetAnim.cancel();
+      sheetAnim = sheet.animate(
+        [{ clipPath: fromClip, transform: 'rotate(-4.5deg)' }, { clipPath: 'inset(0px 0px 0px 0px round 0px)', transform: 'rotate(0deg)' }],
+        { duration: reduced ? 1 : 1050, easing: 'cubic-bezier(0.76, 0, 0.18, 1)', fill: 'both' }
+      );
+
+      document.querySelectorAll('.sheet-line').forEach((el, i) => {
+        el.animate(
+          [{ transform: 'translateY(110%)' }, { transform: 'translateY(0%)' }],
+          { duration: reduced ? 1 : 900, delay: reduced ? 0 : 620 + i * 75, easing: 'cubic-bezier(0.2, 0.8, 0.2, 1)', fill: 'both' }
+        );
+      });
+    }
+
+    window.closeDetailSheet = function() {
+      const sheet = document.getElementById('detailSheet');
+      if (!sheet || isClosingSheet) return;
+      isClosingSheet = true;
+      const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const vw = window.innerWidth;
+      const vh = window.innerHeight;
+      let toClip = 'inset(20% 35% 20% 35% round 3px)';
+      if (activeCoverRect) {
+        toClip = `inset(${Math.max(0, activeCoverRect.top)}px ${Math.max(0, vw - activeCoverRect.right)}px ${Math.max(0, vh - activeCoverRect.bottom)}px ${Math.max(0, activeCoverRect.left)}px round 3px)`;
+      }
+      if (sheetAnim) sheetAnim.cancel();
+      const closeAnim = sheet.animate(
+        [{ clipPath: 'inset(0px 0px 0px 0px round 0px)', transform: 'rotate(0deg)' }, { clipPath: toClip, transform: 'rotate(-4.5deg)' }],
+        { duration: reduced ? 1 : 850, easing: 'cubic-bezier(0.76, 0, 0.18, 1)', fill: 'both' }
+      );
+      closeAnim.onfinish = () => {
+        sheet.classList.remove('is-visible');
+        closeAnim.cancel();
+        if (sheetAnim) { sheetAnim.cancel(); sheetAnim = null; }
+        isClosingSheet = false;
+        isSheetOpen = false;
+      };
+    };
+
+    // Main unified requestAnimationFrame Loop (Shelf + Cursor)
+    let rafLast = performance.now();
+    function tickFrame(now) {
+      const dt = Math.min(0.05, Math.max(0.001, (now - rafLast) / 1000));
+      rafLast = now;
+
+      // 1. Custom Cursor exponential follow
+      const curEl = document.getElementById('customCursor');
+      if (curEl) {
+        const curEase = 1 - Math.exp(-16 * dt);
+        smoothCur.cx += (pointer.mx - smoothCur.cx) * curEase;
+        smoothCur.cy += (pointer.my - smoothCur.cy) * curEase;
+        curEl.style.transform = `translate3d(${smoothCur.cx}px, ${smoothCur.cy}px, 0)`;
+        curEl.className = `custom-cursor${cursorMode !== 'default' ? ' ' + cursorMode : ''}`;
+      }
+
+      // 2. Shelf spring & 3D positioning
+      const shelfVisible = document.getElementById('heroShelfWrapper').style.display !== 'none';
+      if (shelfVisible) {
+        const W = window.innerWidth;
+        const HWin = window.innerHeight;
+        const shelfCenterY = HWin / 2;
+        const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+        const diff = TPos - sPos;
+        if (reduced) {
+          sPos = TPos;
+        } else {
+          const k = dragging ? 18 : 5.2;
+          sPos = Math.abs(diff) < 1e-4 ? TPos : sPos + diff * (1 - Math.exp(-k * dt));
+        }
+
+        if (Math.abs(sPos) > 4 * MODULE_COUNT) {
+          const shift = Math.trunc(sPos / MODULE_COUNT) * MODULE_COUNT;
+          sPos -= shift;
+          TPos -= shift;
+        }
+
+        const nextMod = modIndex(sPos, MODULE_COUNT);
+        if (nextMod !== activeModIdx) {
+          const dir = Math.sign(TPos - sPos) || 1;
+          activeModIdx = nextMod;
+          const m = ADMIN_MODULES[nextMod];
+          runMaskedSwap(document.getElementById('captionTitleMask'), m.title, dir);
+          runMaskedSwap(document.getElementById('captionSubMask'), m.subtitle, dir);
+          runMaskedSwap(document.getElementById('captionMetaMask'), `PAGE ${m.code} — 12`, dir);
+          document.getElementById('footerOpenCode').textContent = m.code;
+          syncCategoryTabs(m.category);
+        }
+
+        const onCover = !isSheetOpen &&
+          Math.abs(pointer.mx - W / 2) < 0.55 * dims.d &&
+          Math.abs(pointer.my - shelfCenterY) < 0.55 * dims.H &&
+          Math.abs(TPos - sPos) < 0.3;
+
+        let targetTiltY = ((pointer.mx - W / 2) / Math.max(1, W)) * 5;
+        let targetTiltX = 0;
+        if (onCover) {
+          targetTiltY = ((pointer.mx - W / 2) / (0.55 * dims.d)) * 9;
+          targetTiltX = -((pointer.my - shelfCenterY) / (dims.H / 2)) * 6;
+        }
+        const tEase = 1 - Math.exp(-7 * dt);
+        tilt.x += (targetTiltX - tilt.x) * tEase;
+        tilt.y += (targetTiltY - tilt.y) * tEase;
+
+        if (!isSheetOpen) {
+          const el = document.elementFromPoint(pointer.mx, pointer.my);
+          const overBtn = Boolean(el && el.closest('button, a') && !el.closest('.shelf-section'));
+          if (onCover) cursorMode = 'open';
+          else if (overBtn) cursorMode = 'btn';
+          else if (hoverV !== -1) {
+            const rHov = wrapRelativeIndex(hoverV, sPos);
+            cursorMode = Math.abs(rHov) > 0.5 ? 'spine' : 'default';
+          } else {
+            cursorMode = 'default';
+          }
+        }
+
+        const ringBtn = document.getElementById('playRingBtn');
+        if (ringBtn) {
+          const ringScale = isSheetOpen ? 0 : smoothstep(Math.max(0, 1 - Math.abs(TPos - sPos) * 3));
+          ringBtn.style.left = `${W / 2 - 0.5 * dims.d - 6}px`;
+          ringBtn.style.top = `${shelfCenterY + 0.36 * dims.H}px`;
+          ringBtn.style.transform = `translate(-50%, -50%) scale(${ringScale})`;
+          ringBtn.style.pointerEvents = ringScale > 0.4 ? 'auto' : 'none';
+        }
+
+        const liftEase = reduced ? 1 : 1 - Math.exp(-12 * dt);
+        for (let v = 0; v < TOTAL_VIRTUAL; v++) {
+          const tapeEl = tapeRefs[v];
+          if (!tapeEl) continue;
+          const r = wrapRelativeIndex(v, sPos);
+          const x = r * (dims.ws + dims.gap) + (dims.d - dims.ws + 1.6 * dims.gap) * smoothStepB(r);
+
+          if (Math.abs(x) > W / 2 + 1.5 * dims.d) {
+            tapeEl.style.visibility = 'hidden';
+            continue;
+          }
+          tapeEl.style.visibility = 'visible';
+
+          const o = smoothstep(Math.max(0, 1 - Math.abs(r)));
+          const targetLift = hoverV === v && Math.abs(r) > 0.5 ? 1 : 0;
+          lifts[v] += (targetLift - lifts[v]) * liftEase;
+
+          const rotY = -90 * o + tilt.y * o;
+          const rotX = tilt.x * o;
+          const rotZ = -4.5 * o;
+          const tz = o * 0.2 * dims.H;
+          const ty = -o * 0.025 * dims.H - lifts[v] * 0.045 * dims.H;
+
+          tapeEl.style.transform = `translate3d(${x}px, ${ty}px, ${tz}px) rotateZ(${rotZ}deg) rotateX(${rotX}deg) rotateY(${rotY}deg)`;
+          tapeEl.style.zIndex = String(Math.round(100 - Math.abs(r) * 4));
+
+          if (spineRefs[v]) spineRefs[v].style.setProperty('--shade', (o * 0.55).toFixed(3));
+          if (coverRefs[v]) coverRefs[v].style.setProperty('--shade', ((1 - o) * 0.68).toFixed(3));
+        }
+      }
+
+      requestAnimationFrame(tickFrame);
+    }
+
+    /* ==========================================
+       3. TIME PICKER & ICONS HELPERS
+       ========================================== */
+    let timePickerResolve = null;
+
+    window.toggleTimePicker = function() {
+      const type = document.querySelector('input[name="timeType"]:checked').value;
+      document.getElementById('customExpireDate').style.display = type === 'custom' ? 'block' : 'none';
+    };
+
+    window.requestTimeSelection = function() {
+      return new Promise((resolve) => {
+        timePickerResolve = resolve;
+        document.getElementById('timePickerModal').style.display = 'flex';
+        document.querySelector('input[name="timeType"][value="unlimited"]').checked = true;
+        document.getElementById('customExpireDate').style.display = 'none';
+        document.getElementById('customExpireDate').value = '';
+      });
+    };
+
+    window.closeTimePicker = function() {
+      document.getElementById('timePickerModal').style.display = 'none';
+      if (timePickerResolve) timePickerResolve(null);
+    };
+
+    window.confirmTimePicker = function() {
+      const type = document.querySelector('input[name="timeType"]:checked').value;
+      const result = { unlimited: type === 'unlimited', date: null };
+      if (type === 'custom') {
+        const val = document.getElementById('customExpireDate').value;
+        if (!val) { alert('กรุณาระบุวันและเวลา'); return; }
+        result.date = new Date(val);
+      }
+      document.getElementById('timePickerModal').style.display = 'none';
+      if (timePickerResolve) timePickerResolve(result);
+    };
+
+    const appleColors = {
+      blue: ['#89C4FA', '#74B5F6'],
+      red: ['#ff8a8a', '#ff5c5c'],
+      orange: ['#ffb380', '#ff944d'],
+      yellow: ['#ffe082', '#ffcc33'],
+      green: ['#85e098', '#5cd675'],
+      purple: ['#d1a3ff', '#b870ff'],
+      gray: ['#c2c2c2', '#a8a8a8']
+    };
+
+    const icons = {
+      pdf: `<svg style="width:46px;height:auto;" viewBox="0 0 64 80" fill="none"><rect x="4" y="4" width="56" height="72" rx="4" fill="#F9F9FB" stroke="#141414" stroke-width="1.8"/><path d="M40 4L60 24V4H40Z" fill="#E5E5EA"/><rect x="16" y="32" width="32" height="4" fill="#B8332A"/><rect x="16" y="44" width="24" height="4" fill="#999"/><rect x="16" y="56" width="28" height="4" fill="#999"/></svg>`,
+      image: `<svg style="width:58px;height:auto;" viewBox="0 0 80 64" fill="none"><rect x="4" y="4" width="72" height="56" rx="4" fill="#F9F9FB" stroke="#141414" stroke-width="1.8"/><circle cx="24" cy="24" r="6" fill="#C47F17"/><path d="M4 48L28 28L52 48L64 38L76 48V56H4V48Z" fill="#1F5B42"/></svg>`,
+      youtube: `<svg style="width:58px;height:auto;" viewBox="0 0 80 56" fill="none"><rect x="4" y="4" width="72" height="48" rx="8" fill="#B8332A"/><path d="M34 18L52 28L34 38V18Z" fill="#F4F2ED"/></svg>`,
+      link: `<svg style="width:46px;height:auto;" viewBox="0 0 80 80" fill="none"><circle cx="40" cy="40" r="36" fill="#F9F9FB" stroke="#141414" stroke-width="1.8"/><path d="M40 10C28 10 20 25 20 40C20 55 28 70 40 70C52 70 60 55 60 40C60 25 52 10 40 10Z" stroke="#1F3FB0" stroke-width="2"/><path d="M10 40H70M20 25H60M20 55H60" stroke="#1F3FB0" stroke-width="1.8"/></svg>`,
+      lock: `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>`,
+      text: `<svg style="width:46px;height:auto;" viewBox="0 0 64 80" fill="none"><rect x="4" y="4" width="56" height="72" rx="4" fill="#F9F9FB" stroke="#141414" stroke-width="1.8"/><rect x="16" y="24" width="32" height="4" fill="#1F3FB0"/><rect x="16" y="36" width="32" height="4" fill="#999"/><rect x="16" y="48" width="24" height="4" fill="#999"/></svg>`
+    };
+
+    function getFolderIcon(color, emoji) {
+      const c = appleColors[color] || appleColors.blue;
+      let svg = `<svg style="width:68px;height:auto;" viewBox="0 0 100 80" fill="none"><path d="M0 12C0 5.37258 5.37258 0 12 0H36.5C39.5 0 42.2 1.5 43.8 4L51 15H88C94.6274 15 100 20.3726 100 27V68C100 74.6274 94.6274 80 88 80H12C5.37258 80 0 74.6274 0 68V12Z" fill="${c[0]}"/><path d="M0 24C0 20.6863 2.68629 18 6 18H94C97.3137 18 100 20.6863 100 24V68C100 74.6274 94.6274 80 88 80H12C5.37258 80 0 74.6274 0 68V24Z" fill="${c[1]}"/>`;
+      if (emoji) svg += `<text x="50%" y="56%" dominant-baseline="middle" text-anchor="middle" font-size="28">${emoji}</text>`;
+      svg += `</svg>`;
+      return svg;
+    }
+
+    function formatTime(timestamp) {
+      if (!timestamp) return "";
+      try {
+        const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+        return date.toLocaleDateString('th-TH', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) + " น.";
+      } catch (e) { return ""; }
+    }
+
+    function getLocalizedName(defaultName, metaObj) {
+      const lang = localStorage.getItem('docSystem_lang') || 'TH';
+      if (!metaObj) return defaultName;
+      if (lang === 'EN' && metaObj.titleEN) return metaObj.titleEN;
+      if (lang === 'CN' && metaObj.titleCN) return metaObj.titleCN;
+      return defaultName;
+    }
+
+    function getLocalizedFileTitle(file) {
+      const lang = localStorage.getItem('docSystem_lang') || 'TH';
+      if (lang === 'EN' && file.titleEN) return file.titleEN;
+      if (lang === 'CN' && file.titleCN) return file.titleCN;
+      return file.title || '-';
+    }
+
+    let allJobsAdmin = [];
+    let currentAdminPath = "";
+    let currentEmptyFolderMarkerId = null;
+    let folderMeta = {};
+    let adminBanners = [];
+    let allReminders = [];
+    let allSchedules = [];
+    let lastReminderAction = null;
+    window.cookieChartInstance = null;
+    window.groupedLogs = {};
+
+    window.toggleInputType = function() {
+      const type = document.getElementById("fileType").value;
+      document.getElementById("urlInputGroup").style.display = type === "text" ? "none" : "block";
+      document.getElementById("textInputGroup").style.display = type === "text" ? "block" : "none";
+    };
+
+    /* ==========================================
+       4. AUTHENTICATION & DATA LOADERS
+       ========================================== */
+    window.loginAdmin = function() {
+      const email = document.getElementById("adminEmail").value;
+      const pwd = document.getElementById("adminPassword").value;
+      const errorMsg = document.getElementById("loginError");
+      const btn = document.getElementById("loginSubmitBtn");
+
+      if (!email || !pwd) {
+        errorMsg.innerText = "กรุณากรอกอีเมลและรหัสผ่านให้ครบถ้วน";
+        errorMsg.style.display = "block";
+        return;
+      }
+
+      errorMsg.style.display = "none";
+      btn.innerText = "กำลังเข้าสู่ระบบ...";
+      signInWithEmailAndPassword(auth, email, pwd)
+        .then(() => { btn.innerText = "เข้าสู่ระบบ / SIGN IN"; })
+        .catch(() => {
+          btn.innerText = "เข้าสู่ระบบ / SIGN IN";
+          errorMsg.style.display = "block";
+          errorMsg.innerText = "อีเมลหรือรหัสผ่านไม่ถูกต้อง กรุณาลองใหม่";
+        });
+    };
+
+    window.logoutAdmin = function() {
+      if (confirm("ต้องการออกจากระบบผู้ดูแลหรือไม่?")) {
+        signOut(auth).catch(() => alert("เกิดข้อผิดพลาดในการออกจากระบบ"));
+      }
+    };
+
+    document.getElementById("adminPassword").addEventListener("keypress", function(e) {
+      if (e.key === "Enter") loginAdmin();
+    });
+
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        document.getElementById("adminLoginWrapper").style.display = "none";
+        document.getElementById("heroShelfWrapper").style.display = "block";
+        measureDims();
+
+        try {
+          await Promise.all([
+            loadBanners(), loadJobs(), loadRequests(), loadHistory(),
+            loadAccessLogs(), loadCookieStats(), loadReminders(), loadSchedules(), loadUsers()
+          ]);
+        } catch (e) {
+          console.error("Initial load error: ", e);
+        }
+
+        setupExternalDragAndDrop();
+        setTimeout(() => processDiscordActions(), 1000);
+      } else {
+        document.getElementById("adminLoginWrapper").style.display = "flex";
+        document.getElementById("heroShelfWrapper").style.display = "none";
+        document.getElementById("detailSheet").classList.remove("is-visible");
+        isSheetOpen = false;
+      }
+    });
+
+    /* --- USERS --- */
+    window.loadUsers = async function() {
+      const tableDiv = document.getElementById("usersTable");
+      tableDiv.innerHTML = "<p style='text-align:center; padding:24px;'>กำลังโหลดข้อมูลผู้ใช้งาน...</p>";
+      try {
+        const querySnapshot = await getDocs(collection(db, "users"));
+        moduleCounts.users = `${querySnapshot.size} PROFILES`;
+        updateCoverLabels();
+        if (querySnapshot.empty) {
+          tableDiv.innerHTML = "<p style='text-align:center; color:var(--muted); padding:24px;'>ไม่พบข้อมูลผู้ใช้งาน</p>";
+          return;
+        }
+        const users = [];
+        querySnapshot.forEach(d => users.push({ id: d.id, ...d.data() }));
+        users.sort((a, b) => (b.updatedAt ? b.updatedAt.toMillis() : 0) - (a.updatedAt ? a.updatedAt.toMillis() : 0));
+
+        let html = `<table class="paper-table"><tr><th style="text-align:center;">รูปโปรไฟล์</th><th style="text-align:center;">รหัสประจำตัว (ID)</th><th>ชื่อแสดงผล</th><th style="text-align:center;">รหัสผ่านเข้าสู่ระบบ</th><th style="text-align:center;">เวลาแก้ชื่อล่าสุด</th></tr>`;
+        users.forEach(data => {
+          const picHtml = data.profilePic
+            ? `<img src="${data.profilePic}" style="width:42px; height:42px; border-radius:50%; object-fit:cover; border:1px solid var(--hairline); margin:0 auto; display:block;">`
+            : `<svg viewBox="0 0 24 24" width="36" height="36" fill="none" stroke="currentColor" stroke-width="1.2" style="color:var(--muted); margin:0 auto; display:block;"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>`;
+          const timeStr = data.lastNameChangeAt ? new Date(data.lastNameChangeAt.toDate()).toLocaleString('th-TH') : "-";
+          html += `<tr><td style="text-align:center;">${picHtml}</td><td style="text-align:center;"><b>${data.id}</b></td><td>${data.displayName || '-'}</td><td style="text-align:center;">${data.password ? `<span style="color:var(--vermilion); font-weight:700;">${data.password}</span>` : `<span style="color:var(--muted);">-</span>`}</td><td style="text-align:center; font-size:12px;">${timeStr}</td></tr>`;
+        });
+        html += "</table>";
+        tableDiv.innerHTML = html;
+      } catch (e) {
+        tableDiv.innerHTML = "<p style='color:var(--vermilion); text-align:center;'>การเรียกข้อมูลผู้ใช้งานล้มเหลว</p>";
+      }
+    };
+
+    /* --- REMINDERS --- */
+    window.loadReminders = async function() {
+      const div = document.getElementById("remindersTable");
+      const searchKeyword = document.getElementById("searchReminder").value.toLowerCase();
+      try {
+        const snap = await getDocs(collection(db, "reminders"));
+        allReminders = [];
+        snap.forEach(d => allReminders.push({ id: d.id, ...d.data() }));
+        moduleCounts.reminders = `${allReminders.length} REMINDERS`;
+        updateCoverLabels();
+
+        const filtered = allReminders
+          .filter(r => (r.title || "").toLowerCase().includes(searchKeyword) || (r.details || "").toLowerCase().includes(searchKeyword))
+          .sort((a, b) => new Date(a.startDate || a.date) - new Date(b.startDate || b.date));
+
+        if (filtered.length === 0) { div.innerHTML = "<p style='text-align:center; color:var(--muted); padding:24px;'>ไม่พบการแจ้งเตือน</p>"; return; }
+
+        let html = `<table class="paper-table"><tr><th>ชื่องาน / วันที่</th><th style="text-align:center;">ผู้ใช้เป้าหมาย</th><th style="text-align:center;">สถานะ</th><th style="text-align:center;">จัดการ</th></tr>`;
+        filtered.forEach(data => {
+          const safeData = encodeURIComponent(JSON.stringify(data));
+          const statusTxt = data.status === 'Complete' ? `<span style="color:var(--forest); font-weight:600;">สำเร็จแล้ว</span>` : `<span style="color:var(--vermilion); font-weight:600;">รอทำ</span>`;
+          let dateStr = data.startDate || data.date;
+          if (data.endDate && data.endDate !== dateStr) dateStr += ` ถึง ${data.endDate}`;
+          let timeStr = data.startTime ? (data.endTime ? `${data.startTime} - ${data.endTime}` : data.startTime) : '';
+          html += `<tr>
+            <td><b>${data.title}</b><br><small style="color:var(--muted);">${dateStr} ${timeStr}</small></td>
+            <td style="text-align:center;">${data.allowedUsers ? data.allowedUsers.length : 0} บัญชี</td>
+            <td style="text-align:center;">${statusTxt}</td>
+            <td style="text-align:center;">
+              <div style="display:flex; gap:6px; justify-content:center;">
+                <button type="button" class="lbl box" onclick="editReminder('${safeData}')">แก้ไข</button>
+                <button type="button" class="lbl box box-vermilion" onclick="deleteReminder('${data.id}')">ลบ</button>
+              </div>
+            </td>
+          </tr>`;
+        });
+        html += "</table>";
+        div.innerHTML = html;
+      } catch (e) { div.innerHTML = "<p style='color:var(--vermilion);'>ดึงข้อมูลล้มเหลว</p>"; }
+    };
+
+    window.saveReminder = async function() {
+      const editId = document.getElementById("editReminderId").value;
+      const title = document.getElementById("remTitle").value.trim();
+      const startDate = document.getElementById("remStartDate").value;
+      const endDate = document.getElementById("remEndDate").value || startDate;
+      const startTime = document.getElementById("remStartTime").value;
+      const endTime = document.getElementById("remEndTime").value;
+      const recurring = document.getElementById("remRecurring").value;
+      const location = document.getElementById("remLocation").value.trim();
+      const url = document.getElementById("remUrl").value.trim();
+      const details = document.getElementById("remDetails").value.trim();
+      const status = document.getElementById("remStatus").value;
+      const userList = document.getElementById("remAllowedUsers").value.split(/[\n,]+/).map(id => id.trim()).filter(id => id !== "");
+
+      if (!title || !startDate) return alert("กรุณาระบุชื่องานและวันที่เริ่มให้ครบถ้วน");
+      const payload = { title, startDate, endDate, date: startDate, startTime, endTime, recurring, location, url, details, status, allowedUsers: userList, updatedAt: serverTimestamp() };
+
+      try {
+        if (editId) {
+          const oldSnap = await getDoc(doc(db, "reminders", editId));
+          if (oldSnap.exists()) {
+            lastReminderAction = { type: 'modify', collection: 'reminders', id: editId, oldData: oldSnap.data() };
+            document.getElementById('btnUndoReminder').style.display = 'inline-flex';
+          }
+          await updateDoc(doc(db, "reminders", editId), payload);
+        } else {
+          payload.createdAt = serverTimestamp();
+          await addDoc(collection(db, "reminders"), payload);
+        }
+        cancelEditReminder();
+        loadReminders();
+      } catch (e) { alert("บันทึกล้มเหลว"); }
+    };
+
+    window.editReminder = function(encodedData) {
+      const data = JSON.parse(decodeURIComponent(encodedData));
+      document.getElementById("editReminderId").value = data.id;
+      document.getElementById("remTitle").value = data.title;
+      document.getElementById("remStartDate").value = data.startDate || data.date;
+      document.getElementById("remEndDate").value = data.endDate || data.date || "";
+      document.getElementById("remStartTime").value = data.startTime || "";
+      document.getElementById("remEndTime").value = data.endTime || "";
+      document.getElementById("remRecurring").value = data.recurring || "ไม่ทำประจำ";
+      document.getElementById("remLocation").value = data.location || "";
+      document.getElementById("remUrl").value = data.url || "";
+      document.getElementById("remDetails").value = data.details || "";
+      document.getElementById("remStatus").value = data.status || "Pending";
+      document.getElementById("remAllowedUsers").value = (data.allowedUsers || []).join(",\n");
+      document.getElementById("btnSaveReminder").innerText = "บันทึกการแก้ไข";
+      document.getElementById("btnCancelReminder").style.display = "inline-flex";
+    };
+
+    window.cancelEditReminder = function() {
+      ["editReminderId","remTitle","remStartDate","remEndDate","remStartTime","remEndTime","remLocation","remUrl","remDetails","remAllowedUsers"].forEach(id => { document.getElementById(id).value = ""; });
+      document.getElementById("remStatus").value = "Pending";
+      document.getElementById("btnSaveReminder").innerText = "สร้างการแจ้งเตือน";
+      document.getElementById("btnCancelReminder").style.display = "none";
+    };
+
+    window.deleteReminder = async function(id) {
+      if (!confirm("ยืนยันการลบการแจ้งเตือน?")) return;
+      try {
+        const oldSnap = await getDoc(doc(db, "reminders", id));
+        if (oldSnap.exists()) {
+          lastReminderAction = { type: 'delete', collection: 'reminders', id, oldData: oldSnap.data() };
+          document.getElementById('btnUndoReminder').style.display = 'inline-flex';
+        }
+        await deleteDoc(doc(db, "reminders", id));
+        loadReminders();
+      } catch (e) { alert("ลบการแจ้งเตือนล้มเหลว"); }
+    };
+
+    window.undoReminder = async function() {
+      if (!lastReminderAction) return;
+      try {
+        await setDoc(doc(db, "reminders", lastReminderAction.id), lastReminderAction.oldData);
+        lastReminderAction = null;
+        document.getElementById('btnUndoReminder').style.display = 'none';
+        loadReminders();
+        alert("เรียกคืนการกระทำสำเร็จแล้ว");
+      } catch (e) { alert("ย้อนกลับล้มเหลว"); }
+    };
+
+    /* --- SCHEDULES --- */
+    window.loadSchedules = async function() {
+      const div = document.getElementById("schedulesTable");
+      try {
+        const snap = await getDocs(collection(db, "schedules"));
+        allSchedules = [];
+        snap.forEach(d => allSchedules.push({ id: d.id, ...d.data() }));
+        moduleCounts.schedules = `${allSchedules.length} SCHEDULES`;
+        updateCoverLabels();
+        if (allSchedules.length === 0) { div.innerHTML = "<p style='text-align:center; color:var(--muted); padding:24px;'>ไม่มีข้อมูลตารางเรียน</p>"; return; }
+
+        let html = `<table class="paper-table"><tr><th>ชื่อตารางเรียน</th><th>รูปภาพ</th><th>กลุ่มผู้ใช้เป้าหมาย</th><th style="text-align:center;">จัดการ</th></tr>`;
+        allSchedules.forEach(data => {
+          const safeData = encodeURIComponent(JSON.stringify(data));
+          html += `<tr>
+            <td><b>${data.title || data.name || '-'}</b></td>
+            <td><img src="${data.imageUrl}" style="max-width:150px; max-height:80px; object-fit:cover; border:1px solid var(--hairline);"></td>
+            <td style="word-break:break-all; font-size:12px;">${data.allowedUsers ? data.allowedUsers.join(", ") : "-"}</td>
+            <td>
+              <div style="display:flex; gap:6px; justify-content:center;">
+                <button type="button" class="lbl box" onclick="editSchedule('${safeData}')">แก้ไข</button>
+                <button type="button" class="lbl box box-vermilion" onclick="deleteSchedule('${data.id}')">ลบ</button>
+              </div>
+            </td>
+          </tr>`;
+        });
+        html += "</table>";
+        div.innerHTML = html;
+      } catch (e) { div.innerHTML = "<p style='color:var(--vermilion);'>ดึงข้อมูลล้มเหลว</p>"; }
+    };
+
+    window.saveSchedule = async function() {
+      const editId = document.getElementById("editScheduleId").value;
+      const title = document.getElementById("schTitle").value.trim();
+      const imageUrl = document.getElementById("schImageUrl").value.trim();
+      const userList = document.getElementById("schAllowedUsers").value.split(/[\n,]+/).map(id => id.trim()).filter(id => id !== "");
+      if (!title || !imageUrl) return alert("กรุณาระบุชื่อและ URL รูปภาพตารางเรียน");
+      const payload = { title, imageUrl, allowedUsers: userList, updatedAt: serverTimestamp() };
+      try {
+        if (editId) await updateDoc(doc(db, "schedules", editId), payload);
+        else { payload.createdAt = serverTimestamp(); await addDoc(collection(db, "schedules"), payload); }
+        cancelEditSchedule();
+        loadSchedules();
+      } catch (e) { alert("บันทึกล้มเหลว"); }
+    };
+
+    window.editSchedule = function(encodedData) {
+      const data = JSON.parse(decodeURIComponent(encodedData));
+      document.getElementById("editScheduleId").value = data.id;
+      document.getElementById("schTitle").value = data.title || data.name || "";
+      document.getElementById("schImageUrl").value = data.imageUrl;
+      document.getElementById("schAllowedUsers").value = (data.allowedUsers || []).join(",\n");
+      document.getElementById("btnSaveSchedule").innerText = "บันทึกการแก้ไข";
+      document.getElementById("btnCancelSchedule").style.display = "inline-flex";
+    };
+
+    window.cancelEditSchedule = function() {
+      document.getElementById("editScheduleId").value = "";
+      document.getElementById("schTitle").value = "";
+      document.getElementById("schImageUrl").value = "";
+      document.getElementById("schAllowedUsers").value = "";
+      document.getElementById("btnSaveSchedule").innerText = "เพิ่มตารางเรียน";
+      document.getElementById("btnCancelSchedule").style.display = "none";
+    };
+
+    window.deleteSchedule = async function(id) {
+      if (!confirm("ยืนยันการลบตารางเรียน?")) return;
+      try { await deleteDoc(doc(db, "schedules", id)); loadSchedules(); } catch (e) { alert("ลบตารางเรียนล้มเหลว"); }
+    };
+
+    /* --- BANNERS --- */
+    window.loadBanners = async function() {
+      const div = document.getElementById("bannersTable");
+      div.innerHTML = "<p style='text-align:center; padding:24px;'>กำลังโหลดข้อมูลโฆษณา...</p>";
+      try {
+        const snap = await getDocs(collection(db, "banners"));
+        adminBanners = [];
+        snap.forEach(d => adminBanners.push({ id: d.id, ...d.data() }));
+        adminBanners.sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0));
+        moduleCounts.banners = `${adminBanners.length} BANNERS`;
+        updateCoverLabels();
+
+        if (adminBanners.length === 0) { div.innerHTML = "<p style='text-align:center; color:var(--muted); padding:24px;'>ไม่มีป้ายโฆษณาในระบบ</p>"; return; }
+        let html = `<table class="paper-table"><tr><th>รูปภาพ (Image)</th><th>ลิงก์ปลายทาง (Target URL)</th><th style="text-align:center;">จัดการ</th></tr>`;
+        adminBanners.forEach(data => {
+          const safeData = encodeURIComponent(JSON.stringify(data));
+          html += `<tr draggable="true" data-banner-id="${data.id}" ondragstart="bannerDragStart(event)" ondragover="bannerDragOver(event)" ondragenter="bannerDragEnter(event)" ondragleave="bannerDragLeave(event)" ondrop="bannerDrop(event, '${data.id}')" style="cursor:grab;">
+            <td><img src="${data.imageUrl}" style="max-width:160px; max-height:80px; object-fit:cover; border:1px solid var(--hairline);"></td>
+            <td style="word-break:break-all; font-size:12px;">${data.link || '-'}</td>
+            <td>
+              <div style="display:flex; gap:6px; justify-content:center;">
+                <button type="button" class="lbl box" onclick="editBanner('${safeData}')">แก้ไข</button>
+                <button type="button" class="lbl box box-vermilion" onclick="deleteBanner('${data.id}')">ลบ</button>
+              </div>
+            </td>
+          </tr>`;
+        });
+        html += "</table>";
+        div.innerHTML = html;
+      } catch (e) { div.innerHTML = "<p style='color:var(--vermilion); text-align:center;'>การเรียกข้อมูลโฆษณาล้มเหลว</p>"; }
+    };
+
+    window.bannerDragStart = function(e) {
+      e.dataTransfer.setData("text/plain", e.currentTarget.getAttribute("data-banner-id"));
+      e.currentTarget.style.opacity = "0.5";
+    };
+    window.bannerDragOver = function(e) { e.preventDefault(); };
+    window.bannerDragEnter = function(e) { e.currentTarget.style.background = "rgba(31,63,176,0.08)"; };
+    window.bannerDragLeave = function(e) { e.currentTarget.style.background = ""; };
+    window.bannerDrop = async function(e, targetId) {
+      e.preventDefault();
+      e.currentTarget.style.background = "";
+      const sourceId = e.dataTransfer.getData("text/plain");
+      if (sourceId === targetId) return;
+      const sourceIdx = adminBanners.findIndex(b => b.id === sourceId);
+      const targetIdx = adminBanners.findIndex(b => b.id === targetId);
+      const [movedItem] = adminBanners.splice(sourceIdx, 1);
+      adminBanners.splice(targetIdx, 0, movedItem);
+      const batch = writeBatch(db);
+      adminBanners.forEach((b, idx) => batch.update(doc(db, "banners", b.id), { sortOrder: idx }));
+      try { await batch.commit(); loadBanners(); } catch (err) { alert("เกิดข้อผิดพลาดในการจัดเรียงป้ายโฆษณา"); }
+    };
+
+    window.saveBanner = async function() {
+      const editId = document.getElementById("editBannerId").value;
+      const imageUrl = document.getElementById("bannerImageUrl").value.trim();
+      const linkUrl = document.getElementById("bannerLinkUrl").value.trim();
+      if (!imageUrl) return alert("กรุณาระบุ URL รูปภาพโฆษณา");
+      try {
+        if (editId) await updateDoc(doc(db, "banners", editId), { imageUrl, link: linkUrl, updatedAt: serverTimestamp() });
+        else await addDoc(collection(db, "banners"), { imageUrl, link: linkUrl, sortOrder: adminBanners.length, createdAt: serverTimestamp() });
+        cancelEditBanner();
+        loadBanners();
+      } catch (e) { alert("บันทึกป้ายโฆษณาล้มเหลว"); }
+    };
+
+    window.editBanner = function(encodedData) {
+      const data = JSON.parse(decodeURIComponent(encodedData));
+      document.getElementById("editBannerId").value = data.id;
+      document.getElementById("bannerImageUrl").value = data.imageUrl;
+      document.getElementById("bannerLinkUrl").value = data.link || "";
+      document.getElementById("btnSaveBanner").innerText = "บันทึกการแก้ไขโฆษณา";
+      document.getElementById("btnCancelBanner").style.display = "inline-flex";
+    };
+
+    window.cancelEditBanner = function() {
+      document.getElementById("editBannerId").value = "";
+      document.getElementById("bannerImageUrl").value = "";
+      document.getElementById("bannerLinkUrl").value = "";
+      document.getElementById("btnSaveBanner").innerText = "เพิ่มป้ายโฆษณา";
+      document.getElementById("btnCancelBanner").style.display = "none";
+    };
+
+    window.deleteBanner = async function(id) {
+      if (!confirm("ยืนยันการลบป้ายโฆษณานี้?")) return;
+      try { await deleteDoc(doc(db, "banners", id)); loadBanners(); } catch (e) { alert("ลบป้ายโฆษณาล้มเหลว"); }
+    };
+
+    /* --- JOBS / FILES / EXPLORER --- */
+    function cleanUrl(type, url) {
+      if (type === "youtube" && url.includes("watch?v=")) return `https://www.youtube.com/embed/${url.split("v=")[1].split("&")[0]}`;
+      if (type === "youtube" && url.includes("youtu.be/")) return `https://www.youtube.com/embed/${url.split("youtu.be/")[1].split("?")[0]}`;
+      if (type === "pdf" && url.includes("drive.google.com") && url.includes("/view")) return url.split("/view")[0] + "/preview";
+      return url;
+    }
+
+    window.loadJobs = async function() {
+      const explorerDiv = document.getElementById("adminFileExplorer");
+      explorerDiv.innerHTML = "<p style='text-align:center; padding:24px;'>กำลังโหลดข้อมูล...</p>";
+      try {
+        const querySnapshot = await getDocs(collection(db, "jobs"));
+        allJobsAdmin = [];
+        folderMeta = {};
+        let jobOptionsHtml = '<option value="">-- กรุณาเลือกระบบงาน หรือ โฟลเดอร์ --</option>';
+        let tableHtml = `<table class="paper-table"><tr><th>ชื่อรายการ / เส้นทางโฟลเดอร์</th><th style="text-align:center;">ประเภท</th><th style="text-align:center;">สิทธิ์การเข้าชมเบื้องต้น</th><th style="text-align:center;">การจัดการ</th></tr>`;
+
+        querySnapshot.forEach((docSnap) => {
+          const data = docSnap.data();
+          const path = (data.folder || "").trim().replace(/^\/+|\/+$/g, '');
+          if (data.type === "system_folder") {
+            folderMeta[path] = {
+              id: docSnap.id, color: data.color || 'blue', emoji: data.emoji || '',
+              password: data.password || '', isPaused: data.isPaused || false,
+              titleEN: data.titleEN || '', titleCN: data.titleCN || '',
+              updatedAt: data.updatedAt || data.createdAt || null
+            };
+          }
+          allJobsAdmin.push({ id: docSnap.id, normalizedPath: path, ...data });
+        });
+
+        moduleCounts.explorer = `${Object.keys(folderMeta).length} FOLDERS`;
+        moduleCounts.jobs = `${allJobsAdmin.length} ITEMS`;
+        moduleCounts.direct = `${allJobsAdmin.filter(j => j.type !== 'system_folder').length} TARGETS`;
+        moduleCounts.form = 'TH · EN · CN';
+        updateCoverLabels();
+
+        Object.keys(folderMeta).forEach(path => {
+          jobOptionsHtml += `<option value="FOLDER::${path}">📁 ให้สิทธิ์ทั้งโฟลเดอร์: ${path || 'หน้าหลัก'}</option>`;
+        });
+        allJobsAdmin.forEach(job => {
+          if (job.type !== "system_folder") jobOptionsHtml += `<option value="FILE::${job.id}">📄 ให้สิทธิ์ไฟล์เดียว: ${job.title}</option>`;
+        });
+
+        allJobsAdmin.forEach(job => {
+          const displayFolder = job.folder ? `📁 ${job.folder}` : "หน้าหลัก (ไม่ระบุโฟลเดอร์)";
+          const lockTxt = job.password ? ` ${icons.lock}` : "";
+          const pauseTxt = job.isPaused ? ` <span style="color:var(--muted); font-size:12px;">(กำลังพัก)</span>` : "";
+
+          if (job.type === "system_folder") {
+            const displayName = getLocalizedName(job.title, folderMeta[job.normalizedPath]);
+            tableHtml += `<tr>
+              <td><b>${displayName}</b>${lockTxt}${pauseTxt}<br><small style="color:var(--muted);">(แฟ้มข้อมูล / กำหนดสี)</small></td>
+              <td style="text-align:center;">โฟลเดอร์</td>
+              <td style="text-align:center; color:var(--muted);">-</td>
+              <td><div style="display:flex; justify-content:center;"><button type="button" class="lbl box box-vermilion" onclick="deleteJob('${job.id}')">ลบโฟลเดอร์</button></div></td>
+            </tr>`;
+          } else {
+            const userCount = job.allowedUsers ? job.allowedUsers.length : 0;
+            const displayName = getLocalizedFileTitle(job);
+            tableHtml += `<tr>
+              <td><b>${displayName}</b>${lockTxt}${pauseTxt}<br><small style="color:var(--muted);">${displayFolder}</small></td>
+              <td style="text-align:center;">${job.type}</td>
+              <td style="text-align:center; color:var(--forest); font-weight:700;">${userCount} บัญชี</td>
+              <td>
+                <div style="display:flex; gap:6px; justify-content:center;">
+                  <button type="button" class="lbl box" onclick="editJob('${job.id}')">แก้ไข</button>
+                  <button type="button" class="lbl box box-vermilion" onclick="deleteJob('${job.id}')">ลบ</button>
+                </div>
+              </td>
+            </tr>`;
+          }
+        });
+
+        tableHtml += "</table>";
+        if (querySnapshot.empty) tableHtml = "<p style='text-align:center; color:var(--muted); padding:24px;'>ไม่พบข้อมูลรายการในระบบ</p>";
+
+        document.getElementById("jobsTable").innerHTML = tableHtml;
+        document.getElementById("directJobSelect").innerHTML = jobOptionsHtml;
+        renderAdminExplorer();
+      } catch (error) {
+        explorerDiv.innerHTML = "<p style='color:var(--vermilion); text-align:center;'>การเรียกข้อมูลล้มเหลว</p>";
+      }
+    };
+
+    window.isLongPressing = false;
+    window.longPressTimer = null;
+    window.startFolderPress = function(e, encodedPath) {
+      if (e.type === 'mousedown' && e.button !== 0) return;
+      window.isLongPressing = false;
+      window.longPressTimer = setTimeout(() => {
+        window.isLongPressing = true;
+        openFolderSettings(decodeURIComponent(encodedPath));
+      }, 500);
+    };
+    window.cancelFolderPress = function() { clearTimeout(window.longPressTimer); };
+    window.handleFolderClick = function(e, encodedPath) {
+      if (window.isLongPressing) {
+        e.preventDefault(); e.stopPropagation(); window.isLongPressing = false; return;
+      }
+      openAdminFolder(encodedPath);
+    };
+    window.handleFolderContextMenu = function(e, encodedPath) {
+      e.preventDefault();
+      e.stopPropagation();
+      cancelFolderPress();
+      openFolderSettings(decodeURIComponent(encodedPath));
+    };
+
+    window.openFolderSettings = function(path) {
+      const folderName = path.split('/').pop();
+      const meta = folderMeta[path] || { color: 'blue', emoji: '', password: '', isPaused: false, titleEN: '', titleCN: '' };
+      document.getElementById("editFolderPath").value = path;
+      document.getElementById("editFolderName").value = folderName;
+      document.getElementById("editFolderNameEN").value = meta.titleEN || "";
+      document.getElementById("editFolderNameCN").value = meta.titleCN || "";
+      document.getElementById("editFolderEmoji").value = meta.emoji;
+      document.getElementById("editFolderPassword").value = meta.password || "";
+      document.getElementById("editFolderIsPaused").checked = meta.isPaused || false;
+      selectFolderColor(meta.color);
+      document.getElementById("folderSettingsModal").style.display = "flex";
+    };
+
+    window.closeFolderSettings = function() {
+      document.getElementById("folderSettingsModal").style.display = "none";
+    };
+
+    window.selectFolderColor = function(colorKey) {
+      window.selectedFolderColor = colorKey;
+      document.querySelectorAll('.color-circle').forEach(el => {
+        const active = el.getAttribute('data-color') === colorKey;
+        el.style.border = active ? '2.5px solid var(--ink)' : '2.5px solid transparent';
+        el.style.transform = active ? 'scale(1.15)' : 'scale(1)';
+      });
+      updateFolderPreview();
+    };
+
+    window.updateFolderPreview = function() {
+      const color = window.selectedFolderColor || 'blue';
+      const emoji = document.getElementById('editFolderEmoji').value;
+      document.getElementById('folderPreviewIcon').innerHTML = getFolderIcon(color, emoji);
+    };
+    document.getElementById('editFolderEmoji').addEventListener('input', updateFolderPreview);
+
+    window.saveFolderSettings = async function() {
+      const oldPath = document.getElementById("editFolderPath").value;
+      const newName = document.getElementById("editFolderName").value.trim();
+      const newNameEN = document.getElementById("editFolderNameEN").value.trim();
+      const newNameCN = document.getElementById("editFolderNameCN").value.trim();
+      const newColor = window.selectedFolderColor || 'blue';
+      const newEmoji = document.getElementById("editFolderEmoji").value.trim();
+      const newPassword = document.getElementById("editFolderPassword").value.trim();
+      const isPaused = document.getElementById("editFolderIsPaused").checked;
+
+      if (!newName) return alert("กรุณาระบุชื่อโฟลเดอร์ภาษาไทย (ใช้เป็นระบบหลัก)");
+      if (newName.includes("/")) return alert("ไม่อนุญาตให้ใช้เครื่องหมาย / ในชื่อโฟลเดอร์");
+
+      const pathParts = oldPath.split('/');
+      pathParts.pop();
+      const parentPath = pathParts.join('/');
+      const newPath = parentPath ? `${parentPath}/${newName}` : newName;
+
+      const batch = writeBatch(db);
+      if (oldPath !== newPath) {
+        allJobsAdmin.forEach(f => {
+          if (f.normalizedPath === oldPath && f.type !== 'system_folder') {
+            batch.update(doc(db, "jobs", f.id), { folder: newPath });
+          } else if (f.normalizedPath.startsWith(oldPath + "/")) {
+            batch.update(doc(db, "jobs", f.id), { folder: newPath + f.normalizedPath.substring(oldPath.length) });
+          }
+        });
+      }
+
+      const meta = folderMeta[oldPath];
+      if (meta && meta.id) {
+        batch.update(doc(db, "jobs", meta.id), {
+          title: `[Folder] ${newName}`, titleEN: newNameEN, titleCN: newNameCN,
+          folder: newPath, color: newColor, emoji: newEmoji, password: newPassword, isPaused,
+          updatedAt: serverTimestamp()
+        });
+      } else {
+        batch.set(doc(collection(db, "jobs")), {
+          title: `[Folder] ${newName}`, titleEN: newNameEN, titleCN: newNameCN,
+          folder: newPath, type: "system_folder", color: newColor, emoji: newEmoji,
+          password: newPassword, isPaused, allowedUsers: [], searchableUsers: [],
+          createdAt: serverTimestamp(), updatedAt: serverTimestamp()
+        });
+      }
+
+      try {
+        await batch.commit();
+        closeFolderSettings();
+        loadJobs();
+      } catch (e) { alert("เกิดข้อผิดพลาดในการบันทึกข้อมูลโฟลเดอร์"); }
+    };
+
+    window.renderAdminExplorer = function() {
+      const foldersInPath = new Set();
+      const filesInPath = [];
+      currentEmptyFolderMarkerId = null;
+
+      allJobsAdmin.forEach(file => {
+        const fp = file.normalizedPath;
+        if (fp === currentAdminPath) {
+          if (file.type === "system_folder") currentEmptyFolderMarkerId = file.id;
+          else filesInPath.push(file);
+        } else if (fp.startsWith(currentAdminPath ? currentAdminPath + "/" : "")) {
+          const rem = fp.substring(currentAdminPath ? currentAdminPath.length + 1 : 0);
+          const sub = rem.split('/')[0];
+          if (sub) foldersInPath.add(sub);
+        }
+      });
+
+      const btnDel = document.getElementById("btnDeleteEmptyFolder");
+      btnDel.style.display = (currentAdminPath !== "" && filesInPath.length === 0 && foldersInPath.size === 0 && currentEmptyFolderMarkerId) ? "inline-flex" : "none";
+
+      let html = `<div class="explorer-grid">`;
+      Array.from(foldersInPath).sort().forEach(folderName => {
+        const safeFolderName = encodeURIComponent(folderName);
+        const targetPath = currentAdminPath ? `${currentAdminPath}/${folderName}` : folderName;
+        const safeTarget = encodeURIComponent(targetPath);
+        const meta = folderMeta[targetPath] || { color: 'blue', emoji: '', password: '', isPaused: false, updatedAt: null };
+        const lockHtml = meta.password ? `<div style="font-size:11px; color:var(--vermilion); margin-top:4px; display:flex; align-items:center; gap:4px;">${icons.lock} ติดรหัสผ่าน</div>` : "";
+        const timeStr = formatTime(meta.updatedAt);
+        const iconDisplay = meta.isPaused
+          ? `<div class="loader-wrapper"><div class="z z-1">Z</div><div class="z z-2">Z</div><div class="z z-3">Z</div><div class="z z-4">Z</div></div>`
+          : getFolderIcon(meta.color, meta.emoji);
+
+        html += `<div class="explorer-card folder-target" data-target-folder="${targetPath}"
+          ondragover="handleDragOverFolder(event)" ondragleave="handleDragLeaveFolder(event)" ondrop="handleDropOnFolder(event)">
+          <div style="height:68px; display:flex; align-items:center; justify-content:center; margin-bottom:8px; cursor:pointer; width:100%;"
+               ontouchstart="startFolderPress(event, '${safeTarget}')" ontouchend="cancelFolderPress()"
+               onmousedown="startFolderPress(event, '${safeTarget}')" onmouseup="cancelFolderPress()" onmouseleave="cancelFolderPress()"
+               oncontextmenu="handleFolderContextMenu(event, '${safeTarget}')" onclick="handleFolderClick(event, '${safeFolderName}')">
+            ${iconDisplay}
+          </div>
+          <div style="font-size:13.5px; font-weight:600; text-align:center; word-break:break-word; cursor:pointer;"
+               ontouchstart="startFolderPress(event, '${safeTarget}')" ontouchend="cancelFolderPress()"
+               onmousedown="startFolderPress(event, '${safeTarget}')" onmouseup="cancelFolderPress()" onmouseleave="cancelFolderPress()"
+               oncontextmenu="handleFolderContextMenu(event, '${safeTarget}')" onclick="handleFolderClick(event, '${safeFolderName}')">
+            ${folderName}
+          </div>
+          <div style="font-size:11px; color:var(--muted); margin-top:4px; text-align:center;">${timeStr}</div>
+          ${lockHtml}
+          <button type="button" class="lbl" style="margin-top:10px; padding:4px 8px; font-size:9px; border:1px solid rgba(20,20,20,0.2); background:transparent; cursor:pointer;" onclick="openFolderSettings(decodeURIComponent('${safeTarget}'))">ตั้งค่าโฟลเดอร์</button>
+        </div>`;
+      });
+
+      filesInPath.forEach(file => {
+        let iconSvg = icons.pdf;
+        if (file.type === "youtube") iconSvg = icons.youtube;
+        else if (file.type === "image") iconSvg = icons.image;
+        else if (file.type === "link") iconSvg = icons.link;
+        else if (file.type === "text") iconSvg = icons.text;
+
+        const lockHtml = file.password ? `<div style="font-size:11px; color:var(--vermilion); margin-top:4px; display:flex; align-items:center; gap:4px;">${icons.lock} ติดรหัสผ่าน</div>` : "";
+        const timeStr = file.updatedAt ? formatTime(file.updatedAt) : (file.createdAt ? formatTime(file.createdAt) : "");
+        const iconDisplay = file.isPaused
+          ? `<div class="loader-wrapper"><div class="z z-1">Z</div><div class="z z-2">Z</div><div class="z z-3">Z</div><div class="z z-4">Z</div></div>`
+          : iconSvg;
+
+        html += `<div class="explorer-card" draggable="true" data-file-id="${file.id}" ondragstart="handleFileDragStart(event)" ondragend="handleFileDragEnd(event)">
+          <div style="height:68px; display:flex; align-items:center; justify-content:center; margin-bottom:8px; cursor:pointer; width:100%;" onclick="editJob('${file.id}')">${iconDisplay}</div>
+          <div style="font-size:13.5px; font-weight:500; text-align:center; word-break:break-word; cursor:pointer;" onclick="editJob('${file.id}')">${file.title}</div>
+          <div style="font-size:11px; color:var(--muted); margin-top:4px; text-align:center;">${timeStr}</div>
+          ${lockHtml}
+          <div style="display:flex; gap:6px; margin-top:12px;">
+            <button type="button" class="lbl box" onclick="editJob('${file.id}')">แก้ไข</button>
+            <button type="button" class="lbl box box-vermilion" onclick="deleteJob('${file.id}')">ลบ</button>
+          </div>
+        </div>`;
+      });
+
+      html += `</div>`;
+      if (foldersInPath.size === 0 && filesInPath.length === 0) {
+        html = "<p style='text-align:center; color:var(--muted); padding:36px;'>โฟลเดอร์ว่างเปล่า</p>";
+      }
+      document.getElementById("adminFileExplorer").innerHTML = html;
+
+      const navHeader = document.getElementById("adminNavHeader");
+      const pathTitleEl = document.getElementById("currentAdminPathTitle");
+      if (currentAdminPath === "") navHeader.style.display = "none";
+      else {
+        navHeader.style.display = "flex";
+        const parts = currentAdminPath.split('/');
+        pathTitleEl.innerText = `${parts[parts.length - 1]} (${currentAdminPath})`;
+      }
+    };
+
+    window.createNewFolder = async function() {
+      const folderName = prompt("ตั้งชื่อโฟลเดอร์ใหม่:");
+      if (!folderName || folderName.trim() === "") return;
+      if (folderName.includes("/")) return alert("ไม่อนุญาตให้ใช้เครื่องหมาย / ในชื่อโฟลเดอร์ใหม่ที่นี่");
+
+      const clean = folderName.trim();
+      const newPath = currentAdminPath ? `${currentAdminPath}/${clean}` : clean;
+      const exists = allJobsAdmin.some(f => f.normalizedPath === newPath || f.normalizedPath.startsWith(newPath + "/"));
+      if (exists) return alert("มีโฟลเดอร์ชื่อนี้อยู่แล้วในระบบ");
+
+      try {
+        await addDoc(collection(db, "jobs"), {
+          title: `[Folder] ${clean}`, titleEN: "", titleCN: "", folder: newPath,
+          type: "system_folder", color: "blue", emoji: "", password: "", isPaused: false,
+          url: "-", allowedUsers: [], searchableUsers: [], updatedAt: serverTimestamp()
+        });
+        loadJobs();
+      } catch (e) { alert("สร้างโฟลเดอร์ล้มเหลว กรุณาลองใหม่"); }
+    };
+
+    window.deleteCurrentEmptyFolder = async function() {
+      if (!currentEmptyFolderMarkerId) return;
+      if (confirm("ยืนยันการลบโฟลเดอร์ว่างเปล่านี้?")) {
+        try {
+          await deleteDoc(doc(db, "jobs", currentEmptyFolderMarkerId));
+          navigateAdminUp();
+          loadJobs();
+        } catch (e) { alert("การลบโฟลเดอร์ล้มเหลว"); }
+      }
+    };
+
+    window.handleFileDragStart = function(e) {
+      e.dataTransfer.setData("text/plain", e.currentTarget.getAttribute("data-file-id"));
+      e.dataTransfer.effectAllowed = "move";
+      e.currentTarget.classList.add("dragging-item");
+    };
+    window.handleFileDragEnd = function(e) { e.currentTarget.classList.remove("dragging-item"); };
+    window.handleDragOverFolder = function(e) { e.preventDefault(); e.stopPropagation(); e.currentTarget.classList.add("dragover-active"); };
+    window.handleDragLeaveFolder = function(e) { e.currentTarget.classList.remove("dragover-active"); };
+    window.handleDropOnFolder = async function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      e.currentTarget.classList.remove("dragover-active");
+      const fileId = e.dataTransfer.getData("text/plain");
+      const targetFolder = e.currentTarget.getAttribute("data-target-folder");
+      if (!fileId) return;
+      try {
+        await updateDoc(doc(db, "jobs", fileId), { folder: targetFolder, updatedAt: serverTimestamp() });
+        loadJobs();
+      } catch (err) { alert("ไม่สามารถลากย้ายไฟล์ระบบได้ในขณะนี้"); }
+    };
+
+    function setupExternalDragAndDrop() {
+      const zone = document.getElementById("explorerDropZone");
+      if (!zone || zone.dataset.bound === "1") return;
+      zone.dataset.bound = "1";
+      zone.addEventListener("dragover", e => { e.preventDefault(); zone.classList.add("dragover-active"); });
+      zone.addEventListener("dragleave", () => { zone.classList.remove("dragover-active"); });
+      zone.addEventListener("drop", e => {
+        e.preventDefault();
+        zone.classList.remove("dragover-active");
+        if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+          const droppedFile = e.dataTransfer.files[0];
+          cancelEdit();
+          document.getElementById("jobTitle").value = droppedFile.name.includes('.') ? droppedFile.name.substring(0, droppedFile.name.lastIndexOf('.')) : droppedFile.name;
+          document.getElementById("jobFolder").value = currentAdminPath;
+          if (droppedFile.type.includes("image")) document.getElementById("fileType").value = "image";
+          else if (droppedFile.type.includes("pdf")) document.getElementById("fileType").value = "pdf";
+          else document.getElementById("fileType").value = "link";
+          window.toggleInputType();
+          switchWorkingPage('form');
+          alert(`เตรียมบันทึกอัปโหลดไฟล์: "${droppedFile.name}" เข้าสู่โฟลเดอร์ "${currentAdminPath || 'หน้าหลัก'}" แล้ว! กรุณาใส่ URL ข้อมูลลิงก์และบันทึกระบบงาน`);
+        }
+      });
+    }
+
+    window.openAdminFolder = function(encodedFolderName) {
+      const folderName = decodeURIComponent(encodedFolderName);
+      currentAdminPath = currentAdminPath === "" ? folderName : `${currentAdminPath}/${folderName}`;
+      renderAdminExplorer();
+    };
+
+    window.navigateAdminUp = function() {
+      if (currentAdminPath === "") return;
+      const parts = currentAdminPath.split('/');
+      parts.pop();
+      currentAdminPath = parts.join('/');
+      renderAdminExplorer();
+    };
+
+    window.addNewJobHere = function() {
+      cancelEdit();
+      document.getElementById("jobFolder").value = currentAdminPath;
+      switchWorkingPage('form');
+    };
+
+    window.saveJob = async function() {
+      const editId = document.getElementById("editJobId").value;
+      const title = document.getElementById("jobTitle").value.trim();
+      const titleEN = document.getElementById("jobTitleEN").value.trim();
+      const titleCN = document.getElementById("jobTitleCN").value.trim();
+      const folder = document.getElementById("jobFolder").value.trim() || "";
+      const type = document.getElementById("fileType").value;
+      let url = document.getElementById("fileUrl").value.trim();
+      let textContent = "";
+
+      if (type === "text") {
+        textContent = (window.tinymce && tinymce.get('editor-container'))
+          ? tinymce.get('editor-container').getContent()
+          : document.getElementById("editor-container").value;
+        url = "-";
+      }
+
+      const rawUsers = document.getElementById("allowedUsers").value;
+      const showWatermark = document.getElementById("showWatermark").value === "true";
+      const password = document.getElementById("jobPassword").value.trim();
+      const isPaused = document.getElementById("jobIsPaused").checked;
+      const statusText = document.getElementById("status");
+
+      if (!title || (!url && type !== "text")) {
+        statusText.innerText = "กรุณาระบุข้อมูลไฟล์และลิงก์/ข้อความให้ครบถ้วน";
+        statusText.style.color = "var(--vermilion)";
+        return;
+      }
+
+      const userList = rawUsers.split(/[\n,]+/).map(id => id.trim()).filter(id => id !== "");
+      const searchList = userList.map(id => id.replace(/[\s"']/g, '').toLowerCase());
+      url = cleanUrl(type, url);
+
+      statusText.innerText = "ระบบกำลังบันทึกข้อมูล...";
+      statusText.style.color = "var(--cobalt)";
+
+      try {
+        const jobData = {
+          title, titleEN, titleCN, folder, type, url, textContent,
+          allowedUsers: userList, searchableUsers: searchList,
+          showWatermark, password, isPaused, updatedAt: serverTimestamp()
+        };
+        if (editId) {
+          await setDoc(doc(db, "jobs", editId), jobData, { merge: true });
+          statusText.innerText = "ปรับปรุงข้อมูลสำเร็จ";
+        } else {
+          jobData.createdAt = serverTimestamp();
+          await addDoc(collection(db, "jobs"), jobData);
+          statusText.innerText = "สร้างข้อมูลระบบงานสำเร็จ";
+        }
+        statusText.style.color = "var(--forest)";
+        cancelEdit();
+        loadJobs();
+      } catch (error) {
+        statusText.innerText = "เกิดข้อผิดพลาดในการบันทึกข้อมูล";
+        statusText.style.color = "var(--vermilion)";
+      }
+    };
+
+    window.editJob = function(jobId) {
+      const data = allJobsAdmin.find(j => j.id === jobId);
+      if (!data) return;
+
+      document.getElementById("formTitle").innerText = "แก้ไขข้อมูลและสิทธิ์ระบบงาน";
+      document.getElementById("editJobId").value = data.id;
+      document.getElementById("jobTitle").value = data.title;
+      document.getElementById("jobTitleEN").value = data.titleEN || "";
+      document.getElementById("jobTitleCN").value = data.titleCN || "";
+      document.getElementById("jobFolder").value = data.folder || "";
+      document.getElementById("fileType").value = data.type;
+
+      if (data.type === "text") {
+        if (window.tinymce && tinymce.get('editor-container')) tinymce.get('editor-container').setContent(data.textContent || "");
+        else document.getElementById("editor-container").value = data.textContent || "";
+        document.getElementById("fileUrl").value = "";
+      } else {
+        document.getElementById("fileUrl").value = data.url || "";
+        if (window.tinymce && tinymce.get('editor-container')) tinymce.get('editor-container').setContent("");
+      }
+      window.toggleInputType();
+
+      document.getElementById("allowedUsers").value = (data.allowedUsers || []).join(",\n");
+      document.getElementById("showWatermark").value = data.showWatermark !== false ? "true" : "false";
+      document.getElementById("jobPassword").value = data.password || "";
+      document.getElementById("jobIsPaused").checked = data.isPaused || false;
+      document.getElementById("btnSave").innerText = "บันทึกการแก้ไข";
+      document.getElementById("btnSave").classList.add("is-edit");
+      document.getElementById("btnCancel").style.display = "inline-flex";
+      document.getElementById("status").innerText = "";
+
+      switchWorkingPage('form');
+    };
+
+    window.cancelEdit = function() {
+      document.getElementById("formTitle").innerText = "เพิ่มรายการเข้าสู่ระบบ";
+      ["editJobId","jobTitle","jobTitleEN","jobTitleCN","jobFolder","fileUrl","allowedUsers","jobPassword"].forEach(id => { document.getElementById(id).value = ""; });
+      if (window.tinymce && tinymce.get('editor-container')) tinymce.get('editor-container').setContent("");
+      document.getElementById("fileType").value = "youtube";
+      window.toggleInputType();
+      document.getElementById("showWatermark").value = "true";
+      document.getElementById("jobIsPaused").checked = false;
+      document.getElementById("btnSave").innerText = "บันทึกข้อมูลระบบงาน";
+      document.getElementById("btnSave").classList.remove("is-edit");
+      document.getElementById("btnCancel").style.display = "none";
+      document.getElementById("status").innerText = "";
+    };
+
+    window.deleteJob = async function(id) {
+      if (!confirm("ยืนยันการลบรายการนี้? (บัญชีทั้งหมดจะถูกตัดสิทธิ์จากรายการนี้ทันที)")) return;
+      try {
+        const job = allJobsAdmin.find(j => j.id === id);
+        await deleteDoc(doc(db, "jobs", id));
+        if (job && job.url && job.url.includes("jpejixrqjszqizmwipju.supabase.co")) {
+          try {
+            const SUPABASE_URL = "https://jpejixrqjszqizmwipju.supabase.co";
+            const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpwZWppeHJxanN6cWl6bXdpcGp1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkwNDQwOTAsImV4cCI6MjEwNDYyMDA5MH0.4C4ZIq1J4TO-oaJt9qouFXmqAau1jSzzREFaQNr0q1E";
+            const SUPABASE_BUCKET = "quick_docs";
+            const pathMatch = job.url.split(`/public/${SUPABASE_BUCKET}/`);
+            if (pathMatch && pathMatch[1]) {
+              await fetch(`${SUPABASE_URL}/storage/v1/object/${SUPABASE_BUCKET}`, {
+                method: 'DELETE',
+                headers: { 'Authorization': `Bearer ${SUPABASE_ANON_KEY}`, 'apikey': SUPABASE_ANON_KEY, 'Content-Type': 'application/json' },
+                body: JSON.stringify({ prefixes: [decodeURIComponent(pathMatch[1])] })
+              });
+            }
+          } catch (err) { console.warn("ไม่สามารถลบไฟล์จริงใน Supabase ได้: ", err); }
+        }
+        loadJobs();
+      } catch (e) { alert("การลบข้อมูลล้มเหลว"); }
+    };
+
+    /* --- REQUESTS & BADGES --- */
+    window.updateRequestBadge = function(count) {
+      const badge = document.getElementById("requestBadge");
+      const countEl = document.getElementById("requestBadgeCount");
+      const shelfBell = document.getElementById("shelfRequestBell");
+      const shelfBellCount = document.getElementById("shelfBellCount");
+      const sheetBell = document.getElementById("sheetBellBtn");
+      const sheetBellCount = document.getElementById("sheetBellCount");
+      const spineBadge = document.querySelector('.spine-pending-badge[data-mod="requests"]');
+
+      if (count > 0) {
+        if (badge && countEl) { badge.style.display = "inline-flex"; countEl.innerText = `${count} คำขอใหม่รอตรวจสอบ`; }
+        if (shelfBell && shelfBellCount) { shelfBell.style.display = "inline-flex"; shelfBellCount.innerText = String(count); }
+        if (sheetBell && sheetBellCount) { sheetBell.style.display = "inline-flex"; sheetBellCount.innerText = String(count); }
+        document.querySelectorAll('.spine-pending-badge[data-mod="requests"]').forEach(b => { b.style.display = "inline-block"; b.innerText = String(count); });
+      } else {
+        if (badge) badge.style.display = "none";
+        if (shelfBell) shelfBell.style.display = "none";
+        if (sheetBell) sheetBell.style.display = "none";
+        if (spineBadge) document.querySelectorAll('.spine-pending-badge[data-mod="requests"]').forEach(b => { b.style.display = "none"; });
+      }
+    };
+
+    window.loadRequests = async function() {
+      const tableDiv = document.getElementById("requestsTable");
+      tableDiv.innerHTML = "<p style='text-align:center; padding:24px;'>กำลังโหลดข้อมูลคำขอ...</p>";
+      try {
+        const querySnapshot = await getDocs(collection(db, "download_requests"));
+        let pendingCount = 0;
+        if (querySnapshot.empty) {
+          moduleCounts.requests = "0 REQUESTS";
+          updateCoverLabels();
+          tableDiv.innerHTML = "<p style='text-align:center; color:var(--muted); padding:24px;'>ไม่พบข้อมูลคำขอในระบบ</p>";
+          window.updateRequestBadge(0);
+          return;
+        }
+        let html = `<table class="paper-table"><tr><th style="text-align:center;">รหัสผู้รับสิทธิ์</th><th>ชื่อรายการ</th><th style="text-align:center;">สถานะปัจจุบัน</th><th style="text-align:center;">การจัดการ</th></tr>`;
+        querySnapshot.forEach(docSnap => {
+          const id = docSnap.id;
+          const data = docSnap.data();
+          if (data.status === "pending") pendingCount++;
+          let badge = "";
+          if (data.status === "pending") badge = `<span style="color:var(--ochre); font-weight:600;">รอการตรวจสอบ</span>`;
+          else if (data.status === "approved") {
+            badge = `<span style="color:var(--forest); font-weight:600;">อนุมัติการเข้าถึง</span>`;
+            badge += data.expiresAt ? `<br><small style="color:var(--muted);">หมดเขต: ${data.expiresAt.toDate().toLocaleString('th-TH')}</small>` : `<br><small style="color:var(--muted);">ไม่มีวันหมดอายุ</small>`;
+          } else if (data.status === "rejected") badge = `<span style="color:var(--vermilion); font-weight:600;">ปฏิเสธการเข้าถึง</span>`;
+
+          html += `<tr>
+            <td style="text-align:center;"><b>${data.studentId}</b></td>
+            <td>${data.jobTitle || '-'}</td>
+            <td style="text-align:center;">${badge}</td>
+            <td>
+              <div style="display:flex; gap:6px; justify-content:center; flex-wrap:wrap;">
+                ${data.status !== 'approved'
+                  ? `<button type="button" class="lbl box box-forest" onclick="updateRequestStatus('${id}', 'approved')">อนุมัติ</button>`
+                  : `<button type="button" class="lbl box" onclick="editExpirationTime('${id}')">แก้เวลา</button>`}
+                ${data.status !== 'rejected' ? `<button type="button" class="lbl box box-cobalt" onclick="updateRequestStatus('${id}', 'rejected')">ปฏิเสธ</button>` : ''}
+                <button type="button" class="lbl box box-vermilion" onclick="deleteRequest('${id}')">ลบ</button>
+              </div>
+            </td>
+          </tr>`;
+        });
+        html += "</table>";
+        tableDiv.innerHTML = html;
+        moduleCounts.requests = pendingCount > 0 ? `${pendingCount} PENDING` : `${querySnapshot.size} REQUESTS`;
+        updateCoverLabels();
+        window.updateRequestBadge(pendingCount);
+      } catch (e) { tableDiv.innerHTML = "<p style='color:var(--vermilion); text-align:center;'>การเรียกข้อมูลล้มเหลว</p>"; }
+    };
+
+    window.deleteRequest = async function(reqId) {
+      if (!confirm("ยืนยันการลบคำขอนี้ออกจากระบบ?")) return;
+      try { await deleteDoc(doc(db, "download_requests", reqId)); loadRequests(); } catch (e) { alert("การลบข้อมูลล้มเหลว"); }
+    };
+
+    window.updateRequestStatus = async function(reqId, newStatus) {
+      try {
+        const updateData = { status: newStatus, updatedAt: serverTimestamp() };
+        if (newStatus === 'approved') {
+          const timeSelection = await requestTimeSelection();
+          if (!timeSelection) return;
+          updateData.expiresAt = timeSelection.unlimited ? null : timeSelection.date;
+        }
+        await updateDoc(doc(db, "download_requests", reqId), updateData);
+        loadRequests();
+      } catch (e) { alert("เกิดข้อผิดพลาดในการบันทึกข้อมูล"); }
+    };
+
+    window.editExpirationTime = async function(reqId) {
+      const timeSelection = await requestTimeSelection();
+      if (!timeSelection) return;
+      try {
+        await updateDoc(doc(db, "download_requests", reqId), {
+          updatedAt: serverTimestamp(),
+          expiresAt: timeSelection.unlimited ? null : timeSelection.date
+        });
+        alert("ปรับปรุงข้อมูลเวลาสำเร็จ");
+        loadRequests();
+      } catch (e) { alert("เกิดข้อผิดพลาดในการบันทึกข้อมูล"); }
+    };
+
+    window.grantDirectDownload = async function() {
+      const selectedVal = document.getElementById("directJobSelect").value;
+      const studentIdsText = document.getElementById("directStudentId").value.trim();
+      if (!selectedVal || !studentIdsText) return alert("กรุณาระบุข้อมูลรายการและรหัสผู้รับสิทธิ์ให้ครบถ้วน");
+
+      const timeSelection = await requestTimeSelection();
+      if (!timeSelection) return;
+
+      const students = studentIdsText.split(/[\n,]+/).map(s => s.trim()).filter(Boolean);
+      const jobsToGrant = [];
+      if (selectedVal.startsWith("FOLDER::")) {
+        const folderPath = selectedVal.split("FOLDER::")[1];
+        allJobsAdmin.forEach(job => {
+          if (job.type !== "system_folder" && (folderPath === "" || job.normalizedPath === folderPath || job.normalizedPath.startsWith(folderPath + "/"))) {
+            jobsToGrant.push(job);
+          }
+        });
+      } else if (selectedVal.startsWith("FILE::")) {
+        const job = allJobsAdmin.find(j => j.id === selectedVal.split("FILE::")[1]);
+        if (job) jobsToGrant.push(job);
+      }
+
+      if (jobsToGrant.length === 0) return alert("ไม่พบไฟล์ในโฟลเดอร์ที่เลือก หรือไม่พบข้อมูล");
+      try {
+        const batch = writeBatch(db);
+        jobsToGrant.forEach(job => {
+          students.forEach(studentId => {
+            batch.set(doc(db, "download_requests", `${job.id}_${studentId}`), {
+              jobId: job.id, jobTitle: job.title, studentId, status: "approved",
+              expiresAt: timeSelection.unlimited ? null : timeSelection.date,
+              updatedAt: serverTimestamp()
+            });
+          });
+        });
+        await batch.commit();
+        alert(`ดำเนินการอนุมัติสิทธิ์สำเร็จ ให้กับ ${students.length} ผู้ใช้ และจำนวน ${jobsToGrant.length} ไฟล์แล้ว!`);
+        document.getElementById("directStudentId").value = "";
+        loadRequests();
+      } catch (e) { alert("เกิดข้อผิดพลาดในการประมวลผลการให้สิทธิ์"); }
+    };
+
+    /* --- DOWNLOAD HISTORY --- */
+    window.loadHistory = async function() {
+      const tableDiv = document.getElementById("historyTable");
+      tableDiv.innerHTML = "<p style='text-align:center; padding:24px;'>กำลังโหลดข้อมูลประวัติ...</p>";
+      try {
+        const querySnapshot = await getDocs(collection(db, "download_history"));
+        moduleCounts.history = `${querySnapshot.size} RECORDS`;
+        updateCoverLabels();
+        if (querySnapshot.empty) { tableDiv.innerHTML = "<p style='text-align:center; color:var(--muted); padding:24px;'>ไม่พบข้อมูลประวัติการดาวน์โหลด</p>"; return; }
+        const histories = [];
+        querySnapshot.forEach(d => histories.push({ id: d.id, ...d.data() }));
+        histories.sort((a, b) => (b.downloadedAt ? b.downloadedAt.toMillis() : 0) - (a.downloadedAt ? a.downloadedAt.toMillis() : 0));
+        let html = `<table class="paper-table"><tr><th style="text-align:center;">รหัสบัญชี</th><th>ข้อมูลรายการที่เข้าถึง</th><th style="text-align:center;">วัน / เวลาทำการ</th></tr>`;
+        histories.forEach(data => {
+          const dateStr = data.downloadedAt ? data.downloadedAt.toDate().toLocaleString('th-TH') : "-";
+          html += `<tr><td style="text-align:center;"><b>${data.studentId || '-'}</b></td><td>${data.jobTitle || '-'}</td><td style="text-align:center; font-size:12px;">${dateStr}</td></tr>`;
+        });
+        html += "</table>";
+        tableDiv.innerHTML = html;
+      } catch (e) { tableDiv.innerHTML = "<p style='color:var(--vermilion); text-align:center;'>การเรียกข้อมูลประวัติล้มเหลว</p>"; }
+    };
+
+    /* --- ACCESS LOGS --- */
+    window.loadAccessLogs = async function() {
+      const tableDiv = document.getElementById("accessLogsTable");
+      tableDiv.innerHTML = "<p style='text-align:center; padding:24px;'>กำลังโหลดข้อมูลสถิติ...</p>";
+      try {
+        const querySnapshot = await getDocs(collection(db, "access_logs"));
+        moduleCounts.accesslogs = `${querySnapshot.size} LOGS`;
+        updateCoverLabels();
+        if (querySnapshot.empty) { tableDiv.innerHTML = "<p style='text-align:center; color:var(--muted); padding:24px;'>ไม่พบข้อมูลสถิติการเข้าสู่ระบบ</p>"; return; }
+        const logs = [];
+        querySnapshot.forEach(d => logs.push({ id: d.id, ...d.data() }));
+        logs.sort((a, b) => (b.loginTime ? b.loginTime.toMillis() : 0) - (a.loginTime ? a.loginTime.toMillis() : 0));
+
+        window.groupedLogs = {};
+        logs.forEach(log => {
+          const sId = log.studentId || 'ไม่ระบุ';
+          if (!window.groupedLogs[sId]) window.groupedLogs[sId] = [];
+          window.groupedLogs[sId].push(log);
+        });
+
+        let html = `<table class="paper-table"><tr><th style="text-align:center;">รหัสบัญชี</th><th style="text-align:center;">จำนวนครั้ง</th><th style="text-align:center;">เข้าสู่ระบบล่าสุด</th><th style="text-align:center;">จัดการ</th></tr>`;
+        for (const [sId, userLogs] of Object.entries(window.groupedLogs)) {
+          const lastLoginStr = userLogs[0].loginTime ? userLogs[0].loginTime.toDate().toLocaleString('th-TH') : "-";
+          html += `<tr>
+            <td style="text-align:center;"><b>${sId}</b></td>
+            <td style="text-align:center; color:var(--cobalt); font-weight:700;">${userLogs.length} ครั้ง</td>
+            <td style="text-align:center; font-size:12px;">${lastLoginStr}</td>
+            <td style="text-align:center;"><button type="button" class="lbl box box-cobalt" onclick="viewUserLogs('${sId}')">ดูประวัติ</button></td>
+          </tr>`;
+        }
+        html += "</table>";
+        tableDiv.innerHTML = html;
+      } catch (e) { tableDiv.innerHTML = "<p style='color:var(--vermilion); text-align:center;'>การเรียกข้อมูลสถิติล้มเหลว</p>"; }
+    };
+
+    window.viewUserLogs = function(sId) {
+      const logs = window.groupedLogs[sId] || [];
+      document.getElementById('userLogsModalTitle').innerText = `ประวัติของ: ${sId}`;
+      let html = `<table class="paper-table" style="min-width:420px;"><tr><th>เวลาเข้าสู่ระบบ</th><th>เวลาออกจากระบบ</th></tr>`;
+      logs.forEach(data => {
+        const loginStr = data.loginTime ? data.loginTime.toDate().toLocaleString('th-TH') : "-";
+        const logoutStr = data.logoutTime ? data.logoutTime.toDate().toLocaleString('th-TH') : "ยังไม่ออกจากระบบ / ปิดเบราว์เซอร์";
+        html += `<tr><td>${loginStr}</td><td style="color:${data.logoutTime ? 'var(--ink)' : 'var(--ochre)'};">${logoutStr}</td></tr>`;
+      });
+      html += "</table>";
+      document.getElementById('userLogsModalContent').innerHTML = html;
+      document.getElementById('userLogsModal').style.display = 'flex';
+    };
+
+    window.closeUserLogsModal = function() {
+      document.getElementById('userLogsModal').style.display = 'none';
+    };
+
+    /* --- COOKIE STATS --- */
+    window.loadCookieStats = async function() {
+      const tableDiv = document.getElementById("cookieStatsTable");
+      tableDiv.innerHTML = "<p style='text-align:center; padding:24px;'>กำลังโหลดข้อมูลสถิติจากคุกกี้...</p>";
+      try {
+        const querySnapshot = await getDocs(collection(db, "cookie_stats"));
+        if (querySnapshot.empty) {
+          moduleCounts.cookies = "0 CONSENTS";
+          updateCoverLabels();
+          tableDiv.innerHTML = "<p style='text-align:center; color:var(--muted); padding:24px;'>ไม่พบข้อมูลสถิติและการยินยอมคุกกี้ในระบบ</p>";
+          return;
+        }
+
+        const uniqueUsersMap = new Map();
+        querySnapshot.forEach(d => {
+          const data = d.data();
+          const key = (data.userId && data.userId !== '-') ? data.userId : (data.deviceId || d.id);
+          uniqueUsersMap.set(key, { id: d.id, ...data });
+        });
+        const stats = Array.from(uniqueUsersMap.values());
+        moduleCounts.cookies = `${stats.length} CONSENTS`;
+        updateCoverLabels();
+
+        let countFunctional = 0, countAnalytics = 0, countMarketing = 0;
+        let html = `<table class="paper-table"><tr><th style="text-align:center;">รหัสบัญชี / อุปกรณ์ (ไม่ซ้ำ)</th><th style="text-align:center;">Functional (ล็อกอิน/ภาษา)</th><th style="text-align:center;">Analytics (การใช้งานหน้าเว็บ)</th><th style="text-align:center;">Marketing (ความสนใจโฆษณา)</th></tr>`;
+        stats.forEach(data => {
+          if (data.functionalData === 'ยอมรับ') countFunctional++;
+          if (data.analyticsData === 'ยอมรับ') countAnalytics++;
+          if (data.marketingData === 'ยอมรับ') countMarketing++;
+          html += `<tr>
+            <td style="text-align:center;"><b>${data.userId || data.deviceId || '-'}</b></td>
+            <td style="text-align:center; color:var(--cobalt); font-weight:600;">${data.functionalData || '-'}</td>
+            <td style="text-align:center; color:var(--forest); font-weight:600;">${data.analyticsData || '-'}</td>
+            <td style="text-align:center; color:var(--vermilion); font-weight:600;">${data.marketingData || '-'}</td>
+          </tr>`;
+        });
+        html += "</table>";
+        tableDiv.innerHTML = html;
+
+        const ctx = document.getElementById('cookieChart');
+        if (ctx && window.Chart) {
+          if (window.cookieChartInstance) window.cookieChartInstance.destroy();
+          window.cookieChartInstance = new Chart(ctx, {
+            type: 'bar',
+            data: {
+              labels: ['Functional', 'Analytics', 'Marketing'],
+              datasets: [{
+                label: 'จำนวนผู้ใช้ที่ยินยอม (คน)',
+                data: [countFunctional, countAnalytics, countMarketing],
+                backgroundColor: ['rgba(31,63,176,0.78)', 'rgba(31,91,66,0.78)', 'rgba(184,51,42,0.78)'],
+                borderColor: ['#1F3FB0', '#1F5B42', '#B8332A'],
+                borderWidth: 1,
+                borderRadius: 2
+              }]
+            },
+            options: {
+              responsive: true,
+              scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } },
+              plugins: {
+                legend: { display: false },
+                title: { display: true, text: 'แผนภูมิแท่งแสดงจำนวนความยินยอมแยกตามหมวดหมู่ (คน)', font: { family: "'Sarabun', sans-serif", size: 14 } }
+              }
+            }
+          });
+        }
+      } catch (e) { tableDiv.innerHTML = "<p style='color:var(--vermilion); text-align:center;'>การเรียกข้อมูลสถิติคุกกี้ล้มเหลว</p>"; }
+    };
+
+    /* --- DISCORD QUERY ACTIONS --- */
+    window.processDiscordActions = async function() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const action = urlParams.get('action');
+      const reqId = urlParams.get('reqId');
+      const durationParam = urlParams.get('duration');
+      if (!action || !reqId) return;
+
+      if (action === 'approve') {
+        let duration = 72;
+        if (durationParam === 'custom') {
+          const hours = prompt("ระบุเวลาการเข้าถึง (ชั่วโมง)\n(เช่น: 24 = 1 วัน, 72 = 3 วัน, 0 = ไม่จำกัดเวลา):", "24");
+          if (hours === null) return;
+          duration = parseInt(hours, 10);
+          if (isNaN(duration) || duration < 0) return alert("กรุณาระบุตัวเลขที่ถูกต้อง");
+        } else if (durationParam !== null) {
+          duration = parseInt(durationParam, 10);
+        }
+        const confirmMsg = duration === 0 ? "ไม่จำกัดเวลา" : `${duration} ชั่วโมง`;
+        if (confirm(`คุณต้องการอนุมัติคำขอสิทธิ์นี้แบบ "${confirmMsg}" ใช่หรือไม่?`)) {
+          try {
+            const updateData = { status: "approved", updatedAt: serverTimestamp(), expiresAt: null };
+            if (duration > 0) {
+              const expireDate = new Date();
+              expireDate.setHours(expireDate.getHours() + duration);
+              updateData.expiresAt = expireDate;
+            }
+            await updateDoc(doc(db, "download_requests", reqId), updateData);
+            alert("✅ อนุมัติสิทธิ์สำเร็จแล้ว!");
+          } catch (e) { alert("เกิดข้อผิดพลาดในการอนุมัติ"); }
+        }
+      } else if (action === 'reject') {
+        if (confirm("คุณต้องการปฏิเสธคำขอสิทธิ์นี้ ใช่หรือไม่?")) {
+          try {
+            await updateDoc(doc(db, "download_requests", reqId), { status: "rejected", updatedAt: serverTimestamp() });
+            alert("❌ ปฏิเสธคำขอเรียบร้อยแล้ว!");
+          } catch (e) { alert("เกิดข้อผิดพลาดในการปฏิเสธ"); }
+        }
+      } else if (action === 'delete') {
+        if (confirm("คุณต้องการลบคำขอนี้ทิ้ง ใช่หรือไม่?")) {
+          try {
+            await deleteDoc(doc(db, "download_requests", reqId));
+            alert("🗑️ ลบคำขอออกจากระบบแล้ว!");
+          } catch (e) { alert("เกิดข้อผิดพลาดในการลบ"); }
+        }
+      }
+
+      window.history.replaceState({}, document.title, window.location.pathname);
+      loadRequests();
+    };
+
+    /* ==========================================
+       5. EVENT LISTENERS & INIT
+       ========================================== */
+    document.addEventListener('DOMContentLoaded', () => {
+      if (window.matchMedia('(pointer: fine)').matches) {
+        document.documentElement.classList.add('custom-cursor-active');
+      }
+
+      buildShelfDom();
+      measureDims();
+      window.addEventListener('resize', measureDims);
+
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          jumpToShelfModule(btn.getAttribute('data-target'));
+        });
+      });
+
+      const shelfSection = document.getElementById('shelfSection');
+      shelfSection.addEventListener('pointerdown', e => {
+        if (isSheetOpen) return;
+        dragStartX = e.clientX;
+        dragStartT = TPos;
+        dragging = false;
+        suppressClick = false;
+      });
+      window.addEventListener('pointermove', e => {
+        pointer.mx = e.clientX;
+        pointer.my = e.clientY;
+        if (isSheetOpen) {
+          const el = document.elementFromPoint(e.clientX, e.clientY);
+          cursorMode = (el && el.closest('button, a')) ? 'btn' : 'default';
+          return;
+        }
+        if (e.buttons === 1) {
+          const dx = e.clientX - dragStartX;
+          if (!dragging && Math.abs(dx) > 5) { dragging = true; suppressClick = true; }
+          if (dragging) TPos = dragStartT - dx / Math.max(20, dims.ws + dims.gap);
+        }
+      });
+      window.addEventListener('pointerup', () => {
+        if (dragging) {
+          dragging = false;
+          TPos = Math.round(TPos);
+          setTimeout(() => { suppressClick = false; }, 40);
+        }
+      });
+
+      window.addEventListener('wheel', e => {
+        if (isSheetOpen || document.getElementById('heroShelfWrapper').style.display === 'none') return;
+        const delta = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
+        if (Math.abs(delta) < 1) return;
+        TPos += (delta / Math.max(20, dims.ws + dims.gap)) * 0.5;
+        if (wheelTimer) clearTimeout(wheelTimer);
+        wheelTimer = setTimeout(() => { TPos = Math.round(TPos); }, 160);
+      }, { passive: true });
+
+      window.addEventListener('keydown', e => {
+        if (isSheetOpen) {
+          if (e.key === 'Escape') { e.preventDefault(); closeDetailSheet(); }
+          return;
+        }
+        const tag = e.target && e.target.tagName;
+        if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
+        if (e.key === 'ArrowLeft') { e.preventDefault(); TPos = Math.round(TPos) - 1; }
+        else if (e.key === 'ArrowRight') { e.preventDefault(); TPos = Math.round(TPos) + 1; }
+        else if (e.key === 'Enter' && document.activeElement === document.body) { e.preventDefault(); openActiveCover(); }
+      });
+
+      if (window.tinymce) {
+        tinymce.init({
+          selector: '#editor-container',
+          height: 460,
+          menubar: 'edit view insert format tools table help',
+          plugins: ['advlist','autolink','lists','link','image','charmap','preview','anchor','searchreplace','visualblocks','code','fullscreen','insertdatetime','media','table','wordcount'],
+          toolbar: 'undo redo | bold italic underline strikethrough | fontfamily fontsize blocks | alignleft aligncenter alignright alignjustify | outdent indent | numlist bullist | forecolor backcolor removeformat | pagebreak | charmap | fullscreen preview print | image media link codesample table | ltr rtl',
+          content_style: "body { font-family: 'Sarabun', sans-serif; font-size: 15px; }",
+          branding: false,
+          promotion: false
+        });
+      }
+
+      requestAnimationFrame(tickFrame);
+    });
+  </script>
+</body>
 </html>
